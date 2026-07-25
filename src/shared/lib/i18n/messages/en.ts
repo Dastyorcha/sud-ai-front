@@ -1,0 +1,81 @@
+import type { Messages } from "./uz";
+
+/** EN message tree — must match `Messages` (the uz shape) exactly. */
+export const en: Messages = {
+  common: {
+    loading: "Loading…",
+    retry: "Retry",
+    close: "Close",
+    save: "Save",
+    cancel: "Cancel",
+    back: "Back",
+    search: "Search",
+    logout: "Log out",
+    openMenu: "Open menu",
+    toggleTheme: "Toggle theme",
+    profile: "Profile",
+    comingSoonTitle: "Coming soon",
+    comingSoonDescription: "This section is still being built.",
+    allRightsReserved: "© {year} {app}. All rights reserved.",
+    noData: "No data found",
+  },
+  nav: {
+    dashboard: "Dashboard",
+    users: "Users",
+  },
+  pages: {
+    dashboard: "Dashboard",
+    users: "Users",
+    login: "Sign in",
+    register: "Sign up",
+    resetPassword: "Reset password",
+    selectOrganization: "Select organization",
+    tools: "Design tools",
+    forbidden: "Access denied",
+    notFound: "Page not found",
+    maintenance: "Under maintenance",
+  },
+  enums: {
+    roles: {
+      admin: "Administrator",
+      editor: "Editor",
+      viewer: "Viewer",
+    },
+  },
+  errors: {
+    notFoundTitle: "Page not found",
+    notFoundDescription: "The page you're looking for doesn't exist or has moved.",
+    genericTitle: "Something went wrong",
+    genericDescription: "Try reloading the page or come back later.",
+    forbiddenTitle: "Access denied",
+    forbiddenDescription: "You don't have permission to view this page.",
+    maintenanceTitle: "Under maintenance",
+    maintenanceDescription: "The system is temporarily unavailable. Please try again shortly.",
+    codes: {
+      validation_error: "The submitted data is invalid. Check it and try again.",
+      not_found: "The requested resource wasn't found.",
+      forbidden: "You don't have permission for this action.",
+      conflict: "The data conflicts with another change. Refresh the page.",
+      network_error: "Network error. Check your connection.",
+      server_error: "Server error. Please try again shortly.",
+      unknown: "An unknown error occurred.",
+    },
+  },
+  langSwitcher: {
+    label: "Language",
+    changeLanguage: "Change language",
+  },
+  users: {
+    description: "View and manage the users in your organization.",
+    active: "Active",
+    inactive: "Inactive",
+    columns: {
+      name: "Name",
+      role: "Role",
+      status: "Status",
+      lastLogin: "Last login",
+      email: "Email",
+      phone: "Phone",
+    },
+  },
+};

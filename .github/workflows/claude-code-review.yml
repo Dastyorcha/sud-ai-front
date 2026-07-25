@@ -1,0 +1,46 @@
+name: Claude Code Review
+
+# Automatically reviews every opened/updated PR. Same setup as claude.yml
+# (Claude GitHub App + CLAUDE_CODE_OAUTH_TOKEN secret).
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Automated PR review
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # No `claude_args: --model …` — an unrecognised model string makes
+          # claude-code-action crash on init (is_error:true, total_cost_usd:0).
+          # Let the action pick its default model.
+          prompt: |
+            Review this pull request as a senior engineer on an admin-panel codebase.
+            Follow the repo's own rules — read CLAUDE.md, docs/architecture.md, and
+            .claude/skills/ui-designer/SKILL.md before judging.
+
+            Focus on:
+            - Correctness and edge cases; loading/empty/error states for data views.
+            - FSD placement + kebab-case naming; tokens from src/index.css (no color literals);
+              cn()/cva usage; primitive reuse (no raw <button> in app code).
+            - Responsive (320/768/1024/1440) and light+dark theme correctness.
+            - Accessibility (labels, aria, contrast, focus-visible).
+            - Performance (lazy routes, memoisation, no needless re-renders).
+            - No SEO and no i18n were added (out of scope for this project).
+
+            Post concise, actionable inline comments. Praise nothing; only flag what needs changing.
+            If the PR is clean, say so in one line.

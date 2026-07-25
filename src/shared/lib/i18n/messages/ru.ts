@@ -1,0 +1,81 @@
+import type { Messages } from "./uz";
+
+/** RU message tree — must match `Messages` (the uz shape) exactly. */
+export const ru: Messages = {
+  common: {
+    loading: "Загрузка…",
+    retry: "Повторить",
+    close: "Закрыть",
+    save: "Сохранить",
+    cancel: "Отмена",
+    back: "Назад",
+    search: "Поиск",
+    logout: "Выйти",
+    openMenu: "Открыть меню",
+    toggleTheme: "Переключить тему",
+    profile: "Профиль",
+    comingSoonTitle: "Скоро",
+    comingSoonDescription: "Этот раздел ещё в разработке.",
+    allRightsReserved: "© {year} {app}. Все права защищены.",
+    noData: "Данные не найдены",
+  },
+  nav: {
+    dashboard: "Панель управления",
+    users: "Пользователи",
+  },
+  pages: {
+    dashboard: "Панель управления",
+    users: "Пользователи",
+    login: "Вход",
+    register: "Регистрация",
+    resetPassword: "Сброс пароля",
+    selectOrganization: "Выбор организации",
+    tools: "Инструменты дизайна",
+    forbidden: "Доступ запрещён",
+    notFound: "Страница не найдена",
+    maintenance: "Технические работы",
+  },
+  enums: {
+    roles: {
+      admin: "Администратор",
+      editor: "Редактор",
+      viewer: "Наблюдатель",
+    },
+  },
+  errors: {
+    notFoundTitle: "Страница не найдена",
+    notFoundDescription: "Страница, которую вы ищете, не существует или была перемещена.",
+    genericTitle: "Произошла ошибка",
+    genericDescription: "Перезагрузите страницу или попробуйте позже.",
+    forbiddenTitle: "Доступ запрещён",
+    forbiddenDescription: "У вас нет прав для просмотра этой страницы.",
+    maintenanceTitle: "Технические работы",
+    maintenanceDescription: "Система временно недоступна. Попробуйте снова чуть позже.",
+    codes: {
+      validation_error: "Введённые данные некорректны. Проверьте и попробуйте снова.",
+      not_found: "Запрашиваемые данные не найдены.",
+      forbidden: "У вас нет прав для этого действия.",
+      conflict: "Данные конфликтуют с другим изменением. Обновите страницу.",
+      network_error: "Ошибка сети. Проверьте подключение.",
+      server_error: "Ошибка сервера. Попробуйте снова чуть позже.",
+      unknown: "Произошла неизвестная ошибка.",
+    },
+  },
+  langSwitcher: {
+    label: "Язык",
+    changeLanguage: "Сменить язык",
+  },
+  users: {
+    description: "Просматривайте и управляйте пользователями вашей организации.",
+    active: "Активен",
+    inactive: "Неактивен",
+    columns: {
+      name: "Имя",
+      role: "Роль",
+      status: "Статус",
+      lastLogin: "Последний вход",
+      email: "Email",
+      phone: "Телефон",
+    },
+  },
+};
