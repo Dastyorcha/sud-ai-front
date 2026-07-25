@@ -130,6 +130,8 @@ See `docs/architecture.md` → "Mock API / data layer" for the swap-to-real-API 
 
 - `src/shared/lib/mock-api/delay.ts` · `delay` · simulated latency helper (timer-based `Promise`) every mock service awaits.
 - `src/shared/lib/mock-api/user.service.ts` · `listUsers`, `getUser` · server-shaped user directory service — list + single lookup by id.
+- `src/shared/lib/mock-api/court-case.service.ts` · `listCases`, `getCase`, `createCase`, `updateCase`, `archiveCase`, `CaseFilters`, `CaseSortField`, `CreateCaseInput` · server-shaped case service (spec §14.2/FR-02) with search/filter/sort/paging over a session-mutable store.
+- `src/shared/lib/mock-api/participant.service.ts` · `listParticipants`, `createParticipant`, `updateParticipant`, `deleteParticipant`, `CreateParticipantInput` · server-shaped participant service (spec §14.3) that keeps the owning case's `participantCount` in sync.
 - `src/shared/lib/mock-api/data/organization.ts` · `ORGANIZATION` · the single mock organization/tenant.
 - `src/shared/lib/mock-api/data/users.ts` · `USERS` · mock users across the example admin/editor/viewer roles.
 - `src/shared/lib/mock-api/data/court-users.ts` · `COURT_USERS` · mock app users, one per court role (spec §4); the accounts auth authenticates and `judgeId` points at.
