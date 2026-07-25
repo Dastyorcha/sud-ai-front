@@ -3,6 +3,7 @@
 **Duration:** Week 1, days 1–2
 **Spec refs:** §20, §21, §30 (Frontend — birinchi hafta), D-01…D-04
 **Prerequisites:** none — this is the first phase
+**Status:** substantially pre-existing in this repo (Vite + React Router + TS strict + ESLint + Prettier + Husky/commit hooks already configured); no separate build needed. Stack differs from the Next.js steps below — see Phase 04's "Repo adaptation" table for the mapping.
 
 **Goal:** a repository where a wrong type, a wrong import direction, or a missing environment variable fails the build. Everything after this phase depends on that being true.
 
@@ -33,12 +34,12 @@ Delete the Next.js starter page, starter CSS and the demo assets immediately. No
 ```jsonc
 {
   "strict": true,
-  "noUncheckedIndexedAccess": true,     // array access returns T | undefined
-  "exactOptionalPropertyTypes": true,   // `foo?: string` ≠ `foo: string | undefined`
+  "noUncheckedIndexedAccess": true, // array access returns T | undefined
+  "exactOptionalPropertyTypes": true, // `foo?: string` ≠ `foo: string | undefined`
   "noImplicitOverride": true,
   "noFallthroughCasesInSwitch": true,
-  "verbatimModuleSyntax": true,         // type imports never reach the bundle
-  "forceConsistentCasingInFileNames": true
+  "verbatimModuleSyntax": true, // type imports never reach the bundle
+  "forceConsistentCasingInFileNames": true,
 }
 ```
 
@@ -113,13 +114,13 @@ NEXT_PUBLIC_APP_VERSION=0.1.0
 const EnvSchema = z.object({
   NEXT_PUBLIC_API_BASE_URL: z.string().url(),
   NEXT_PUBLIC_WS_URL: z.string().url(),
-  NEXT_PUBLIC_USE_MOCKS: z.enum(['true', 'false']).transform(v => v === 'true'),
+  NEXT_PUBLIC_USE_MOCKS: z.enum(["true", "false"]).transform((v) => v === "true"),
   NEXT_PUBLIC_AUDIO_SAMPLE_RATE: z.coerce.number().int().positive(),
   NEXT_PUBLIC_AUDIO_CHUNK_MS: z.coerce.number().int().positive(),
   NEXT_PUBLIC_MAX_BUFFERED_CHUNKS: z.coerce.number().int().positive(),
 });
 
-export const env = EnvSchema.parse({ /* explicit property access — Next.js inlines these */ });
+export const env = EnvSchema.parse({/* explicit property access — Next.js inlines these */});
 ```
 
 A missing or malformed variable fails the build, not a user's hearing at minute forty.
