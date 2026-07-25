@@ -77,11 +77,54 @@ export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelPr
       i++;
     }, 4_000);
     const clock = setInterval(() => setElapsedMs((ms) => ms + 1_000), 1_000);
-    const meter = setInterval(() => setLevel(30 + ((Date.now() / 300) % 50)), 300);
     return () => {
       clearInterval(feed);
       clearInterval(clock);
-      clearInterval(meter);
+    };
+  }, [recording]);
+
+  // Real microphone level meter (FR-04): getUserMedia → AnalyserNode RMS.
+  // Echo cancellation / noise suppression / AGC off — they damage courtroom
+  // audio (plan D-07). Falls back to a simulated level if access is denied.
+  useEffect(() => {
+    if (!recording) {
+      setLevel(0);
+      return;
+    }
+    let stream: MediaStream | null = null;
+    let ctx: AudioContext | null = null;
+    let raf = 0;
+    let fallback: ReturnType<typeof setInterval> | undefined;
+
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      })
+      .then((s) => {
+        stream = s;
+        ctx = new AudioContext();
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 512;
+        ctx.createMediaStreamSource(s).connect(analyser);
+        const buf = new Float32Array(analyser.fftSize);
+        const tick = () => {
+          analyser.getFloatTimeDomainData(buf);
+          let sum = 0;
+          for (const v of buf) sum += v * v;
+          setLevel(Math.min(100, Math.sqrt(sum / buf.length) * 400));
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      })
+      .catch(() => {
+        fallback = setInterval(() => setLevel(30 + ((Date.now() / 300) % 50)), 300);
+      });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      if (fallback) clearInterval(fallback);
+      stream?.getTracks().forEach((t) => t.stop());
+      void ctx?.close();
     };
   }, [recording]);
 
