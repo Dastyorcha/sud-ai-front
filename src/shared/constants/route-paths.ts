@@ -14,6 +14,10 @@ export const ROUTE_PATHS = {
   // Product sections (see NAV_ITEMS)
   DASHBOARD: "/",
   USERS: "/users",
+  CASES: "/cases",
+  CASE_NEW: "/cases/new",
+  /** Detail route pattern for `<Route path>`; build a concrete URL with `buildRoute.caseDetail`. */
+  CASE_DETAIL: "/cases/:caseId",
 
   // Auth / session
   LOGIN: "/auth/login",
@@ -39,6 +43,7 @@ export type RoutePathKey = keyof typeof ROUTE_PATHS;
  */
 export const buildRoute = {
   userDetail: (userId: string) => `${ROUTE_PATHS.USERS}?user=${userId}`,
+  caseDetail: (caseId: string) => `${ROUTE_PATHS.CASES}/${caseId}`,
 } as const;
 
 /** Query-param key for the user detail drawer. */
