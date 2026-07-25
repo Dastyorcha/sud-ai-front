@@ -219,6 +219,18 @@ export const uz = {
     pendingReview: "Ko'rib chiqish kutilmoqda",
     noSource: "Manba segmentsiz hodisa — xatolik!",
   },
+  protocol: {
+    origin: { template: "Shablon", ai: "AI yaratgan", human: "Tahrirlangan" },
+    sources: "Manba",
+    submitReview: "Tasdiqqa yuborish",
+    approve: "Tasdiqlash",
+    requestChanges: "O'zgartirish so'rash",
+    exportDoc: "Eksport (DOCX/PDF)",
+    exported: "Eksport qilindi",
+    noDocument: "Bu majlis uchun bayonnoma hali yaratilmagan.",
+    generate: "Bayonnoma yaratish",
+    generating: "Bayonnoma yaratilmoqda…",
+  },
   vocab: {
     title: "Maxsus lug‘at",
     note: "Bu terminlar transkripsiya aniqligini oshirish uchun STT tizimiga uzatiladi.",

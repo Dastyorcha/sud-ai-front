@@ -28,6 +28,10 @@ import { useCase } from "@/features/cases/use-case";
 import { useParticipants } from "@/features/participants/use-participants";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
 import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
+import { useHearings } from "@/features/hearings/use-hearings";
+import { createHearing } from "@/shared/lib/mock-api/hearing.service";
+import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
+import { buildRoute } from "@/shared/constants/route-paths";
 import { deleteParticipant } from "@/shared/lib/mock-api/participant.service";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
 import type { Participant } from "@/shared/types/models";
@@ -46,6 +50,13 @@ export default function CaseDetailView() {
   const { caseId = "" } = useParams<{ caseId: string }>();
   const { data: courtCase, isLoading, error } = useCase(caseId);
   const { data: participants, refetch: refetchParticipants } = useParticipants(caseId);
+  const { data: hearings, refetch: refetchHearings } = useHearings(caseId);
+
+  async function addHearing() {
+    const inWeek = new Date(Date.now() + 7 * 86_400_000).toISOString();
+    await createHearing(caseId, inWeek);
+    refetchHearings();
+  }
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Participant | null>(null);
@@ -210,6 +221,42 @@ export default function CaseDetailView() {
               </TableBody>
             </Table>
           </div>
+        ) : (
+          <EmptyState />
+        )}
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-foreground">{t("hearing.listTitle")}</h2>
+          <Button size="sm" variant="outline" onClick={addHearing}>
+            <Plus className="size-4" />
+            {t("hearing.newHearing")}
+          </Button>
+        </div>
+        {hearings && hearings.length > 0 ? (
+          <ul className="divide-y divide-border rounded-lg border border-border">
+            {hearings.map((h) => (
+              <li key={h.id}>
+                <Link
+                  to={withLocale(locale, buildRoute.hearingDetail(h.id))}
+                  className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-muted/50"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground">
+                      {t("hearing.scheduled")}: <DateText value={h.scheduledAt} />
+                    </span>
+                    {h.audioDurationMs > 0 && (
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {Math.round(h.audioDurationMs / 60_000)} min
+                      </span>
+                    )}
+                  </div>
+                  <RecordStateBadge kind="hearing" status={h.status} />
+                </Link>
+              </li>
+            ))}
+          </ul>
         ) : (
           <EmptyState />
         )}

@@ -216,6 +216,18 @@ export const en: Messages = {
     pendingReview: "Pending review",
     noSource: "Event without source segments — error!",
   },
+  protocol: {
+    origin: { template: "Template", ai: "AI-generated", human: "Edited" },
+    sources: "Source",
+    submitReview: "Submit for review",
+    approve: "Approve",
+    requestChanges: "Request changes",
+    exportDoc: "Export (DOCX/PDF)",
+    exported: "Exported",
+    noDocument: "No protocol has been generated for this hearing yet.",
+    generate: "Generate protocol",
+    generating: "Generating protocol…",
+  },
   vocab: {
     title: "Case vocabulary",
     note: "These terms are fed to the STT provider to improve transcription accuracy.",

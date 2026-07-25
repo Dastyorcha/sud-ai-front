@@ -216,6 +216,18 @@ export const ru: Messages = {
     pendingReview: "Ожидает проверки",
     noSource: "Событие без исходных сегментов — ошибка!",
   },
+  protocol: {
+    origin: { template: "Шаблон", ai: "Сгенерировано ИИ", human: "Отредактировано" },
+    sources: "Источник",
+    submitReview: "Отправить на утверждение",
+    approve: "Утвердить",
+    requestChanges: "Запросить изменения",
+    exportDoc: "Экспорт (DOCX/PDF)",
+    exported: "Экспортировано",
+    noDocument: "Протокол для этого заседания ещё не создан.",
+    generate: "Создать протокол",
+    generating: "Создание протокола…",
+  },
   vocab: {
     title: "Словарь дела",
     note: "Эти термины передаются в STT для повышения точности транскрипции.",
