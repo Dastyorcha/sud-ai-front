@@ -112,6 +112,10 @@ export const ru: Messages = {
       FAILED: "Ошибка",
     },
   },
+  record: {
+    confidence: "Уверенность",
+    unmappedSpeaker: "Несопоставленный говорящий",
+  },
   errors: {
     notFoundTitle: "Страница не найдена",
     notFoundDescription: "Страница, которую вы ищете, не существует или была перемещена.",

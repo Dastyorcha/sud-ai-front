@@ -115,6 +115,10 @@ export const uz = {
       FAILED: "Xatolik",
     },
   },
+  record: {
+    confidence: "Ishonch darajasi",
+    unmappedSpeaker: "Bog‘lanmagan gapiruvchi",
+  },
   errors: {
     notFoundTitle: "Sahifa topilmadi",
     notFoundDescription: "Siz izlagan sahifa mavjud emas yoki koʻchirilgan.",

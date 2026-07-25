@@ -61,6 +61,11 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/custom/theme-toggle.tsx` · `ThemeToggle` · icon button flipping `next-themes`' resolved theme; localized `aria-label`.
 - `src/shared/custom/coming-soon.tsx` · `ComingSoon`, `ComingSoonProps` · centered "coming soon" state for placeholder views (dashboard); optional `titleKey`.
 - `src/shared/custom/status-badge.tsx` · `StatusBadge`, `StatusBadgeProps` · generic `cva` tone badge (`neutral|primary|success|warning|destructive|info`) — localized `label` + optional `icon`/`dotClassName`.
+- `src/shared/custom/record/timestamp.tsx` · `Timestamp` · mono, tabular hearing-relative `HH:MM:SS`/`MM:SS`; clickable variant emits `onSeek(ms)` (spec §16.3).
+- `src/shared/custom/record/speaker-chip.tsx` · `SpeakerChip` · speaker attribution chip — unmapped (mono, dashed) / mapped (role) / conflicting (destructive) states (spec §9.6).
+- `src/shared/custom/record/confidence-bar.tsx` · `ConfidenceBar` · 3px STT confidence meter, `warning` below 0.75, numeric value via ARIA (spec §16.3).
+- `src/shared/custom/record/record-state-badge.tsx` · `RecordStateBadge` · single badge for document/segment/hearing/job status; one tone table per enum, label via `enums.*` (spec §16, FR-11).
+- `src/shared/custom/record/critical-field-mark.tsx` · `CriticalFieldMark` · inline dotted-underline mark for critical fields; reviewed=success, unreviewed=destructive (spec §10.3).
 - `src/shared/custom/money.tsx` · `Money`, `MoneyProps` · localized money amount (`formatMoney`), `tabular-nums`.
 - `src/shared/custom/date-text.tsx` · `DateText`, `DateTextProps` · localized date display (`formatDate`).
 - `src/shared/custom/detail-grid.tsx` · `DetailGrid`, `DetailGridProps`, `DetailGridItem` · read-only key/value grid for detail/summary views.

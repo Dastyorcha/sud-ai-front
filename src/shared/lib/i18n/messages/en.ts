@@ -112,6 +112,10 @@ export const en: Messages = {
       FAILED: "Failed",
     },
   },
+  record: {
+    confidence: "Confidence",
+    unmappedSpeaker: "Unmapped speaker",
+  },
   errors: {
     notFoundTitle: "Page not found",
     notFoundDescription: "The page you're looking for doesn't exist or has moved.",

@@ -1,0 +1,77 @@
+import { useTranslation } from "@/shared/lib/i18n/locale-context";
+import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { StatusBadge, type StatusBadgeProps } from "@/shared/custom/status-badge";
+import type { DocumentStatus, HearingStatus, JobStatus, SegmentStatus } from "@/shared/types/enums";
+
+type Tone = NonNullable<StatusBadgeProps["tone"]>;
+
+/**
+ * One mapping table per status enum, so a given status can never render with a
+ * different colour on two screens (spec §16, FR-11). `seal`/record-critical
+ * states map to `destructive`, verified/approved to `success`, in-flight to
+ * `info`/`warning`.
+ */
+const DOCUMENT_TONES: Record<DocumentStatus, Tone> = {
+  DRAFT: "neutral",
+  AI_GENERATED: "info",
+  UNDER_REVIEW: "warning",
+  CHANGES_REQUESTED: "destructive",
+  APPROVED: "success",
+  EXPORTED: "primary",
+  ARCHIVED: "neutral",
+};
+
+const SEGMENT_TONES: Record<SegmentStatus, Tone> = {
+  INTERIM: "neutral",
+  FINAL: "info",
+  EDITED: "warning",
+  VERIFIED: "success",
+};
+
+const HEARING_TONES: Record<HearingStatus, Tone> = {
+  CREATED: "neutral",
+  DEVICE_CHECK: "info",
+  RECORDING: "destructive",
+  PAUSED: "warning",
+  FINALIZING: "info",
+  PROCESSING: "info",
+  READY_FOR_REVIEW: "primary",
+  APPROVED: "success",
+  FAILED: "destructive",
+};
+
+const JOB_TONES: Record<JobStatus, Tone> = {
+  QUEUED: "neutral",
+  RUNNING: "info",
+  SUCCEEDED: "success",
+  FAILED: "destructive",
+};
+
+export type RecordStateBadgeProps =
+  | { kind: "document"; status: DocumentStatus; className?: string }
+  | { kind: "segment"; status: SegmentStatus; className?: string }
+  | { kind: "hearing"; status: HearingStatus; className?: string }
+  | { kind: "job"; status: JobStatus; className?: string };
+
+function resolve(props: RecordStateBadgeProps): { tone: Tone; key: MessageKey } {
+  switch (props.kind) {
+    case "document":
+      return { tone: DOCUMENT_TONES[props.status], key: `enums.documentStatus.${props.status}` };
+    case "segment":
+      return { tone: SEGMENT_TONES[props.status], key: `enums.segmentStatus.${props.status}` };
+    case "hearing":
+      return { tone: HEARING_TONES[props.status], key: `enums.hearingStatus.${props.status}` };
+    case "job":
+      return { tone: JOB_TONES[props.status], key: `enums.jobStatus.${props.status}` };
+  }
+}
+
+/**
+ * The single badge for every record status in the product (document, segment,
+ * hearing, job). Resolves the localized label via the `enums.*` message tree.
+ */
+export function RecordStateBadge(props: RecordStateBadgeProps) {
+  const { t } = useTranslation();
+  const { tone, key } = resolve(props);
+  return <StatusBadge tone={tone} label={t(key)} className={props.className} />;
+}
