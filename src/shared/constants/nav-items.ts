@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Gavel, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, Gavel, FileText, Settings, type LucideIcon } from "lucide-react";
 import { ROUTE_PATHS } from "@/shared/constants/route-paths";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 
@@ -30,6 +30,18 @@ export const NAV_ITEMS: readonly NavItem[] = [
     labelKey: "nav.cases",
     path: ROUTE_PATHS.CASES,
     icon: Gavel,
+  },
+  {
+    key: "documents",
+    labelKey: "nav.documents",
+    path: ROUTE_PATHS.DOCUMENTS,
+    icon: FileText,
+  },
+  {
+    key: "admin",
+    labelKey: "nav.admin",
+    path: ROUTE_PATHS.ADMIN,
+    icon: Settings,
   },
   {
     key: "users",

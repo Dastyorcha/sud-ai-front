@@ -14,3 +14,4 @@ export {
   GENERATED_DOCUMENTS,
   DOCUMENT_VERSIONS,
 } from "@/shared/lib/mock-api/data/documents";
+export { AUDIT_LOGS } from "@/shared/lib/mock-api/data/audit-logs";

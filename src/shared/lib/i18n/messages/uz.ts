@@ -25,6 +25,8 @@ export const uz = {
   nav: {
     dashboard: "Boshqaruv paneli",
     cases: "Sud ishlari",
+    documents: "Hujjatlar",
+    admin: "Administrator",
     users: "Foydalanuvchilar",
   },
   pages: {
@@ -40,6 +42,8 @@ export const uz = {
     notFound: "Sahifa topilmadi",
     maintenance: "Texnik ishlar",
     hearing: "Sud majlisi",
+    documents: "Hujjatlar",
+    admin: "Administrator",
   },
   enums: {
     roles: {
@@ -218,6 +222,29 @@ export const uz = {
     sources: "Manba segmentlar",
     pendingReview: "Ko'rib chiqish kutilmoqda",
     noSource: "Manba segmentsiz hodisa — xatolik!",
+  },
+  documents: {
+    description: "Yaratilgan hujjatlar va shablonlar katalogi.",
+    generated: "Yaratilgan hujjatlar",
+    templates: "Shablonlar katalogi",
+    template: "Shablon",
+    version: "Versiya",
+    approvedBy: "Tasdiqlagan",
+    notApproved: "Tasdiqlanmagan",
+  },
+  admin: {
+    description: "Shablonlar, audit jurnali va tizim holati (faqat o'qish).",
+    auditLog: "Audit jurnali",
+    providers: "Provayder holati",
+    action: "Amal",
+    actor: "Bajaruvchi",
+    entity: "Obyekt",
+    time: "Vaqt",
+    liveProvider: "Jonli STT provayderi",
+    finalProvider: "Yakuniy STT provayderi",
+    model: "Model",
+    latency: "Kechikish (p95)",
+    queueDepth: "Navbat chuqurligi",
   },
   protocol: {
     origin: { template: "Shablon", ai: "AI yaratgan", human: "Tahrirlangan" },

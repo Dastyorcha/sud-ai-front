@@ -22,6 +22,8 @@ export const ru: Messages = {
   nav: {
     dashboard: "Панель управления",
     cases: "Дела",
+    documents: "Документы",
+    admin: "Администратор",
     users: "Пользователи",
   },
   pages: {
@@ -37,6 +39,8 @@ export const ru: Messages = {
     notFound: "Страница не найдена",
     maintenance: "Технические работы",
     hearing: "Судебное заседание",
+    documents: "Документы",
+    admin: "Администратор",
   },
   enums: {
     roles: {
@@ -215,6 +219,29 @@ export const ru: Messages = {
     sources: "Исходные сегменты",
     pendingReview: "Ожидает проверки",
     noSource: "Событие без исходных сегментов — ошибка!",
+  },
+  documents: {
+    description: "Созданные документы и каталог шаблонов.",
+    generated: "Созданные документы",
+    templates: "Каталог шаблонов",
+    template: "Шаблон",
+    version: "Версия",
+    approvedBy: "Утвердил",
+    notApproved: "Не утверждён",
+  },
+  admin: {
+    description: "Шаблоны, журнал аудита и статус системы (только чтение).",
+    auditLog: "Журнал аудита",
+    providers: "Статус провайдеров",
+    action: "Действие",
+    actor: "Исполнитель",
+    entity: "Объект",
+    time: "Время",
+    liveProvider: "Live STT провайдер",
+    finalProvider: "Финальный STT провайдер",
+    model: "Модель",
+    latency: "Задержка (p95)",
+    queueDepth: "Глубина очереди",
   },
   protocol: {
     origin: { template: "Шаблон", ai: "Сгенерировано ИИ", human: "Отредактировано" },

@@ -26,6 +26,8 @@ const CasesView = lazy(() => import("@/views/cases/cases"));
 const CaseNewView = lazy(() => import("@/views/cases/case-new"));
 const CaseDetailView = lazy(() => import("@/views/cases/case-detail"));
 const HearingDetailView = lazy(() => import("@/views/hearings/hearing-detail"));
+const DocumentsView = lazy(() => import("@/views/documents/documents"));
+const AdminView = lazy(() => import("@/views/admin/admin"));
 
 // system/error views lazy imports
 const Forbidden = lazy(() => import("@/views/errors/forbidden"));
@@ -134,6 +136,22 @@ function App() {
             element={
               <Suspense>
                 <HearingDetailView />
+              </Suspense>
+            }
+          />
+          <Route
+            path={relative(ROUTE_PATHS.DOCUMENTS)}
+            element={
+              <Suspense>
+                <DocumentsView />
+              </Suspense>
+            }
+          />
+          <Route
+            path={relative(ROUTE_PATHS.ADMIN)}
+            element={
+              <Suspense>
+                <AdminView />
               </Suspense>
             }
           />

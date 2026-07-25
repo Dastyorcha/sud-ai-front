@@ -26,6 +26,16 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/views/cases/cases.tsx` · `CasesView` (default) · court-case list (spec FR-02/UC-01) — debounced search over `useCases()`, a `Table`, row click opens the case detail page.
 - `src/views/cases/case-new.tsx` · `CaseNewView` (default) · case creation form (spec UC-01) — requisites + participants field array (RHF + Zod, ≥1 claimant/defendant), `sessionStorage` draft, creates case + participants then opens detail.
 - `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · compact case detail — requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`; reads `:caseId`.
+- `src/views/hearings/hearing-detail.tsx` · `HearingDetailView` (default) · hearing workspace (spec §16.1 #6–9) — tabs: live / transcript / events / protocol; canonical approval transitions the hearing.
+- `src/views/documents/documents.tsx` · `DocumentsView` (default) · generated documents + read-only template catalogue (spec §16.1 #10/#12, D-14).
+- `src/views/admin/admin.tsx` · `AdminView` (default) · read-only audit log + provider status (spec §16.1 #13–14, FR-12, NFR-05).
+- `src/features/hearings/use-hearings.ts` · `useHearings`, `useHearing` · hearing hooks over `hearing.service`.
+- `src/features/live-session/live-hearing-panel.tsx` · `LiveHearingPanel` · live hearing screen (§16.2) — scripted live-feed stand-in for the STT WebSocket, §17.3 controls, finalize job flow.
+- `src/features/transcript/transcript-panel.tsx` · `TranscriptPanel` · transcript editor (FR-07/UC-05) — filters, inline edit (raw preserved), verify, bulk speaker mapping (AC-03), canonical-approval gate.
+- `src/features/events/events-panel.tsx` · `EventsPanel` · procedural-events review (FR-08/§11) — verify/reject, sources shown, unsourced events flagged as errors.
+- `src/features/protocol/protocol-panel.tsx` · `ProtocolPanel` · protocol view (FR-09/UC-06) — sections with origin + source traceability, FR-11 approval actions, export job.
+- `src/features/cases/vocabulary-panel.tsx` · `VocabularyPanel` · case vocabulary (§9.7) — auto-derived terms grouped by origin with weights.
+- `src/shared/lib/mock-api/data/audit-logs.ts` · `AUDIT_LOGS` · audit-trail fixtures (FR-12).
 - `src/views/users/users.tsx` · `UsersView` (default) · the reference CRUD list page — debounced search over `useUsers()`, a `Table`, row click opens the detail drawer via `?user=`.
 - `src/views/users/user-detail.tsx` · `UserDetail` (default), `UserDetailProps` · single-user detail `Sheet` drawer — takes `userId` + `onClose`, fetches independently via `use-mock-query` + `getUser`.
 - `src/views/errors/forbidden.tsx` · `Forbidden` (default) · 403 view, `NoData` + localized copy.
@@ -103,6 +113,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `skeleton.tsx` · `Skeleton` · loading placeholder block.
 - `tooltip.tsx` · `Tooltip` + parts · radix tooltip.
 - `badge.tsx` · `Badge`, `badgeVariants` · radix-free shadcn badge; base primitive for `shared/custom/status-badge.tsx`.
+- `textarea.tsx` · `Textarea` · standard shadcn textarea (no extra package) — used by the transcript segment editor.
 - `table.tsx` · `Table` + parts · radix-free shadcn table primitive (`UsersView`).
 - `select.tsx` · `Select` + parts · radix select.
 - `popover.tsx` · `Popover` + parts · radix popover.

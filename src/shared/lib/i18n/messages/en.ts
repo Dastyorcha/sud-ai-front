@@ -22,6 +22,8 @@ export const en: Messages = {
   nav: {
     dashboard: "Dashboard",
     cases: "Cases",
+    documents: "Documents",
+    admin: "Admin",
     users: "Users",
   },
   pages: {
@@ -37,6 +39,8 @@ export const en: Messages = {
     notFound: "Page not found",
     maintenance: "Under maintenance",
     hearing: "Hearing",
+    documents: "Documents",
+    admin: "Admin",
   },
   enums: {
     roles: {
@@ -215,6 +219,29 @@ export const en: Messages = {
     sources: "Source segments",
     pendingReview: "Pending review",
     noSource: "Event without source segments — error!",
+  },
+  documents: {
+    description: "Generated documents and the template catalogue.",
+    generated: "Generated documents",
+    templates: "Template catalogue",
+    template: "Template",
+    version: "Version",
+    approvedBy: "Approved by",
+    notApproved: "Not approved",
+  },
+  admin: {
+    description: "Templates, audit log and system status (read-only).",
+    auditLog: "Audit log",
+    providers: "Provider status",
+    action: "Action",
+    actor: "Actor",
+    entity: "Entity",
+    time: "Time",
+    liveProvider: "Live STT provider",
+    finalProvider: "Final STT provider",
+    model: "Model",
+    latency: "Latency (p95)",
+    queueDepth: "Queue depth",
   },
   protocol: {
     origin: { template: "Template", ai: "AI-generated", human: "Edited" },
