@@ -23,6 +23,7 @@ const ResetPasswordPage = lazy(() => import("@/pages/auth/resetPassword/resetPas
 const Dashboard = lazy(() => import("@/views/dashboard/dashboard"));
 const UsersView = lazy(() => import("@/views/users/users"));
 const CasesView = lazy(() => import("@/views/cases/cases"));
+const CaseNewView = lazy(() => import("@/views/cases/case-new"));
 const CaseDetailView = lazy(() => import("@/views/cases/case-detail"));
 
 // system/error views lazy imports
@@ -108,6 +109,14 @@ function App() {
             element={
               <Suspense>
                 <CasesView />
+              </Suspense>
+            }
+          />
+          <Route
+            path={relative(ROUTE_PATHS.CASE_NEW)}
+            element={
+              <Suspense>
+                <CaseNewView />
               </Suspense>
             }
           />

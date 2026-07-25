@@ -24,6 +24,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 - `src/views/dashboard/dashboard.tsx` · `Dashboard` (default) · dashboard placeholder — renders `ComingSoon`. Replace with real KPI/summary widgets.
 - `src/views/cases/cases.tsx` · `CasesView` (default) · court-case list (spec FR-02/UC-01) — debounced search over `useCases()`, a `Table`, row click opens the case detail page.
+- `src/views/cases/case-new.tsx` · `CaseNewView` (default) · case creation form (spec UC-01) — requisites + participants field array (RHF + Zod, ≥1 claimant/defendant), `sessionStorage` draft, creates case + participants then opens detail.
 - `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · compact case detail — requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`; reads `:caseId`.
 - `src/views/users/users.tsx` · `UsersView` (default) · the reference CRUD list page — debounced search over `useUsers()`, a `Table`, row click opens the detail drawer via `?user=`.
 - `src/views/users/user-detail.tsx` · `UserDetail` (default), `UserDetailProps` · single-user detail `Sheet` drawer — takes `userId` + `onClose`, fetches independently via `use-mock-query` + `getUser`.

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -8,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { StatusBadge } from "@/shared/custom/status-badge";
 import { DateText } from "@/shared/custom/date-text";
@@ -15,7 +17,7 @@ import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { useCases } from "@/features/cases/use-cases";
-import { buildRoute, withLocale } from "@/shared/constants/route-paths";
+import { ROUTE_PATHS, buildRoute, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 
@@ -46,9 +48,19 @@ export default function CasesView() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("pages.cases")}</h1>
-        <p className="text-sm text-muted-foreground">{t("cases.description")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            {t("pages.cases")}
+          </h1>
+          <p className="text-sm text-muted-foreground">{t("cases.description")}</p>
+        </div>
+        <Button asChild>
+          <Link to={withLocale(locale, ROUTE_PATHS.CASE_NEW)}>
+            <Plus className="size-4" />
+            {t("cases.newCase")}
+          </Link>
+        </Button>
       </div>
 
       <Input

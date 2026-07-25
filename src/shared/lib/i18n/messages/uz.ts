@@ -171,6 +171,28 @@ export const uz = {
       organization: "Tashkilot",
     },
   },
+  caseForm: {
+    detailsTitle: "Ish ma'lumotlari",
+    participantsTitle: "Ishtirokchilar",
+    caseNumber: "Ish raqami",
+    caseNumberHint: "Masalan: 4-2101-2604/13",
+    courtName: "Sud nomi",
+    selectCourtType: "Sud turini tanlang",
+    selectCaseType: "Ish turini tanlang",
+    selectJudge: "Sudyani tanlang",
+    unassigned: "Tayinlanmagan",
+    participantNamePlaceholder: "F.I.Sh. yoki tashkilot nomi",
+    organizationPlaceholder: "Tashkilot (ixtiyoriy)",
+    selectRole: "Rolni tanlang",
+    addParticipant: "Ishtirokchi qo'shish",
+    remove: "O'chirish",
+    create: "Ishni yaratish",
+    creating: "Yaratilmoqda…",
+    errCaseNumber: "Ish raqamini kiriting",
+    errCourtName: "Sud nomini kiriting",
+    errName: "Nomini kiriting",
+    errClaimantDefendant: "Kamida bitta da'vogar va bitta javobgar bo'lishi kerak",
+  },
 };
 
 export type Messages = typeof uz;
