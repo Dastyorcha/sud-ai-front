@@ -99,7 +99,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Shared — lib / constants / types (FSD `src/shared/`)
 
-- `src/shared/types/models.ts` · `Organization`, `User` · example domain entity interfaces consumed by the mock API layer; add your real entities here, backend-shaped (ISO date strings, enum IDs from `enums.ts`).
+- `src/shared/types/models.ts` · `Organization`, `User`, `CourtUser`, `CourtCase`, `Participant`, `Hearing`, `AudioTrack`, `TranscriptSegment`, `ProceduralEvent`, `DocumentTemplate`, `GeneratedDocument`, `DocumentVersion`, `AuditLog`, `Job` · domain entity interfaces consumed by the mock API layer; backend-shaped (ISO date strings, ms offsets, enum IDs from `enums.ts`). `Organization`/`User` are the template's examples; the rest are the LexKotib court domain (spec §14).
 - `src/shared/types/query-types.ts` · `ListParams`, `SortSpec`, `Paginated` · generic server-style list request/response shapes used by every mock service.
 - `src/shared/lib/utils.ts` · `cn` · Tailwind class merge (`clsx` + `tailwind-merge`).
 - `src/shared/hooks/use-debounce.ts` · `useDebounce` · returns a value delayed until it stops changing (throttles search input, etc.).
@@ -113,7 +113,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/constants/page-names.ts` · `PAGE_NAMES` · i18n page-title message keys keyed by `ROUTE_PATHS` key — resolve with `t(PAGE_NAMES.KEY)`.
 - `src/shared/constants/nav-items.ts` · `NAV_ITEMS`, `NavItem` · sidebar sections; each carries a `labelKey` resolved via `t()`.
 - `src/shared/constants/permissions.ts` · `PERMISSION_ACTION`, `PermissionAction`, `PERMISSIONS` · typed role×action matrix (admin/editor/viewer example) consumed by `usePermission`/`Can`.
-- `src/shared/types/enums.ts` · `USER_ROLE`, `SORT_DIRECTION` · core enum IDs; labels live in i18n messages under `enums.*` (see `docs/i18n.md`).
+- `src/shared/types/enums.ts` · `USER_ROLE`, `SORT_DIRECTION`, `COURT_ROLE`, `COURT_TYPE`, `CASE_TYPE`, `CASE_STATUS`, `PARTICIPANT_ROLE`, `HEARING_STATUS`, `SEGMENT_STATUS`, `PROCEDURAL_EVENT_TYPE`, `EVENT_REVIEW_STATUS`, `CRITICAL_FIELD_TYPE`, `DOCUMENT_TYPE`, `DOCUMENT_STATUS`, `TEMPLATE_STATUS`, `JOB_STATUS`, `EXPORT_FORMAT` · core enum IDs (LexKotib court domain keeps the spec's exact UPPER_SNAKE values); labels live in i18n messages under `enums.*` (see `docs/i18n.md`).
 - `src/shared/lib/i18n/locale.ts` · `LOCALES`, `Locale`, `DEFAULT_LOCALE`, `LOCALE_LABELS`, `LOCALE_STORAGE_KEY`, `isLocale` · locale model.
 - `src/shared/lib/i18n/format.ts` · `formatMoney`, `formatDate`, `formatNumber` · `Intl`-based, locale-aware formatting.
 - `src/shared/lib/i18n/locale-context.tsx` · `LocaleProvider`, `useTranslation`, `LocaleContextValue` · derives locale from the `:lang` route param; provides `t()` + formatters.
