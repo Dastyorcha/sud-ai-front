@@ -117,6 +117,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/lib/utils.ts` · `cn` · Tailwind class merge (`clsx` + `tailwind-merge`).
 - `src/shared/hooks/use-debounce.ts` · `useDebounce` · returns a value delayed until it stops changing (throttles search input, etc.).
 - `src/shared/hooks/use-mock-query.ts` · `useMockQuery`, `UseMockQueryResult` · generic Promise-service loader (`useState`/`useEffect`, `{ data, isLoading, error, refetch }`) — used by the user detail drawer.
+- `src/shared/hooks/use-job.ts` · `useJob` · polls a background job at 1s until SUCCEEDED/FAILED (spec Jobs) — powers finalize/extract/generate/export progress.
 - `src/shared/hooks/use-unsaved-guard.ts` · `useUnsavedGuard`, `UseUnsavedGuardResult` · unsaved-changes guard — `beforeunload` while dirty + a `confirmDiscard(message)` for in-app navigation (no data router, so no `useBlocker`).
 - `src/shared/lib/toast.ts` · `notify` · typed `sonner` toast wrappers (success/error/info/warning) for consistent app toasts.
 - `src/shared/lib/errors/error-map.ts` · `errorMessageKey`, `ErrorCode` · maps a thrown error/`{ code }` to a localized `errors.codes.*` message key; resolve with `t()` and surface via `notify.error`.
@@ -145,6 +146,15 @@ See `docs/architecture.md` → "Mock API / data layer" for the swap-to-real-API 
 - `src/shared/lib/mock-api/user.service.ts` · `listUsers`, `getUser` · server-shaped user directory service — list + single lookup by id.
 - `src/shared/lib/mock-api/court-case.service.ts` · `listCases`, `getCase`, `createCase`, `updateCase`, `archiveCase`, `CaseFilters`, `CaseSortField`, `CreateCaseInput` · server-shaped case service (spec §14.2/FR-02) with search/filter/sort/paging over a session-mutable store.
 - `src/shared/lib/mock-api/participant.service.ts` · `listParticipants`, `createParticipant`, `updateParticipant`, `deleteParticipant`, `CreateParticipantInput` · server-shaped participant service (spec §14.3) that keeps the owning case's `participantCount` in sync.
+- `src/shared/lib/mock-api/hearing.service.ts` · `listHearings`, `getHearing`, `createHearing`, `transitionHearing` · hearing service enforcing the §17.3 session state machine (illegal transitions throw).
+- `src/shared/lib/mock-api/transcript.service.ts` · `listSegments`, `editSegmentText`, `verifySegment`, `mapSpeaker` · transcript service (spec §14.6); edits preserve raw ASR text, speaker mapping is one bulk mutation (AC-03).
+- `src/shared/lib/mock-api/event.service.ts` · `listEvents`, `updateEvent`, `verifyEvent`, `rejectEvent` · procedural-event service (spec §14.7, FR-08).
+- `src/shared/lib/mock-api/document.service.ts` · `listTemplates`, `listDocuments`, `getDocument`, `listVersions`, `transitionDocument`, `saveDocumentVersion` · documents/templates/versions + FR-11 approval workflow (illegal transitions throw).
+- `src/shared/lib/mock-api/job.service.ts` · `startJob`, `getJob` · simulated background jobs that progress to SUCCEEDED over wall-clock time.
+- `src/shared/lib/mock-api/data/hearings.ts` · `HEARINGS` · hearing fixtures (hearing-1 = case-1's processed 34-min hearing).
+- `src/shared/lib/mock-api/data/transcript-segments.ts` · `TRANSCRIPT_SEGMENTS` · 60 deterministic scripted segments for hearing-1 with low-confidence/critical/verified variety.
+- `src/shared/lib/mock-api/data/procedural-events.ts` · `PROCEDURAL_EVENTS` · 8 events for hearing-1, all with non-empty `sourceSegmentIds` (§11.3).
+- `src/shared/lib/mock-api/data/documents.ts` · `DOCUMENT_TEMPLATES`, `GENERATED_DOCUMENTS`, `DOCUMENT_VERSIONS` · template catalogue (with `inputSchema`), doc-1 protocol draft + its v1 content.
 - `src/shared/lib/mock-api/data/organization.ts` · `ORGANIZATION` · the single mock organization/tenant.
 - `src/shared/lib/mock-api/data/users.ts` · `USERS` · mock users across the example admin/editor/viewer roles.
 - `src/shared/lib/mock-api/data/court-users.ts` · `COURT_USERS` · mock app users, one per court role (spec §4); the accounts auth authenticates and `judgeId` points at.
