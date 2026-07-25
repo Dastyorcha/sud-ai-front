@@ -237,6 +237,7 @@ export const en: Messages = {
     actor: "Actor",
     entity: "Entity",
     time: "Time",
+    activeRole: "Active role (demo)",
     liveProvider: "Live STT provider",
     finalProvider: "Final STT provider",
     model: "Model",

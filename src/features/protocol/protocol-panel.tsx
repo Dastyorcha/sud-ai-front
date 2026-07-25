@@ -15,7 +15,7 @@ import {
 } from "@/shared/lib/mock-api/document.service";
 import { startJob } from "@/shared/lib/mock-api/job.service";
 import { useJob } from "@/shared/hooks/use-job";
-import { usePermission } from "@/features/auth/use-permission";
+import { useCourtAuth } from "@/features/auth/use-court-auth";
 import type { Hearing } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
@@ -40,7 +40,7 @@ export interface ProtocolPanelProps {
  */
 export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const { t } = useTranslation();
-  const { can } = usePermission();
+  const { can } = useCourtAuth();
   const { data: documents, isLoading, refetch } = useMockQuery(
     () => listDocuments(hearing.caseId),
     [hearing.caseId],
@@ -85,13 +85,14 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
           {doc.templateCode} v{doc.templateVersion}
         </span>
         <div className="ml-auto flex flex-wrap gap-2">
-          {(doc.status === "AI_GENERATED" || doc.status === "DRAFT" || doc.status === "CHANGES_REQUESTED") && (
+          {(doc.status === "AI_GENERATED" || doc.status === "DRAFT" || doc.status === "CHANGES_REQUESTED") &&
+            can("document.submit") && (
             <Button size="sm" onClick={() => act("UNDER_REVIEW")}>
               <Send className="size-4" />
               {t("protocol.submitReview")}
             </Button>
           )}
-          {doc.status === "UNDER_REVIEW" && can("record.delete") && (
+          {doc.status === "UNDER_REVIEW" && can("document.approve") && (
             <>
               <Button size="sm" onClick={() => act("APPROVED")}>
                 <Check className="size-4" />
@@ -102,7 +103,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
               </Button>
             </>
           )}
-          {doc.status === "APPROVED" && (
+          {doc.status === "APPROVED" && can("document.export") && (
             <Button size="sm" variant="outline" onClick={() => act("EXPORTED")}>
               <Download className="size-4" />
               {t("protocol.exportDoc")}

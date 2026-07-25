@@ -240,6 +240,7 @@ export const uz = {
     actor: "Bajaruvchi",
     entity: "Obyekt",
     time: "Vaqt",
+    activeRole: "Faol rol (demo)",
     liveProvider: "Jonli STT provayderi",
     finalProvider: "Yakuniy STT provayderi",
     model: "Model",

@@ -237,6 +237,7 @@ export const ru: Messages = {
     actor: "Исполнитель",
     entity: "Объект",
     time: "Время",
+    activeRole: "Активная роль (демо)",
     liveProvider: "Live STT провайдер",
     finalProvider: "Финальный STT провайдер",
     model: "Модель",
