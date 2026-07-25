@@ -93,6 +93,27 @@ export const uz = {
       APPROVED: "Tasdiqlangan",
       FAILED: "Xatolik",
     },
+    segmentStatus: {
+      INTERIM: "Vaqtinchalik",
+      FINAL: "Yakuniy",
+      EDITED: "Tahrirlangan",
+      VERIFIED: "Tasdiqlangan",
+    },
+    documentStatus: {
+      DRAFT: "Qoralama",
+      AI_GENERATED: "AI yaratgan",
+      UNDER_REVIEW: "Ko‘rib chiqilmoqda",
+      CHANGES_REQUESTED: "O‘zgartirish so‘ralgan",
+      APPROVED: "Tasdiqlangan",
+      EXPORTED: "Eksport qilingan",
+      ARCHIVED: "Arxivlangan",
+    },
+    jobStatus: {
+      QUEUED: "Navbatda",
+      RUNNING: "Bajarilmoqda",
+      SUCCEEDED: "Muvaffaqiyatli",
+      FAILED: "Xatolik",
+    },
   },
   errors: {
     notFoundTitle: "Sahifa topilmadi",

@@ -90,6 +90,27 @@ export const en: Messages = {
       APPROVED: "Approved",
       FAILED: "Failed",
     },
+    segmentStatus: {
+      INTERIM: "Interim",
+      FINAL: "Final",
+      EDITED: "Edited",
+      VERIFIED: "Verified",
+    },
+    documentStatus: {
+      DRAFT: "Draft",
+      AI_GENERATED: "AI-generated",
+      UNDER_REVIEW: "Under review",
+      CHANGES_REQUESTED: "Changes requested",
+      APPROVED: "Approved",
+      EXPORTED: "Exported",
+      ARCHIVED: "Archived",
+    },
+    jobStatus: {
+      QUEUED: "Queued",
+      RUNNING: "Running",
+      SUCCEEDED: "Succeeded",
+      FAILED: "Failed",
+    },
   },
   errors: {
     notFoundTitle: "Page not found",

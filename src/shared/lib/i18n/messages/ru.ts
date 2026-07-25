@@ -90,6 +90,27 @@ export const ru: Messages = {
       APPROVED: "Утверждено",
       FAILED: "Ошибка",
     },
+    segmentStatus: {
+      INTERIM: "Промежуточный",
+      FINAL: "Финальный",
+      EDITED: "Отредактирован",
+      VERIFIED: "Проверен",
+    },
+    documentStatus: {
+      DRAFT: "Черновик",
+      AI_GENERATED: "Сгенерировано ИИ",
+      UNDER_REVIEW: "На рассмотрении",
+      CHANGES_REQUESTED: "Запрошены изменения",
+      APPROVED: "Утверждено",
+      EXPORTED: "Экспортировано",
+      ARCHIVED: "В архиве",
+    },
+    jobStatus: {
+      QUEUED: "В очереди",
+      RUNNING: "Выполняется",
+      SUCCEEDED: "Успешно",
+      FAILED: "Ошибка",
+    },
   },
   errors: {
     notFoundTitle: "Страница не найдена",
