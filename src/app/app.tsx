@@ -22,6 +22,8 @@ const ResetPasswordPage = lazy(() => import("@/pages/auth/resetPassword/resetPas
 // product views lazy imports (rendered inside the protected app shell)
 const Dashboard = lazy(() => import("@/views/dashboard/dashboard"));
 const UsersView = lazy(() => import("@/views/users/users"));
+const CasesView = lazy(() => import("@/views/cases/cases"));
+const CaseDetailView = lazy(() => import("@/views/cases/case-detail"));
 
 // system/error views lazy imports
 const Forbidden = lazy(() => import("@/views/errors/forbidden"));
@@ -98,6 +100,22 @@ function App() {
             element={
               <Suspense>
                 <Dashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            path={relative(ROUTE_PATHS.CASES)}
+            element={
+              <Suspense>
+                <CasesView />
+              </Suspense>
+            }
+          />
+          <Route
+            path={relative(ROUTE_PATHS.CASE_DETAIL)}
+            element={
+              <Suspense>
+                <CaseDetailView />
               </Suspense>
             }
           />

@@ -3,6 +3,7 @@
 **Duration:** Week 2, days 1–3
 **Spec refs:** §14 (data model), §15 (API contracts), §15.4 (error envelope), §16.5, D-05, D-09
 **Prerequisites:** Phase 00, Phase 01
+**Status:** in progress. Done: domain types + enums (`src/shared/types/`), uz/en/ru enum labels, court mock fixtures + `court-case`/`participant` mock services. Adapted to the repo's `mock-api` service pattern + plain `useState/useEffect` hooks instead of Zod-contract layer + TanStack Query + MSW. Remaining: hearing/transcript/event/document fixtures + services, and a `useJob` polling hook.
 
 **Goal:** every backend interaction is typed, validated at runtime, and fully mockable. After this phase the frontend can be built to completion with the backend absent.
 
@@ -26,17 +27,34 @@ Declare every enum from the specification as a Zod enum, export the inferred uni
 
 ```ts
 export const ProceduralEventTypeSchema = z.enum([
-  'HEARING_OPENED', 'IDENTITY_VERIFIED', 'RIGHTS_EXPLAINED', 'CLAIM_EXPLAINED',
-  'RESPONSE_GIVEN', 'OBJECTION_RAISED', 'MOTION_SUBMITTED', 'MOTION_DISCUSSION',
-  'EVIDENCE_SUBMITTED', 'EVIDENCE_EXAMINED', 'QUESTION_ASKED', 'ANSWER_GIVEN',
-  'BREAK_ANNOUNCED', 'HEARING_POSTPONED', 'RULING_ANNOUNCED', 'HEARING_CLOSED',
-  'OTHER',
-]);   // FR-08 — all 17 values
+  "HEARING_OPENED",
+  "IDENTITY_VERIFIED",
+  "RIGHTS_EXPLAINED",
+  "CLAIM_EXPLAINED",
+  "RESPONSE_GIVEN",
+  "OBJECTION_RAISED",
+  "MOTION_SUBMITTED",
+  "MOTION_DISCUSSION",
+  "EVIDENCE_SUBMITTED",
+  "EVIDENCE_EXAMINED",
+  "QUESTION_ASKED",
+  "ANSWER_GIVEN",
+  "BREAK_ANNOUNCED",
+  "HEARING_POSTPONED",
+  "RULING_ANNOUNCED",
+  "HEARING_CLOSED",
+  "OTHER",
+]); // FR-08 — all 17 values
 
 export const DocumentStatusSchema = z.enum([
-  'DRAFT', 'AI_GENERATED', 'UNDER_REVIEW', 'CHANGES_REQUESTED',
-  'APPROVED', 'EXPORTED', 'ARCHIVED',
-]);   // FR-11
+  "DRAFT",
+  "AI_GENERATED",
+  "UNDER_REVIEW",
+  "CHANGES_REQUESTED",
+  "APPROVED",
+  "EXPORTED",
+  "ARCHIVED",
+]); // FR-11
 ```
 
 Also: `CaseStatus`, `CourtType`, `CaseType`, `HearingStatus`, `SegmentStatus`, `ParticipantRole`, `UserRole`, `ReviewStatus`, `JobStatus`.
@@ -88,7 +106,7 @@ A thin `fetch` wrapper with exactly five responsibilities:
 
 ```ts
 export class ApiError extends Error {
-  code: string;                    // 'VALIDATION_FAILED'
+  code: string; // 'VALIDATION_FAILED'
   status: number;
   details: Array<{ field: string; message: string }>;
   requestId: string;
@@ -129,18 +147,18 @@ Parsing is not ceremony: when the backend renames a field in week seven, this tu
 ```ts
 export const queryKeys = {
   cases: {
-    all: ['cases'] as const,
-    list: (filters: CaseFilters) => ['cases', 'list', filters] as const,
-    detail: (id: string) => ['cases', id] as const,
-    participants: (id: string) => ['cases', id, 'participants'] as const,
+    all: ["cases"] as const,
+    list: (filters: CaseFilters) => ["cases", "list", filters] as const,
+    detail: (id: string) => ["cases", id] as const,
+    participants: (id: string) => ["cases", id, "participants"] as const,
   },
   hearings: {
-    detail: (id: string) => ['hearings', id] as const,
-    transcript: (id: string) => ['hearings', id, 'transcript'] as const,
-    events: (id: string) => ['hearings', id, 'events'] as const,
+    detail: (id: string) => ["hearings", id] as const,
+    transcript: (id: string) => ["hearings", id, "transcript"] as const,
+    events: (id: string) => ["hearings", id, "events"] as const,
   },
-  documents: { /* ... */ },
-  jobs: { detail: (id: string) => ['jobs', id] as const },
+  documents: {/* ... */},
+  jobs: { detail: (id: string) => ["jobs", id] as const },
 } as const;
 ```
 
@@ -156,12 +174,14 @@ mutations: { retry: false }
 ### Optimistic update policy — §16.5, enforced
 
 **Permitted:**
+
 - transcript segment text edit
 - speaker assignment
 - verify toggle
 - participant add/edit
 
 **Forbidden — these await the server:**
+
 - document approve / submit-review / request-changes
 - export
 - hearing start / pause / resume / stop / finalize
@@ -204,15 +224,15 @@ Content must be genuinely Uzbek legal-register text with real diacritics, real o
 
 A dev-only toolbar (bottom-right, `NEXT_PUBLIC_USE_MOCKS` gated) switching MSW behaviour:
 
-| Scenario | Effect |
-|---|---|
-| `slow-network` | 3s latency on every request |
-| `validation-error` | Generation endpoints return §15.4 errors |
-| `generation-blocked` | Missing-source precondition fails |
-| `job-fails` | Job polling ends in `FAILED` |
-| `conflict` | Segment PATCH returns 409 |
-| `empty-account` | All lists empty |
-| `unauthorized` | Next request returns 401 |
+| Scenario             | Effect                                   |
+| -------------------- | ---------------------------------------- |
+| `slow-network`       | 3s latency on every request              |
+| `validation-error`   | Generation endpoints return §15.4 errors |
+| `generation-blocked` | Missing-source precondition fails        |
+| `job-fails`          | Job polling ends in `FAILED`             |
+| `conflict`           | Segment PATCH returns 409                |
+| `empty-account`      | All lists empty                          |
+| `unauthorized`       | Next request returns 401                 |
 
 Phase 12's error-state audit is impossible without this toolbar. Build it now.
 

@@ -3,6 +3,7 @@
 **Duration:** Week 1, days 3–5
 **Spec refs:** §16.1, §16.6, `02-design-system.md`, D-04
 **Prerequisites:** Phase 00 complete
+**Status:** record primitives done — `Timestamp`, `SpeakerChip`, `ConfidenceBar`, `RecordStateBadge`, `CriticalFieldMark`, `RecordSpine` in `src/shared/custom/record/`, showcased at `/tools`. Adapted to the repo's existing token system (record-state colours mapped onto existing `destructive`/`success`/`warning` tokens) instead of the new ink/paper palette + IBM Plex + Storybook in the steps below. App-shell nav for court pages is folded into Phase 04 routing.
 
 **Goal:** every visual decision in the product is made once, here, and expressed as a token or a primitive. No screen built after this phase invents styling.
 
@@ -16,26 +17,31 @@
 @layer base {
   :root {
     /* colour — see 02-design-system.md */
-    --ink: #14161A;
-    --paper: #FCFCFA;
-    --rule: #DCDDD8;
-    --muted: #6E7278;
-    --seal: #7A1F2B;
-    --attested: #1F5D4C;
-    --caution: #8A6212;
+    --ink: #14161a;
+    --paper: #fcfcfa;
+    --rule: #dcddd8;
+    --muted: #6e7278;
+    --seal: #7a1f2b;
+    --attested: #1f5d4c;
+    --caution: #8a6212;
 
     /* type scale */
     --text-2xs: 12px;
     --text-xs: 13px;
-    --text-sm: 14px;   /* body */
+    --text-sm: 14px; /* body */
     --text-md: 16px;
     --text-lg: 20px;
     --text-xl: 28px;
     --text-2xl: 40px;
 
     /* spacing — 4px base */
-    --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
-    --space-4: 16px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
 
     /* structure */
     --radius: 2px;
@@ -97,21 +103,27 @@ Then restyle **all of them in one pass** against the tokens:
 These encode the domain. They are used by five different features, so they are built once and correctly.
 
 ### `<Timestamp ms onSeek? />`
+
 Mono, `HH:MM:SS` or `MM:SS` for hearings under an hour. Clickable variant renders as a button with a subtle underline and emits `onSeek(ms)`.
 
 ### `<SpeakerChip label participantId? role? size? />`
+
 Three visual states:
+
 - **Unmapped** — `SPEAKER_02` in Mono, `--muted`, dashed hairline border. Reads as provisional, because it is.
 - **Mapped** — procedural role in Sans, solid hairline, `--ink`.
 - **Conflicting** — `--seal` border when the mapping is contradicted elsewhere.
 
 ### `<ConfidenceBar value />`
+
 3px bar, `--rule` track. Fill is `--ink` at ≥0.75, `--caution` below. `aria-label` gives the numeric value — the colour is never the only signal.
 
 ### `<RecordStateBadge status kind />`
+
 Covers every enum in the specification: `DocumentStatus` (7 values, FR-11), segment status, hearing status, job status. One component, one mapping table, so a status can never render differently on two screens.
 
 ### `<CriticalFieldMark type children />`
+
 Dotted underline plus a 10px type glyph for the ten §10.3 categories: F.I.Sh., organization, case number, date, time, amount, percent, document number, law article, address. Unreviewed marks are `--seal`; reviewed are `--attested`.
 
 ### `<RecordSpine />` — the signature element
@@ -122,7 +134,7 @@ interface RecordSpineProps {
   events: Array<{ id: string; atMs: number; type: ProceduralEventType; verified: boolean }>;
   playheadMs?: number;
   visibleRange?: { startMs: number; endMs: number };
-  activityDensity?: number[];         // optional speaking-activity histogram
+  activityDensity?: number[]; // optional speaking-activity histogram
   onSeek: (ms: number) => void;
 }
 ```
@@ -173,6 +185,7 @@ Build it fully in Storybook in this phase even though no screen consumes it unti
 Install Storybook 9 with the Vite builder. Every component in `components/record/` and `components/ui/` gets a story covering all its states.
 
 Priority stories — these carry the most states and are hardest to reach through the app:
+
 - `SegmentRow` in interim / final / low-confidence / critical-unreviewed / verified / editing / conflicted
 - `RecordSpine` at 5 minutes, 45 minutes and 4 hours of events
 - `RecordStateBadge` — all 20+ enum values on one page

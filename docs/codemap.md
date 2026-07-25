@@ -23,6 +23,8 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 ## Views (`src/views/`)
 
 - `src/views/dashboard/dashboard.tsx` · `Dashboard` (default) · dashboard placeholder — renders `ComingSoon`. Replace with real KPI/summary widgets.
+- `src/views/cases/cases.tsx` · `CasesView` (default) · court-case list (spec FR-02/UC-01) — debounced search over `useCases()`, a `Table`, row click opens the case detail page.
+- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · compact case detail — requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`; reads `:caseId`.
 - `src/views/users/users.tsx` · `UsersView` (default) · the reference CRUD list page — debounced search over `useUsers()`, a `Table`, row click opens the detail drawer via `?user=`.
 - `src/views/users/user-detail.tsx` · `UserDetail` (default), `UserDetailProps` · single-user detail `Sheet` drawer — takes `userId` + `onClose`, fetches independently via `use-mock-query` + `getUser`.
 - `src/views/errors/forbidden.tsx` · `Forbidden` (default) · 403 view, `NoData` + localized copy.
@@ -52,6 +54,9 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/features/auth/use-auth.ts` · `useAuth`, `AuthUser`, `UseAuthResult` · stub current-session hook (mock authenticated admin user); real auth lands when you wire a backend.
 - `src/features/auth/use-permission.ts` · `usePermission`, `UsePermissionResult` · `can(action)` role check over `PERMISSIONS` for the current `useAuth()` role.
 - `src/features/users/use-users.ts` · `useUsers`, `UseUsersResult` · user directory hook over `user.service.listUsers` — powers the users list page.
+- `src/features/cases/use-cases.ts` · `useCases`, `UseCasesParams`, `UseCasesResult` · case-list hook over `court-case.service.listCases` — re-fetches on filter/page change (debounce search at call site).
+- `src/features/cases/use-case.ts` · `useCase`, `UseCaseResult` · single-case hook over `court-case.service.getCase`.
+- `src/features/participants/use-participants.ts` · `useParticipants`, `UseParticipantsResult` · a case's participants hook over `participant.service.listParticipants`.
 
 ## Shared — custom (`src/shared/custom/`)
 

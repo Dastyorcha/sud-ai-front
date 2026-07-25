@@ -9,6 +9,9 @@ import type { MessageKey } from "@/shared/lib/i18n/messages";
 export const PAGE_NAMES: Record<RoutePathKey, MessageKey> = {
   DASHBOARD: "pages.dashboard",
   USERS: "pages.users",
+  CASES: "pages.cases",
+  CASE_NEW: "pages.cases",
+  CASE_DETAIL: "pages.cases",
   LOGIN: "pages.login",
   REGISTER: "pages.register",
   RESET_PASSWORD: "pages.resetPassword",

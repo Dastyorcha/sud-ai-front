@@ -3,6 +3,37 @@
 **Duration:** Week 3
 **Spec refs:** FR-02, UC-01, §14.2, §14.3, §9.7, §16.1 #2–5
 **Prerequisites:** Phase 03
+**Status:** in progress (`plans/doing/`)
+
+---
+
+## Repo adaptation (Vite + React Router) — overrides the Next.js steps below
+
+This project is Vite + React Router v7, not Next.js. Where the steps below say
+otherwise, follow this mapping:
+
+| Plan says (Next.js)                        | Do this instead (this repo)                                                                                                                                                                         |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/(app)/cases/page.tsx` route files | Add routes in `src/app/app.tsx` under the `/:lang` `AppShell`; screens live in `src/views/cases/*` (list/detail) mirroring `src/views/users/`.                                                      |
+| `src/features/cases/screens/*`             | Screen components in `src/views/cases/`; data hooks in `src/features/cases/` (mirror `src/features/users/use-users.ts`).                                                                            |
+| TanStack Query                             | Plain `useState`/`useEffect` consumer hooks over the mock services (`src/shared/lib/mock-api/court-case.service.ts`, `participant.service.ts`) — the established repo pattern.                      |
+| MSW                                        | The `mock-api` service layer (already built for cases + participants).                                                                                                                              |
+| `nuqs` URL-sync                            | React Router `useSearchParams` (as `src/views/users/users.tsx` does).                                                                                                                               |
+| Zustand `sessionStorage` draft store       | A small `sessionStorage`-backed hook/util under `src/features/cases/` (no Zustand dependency unless escalated).                                                                                     |
+| Route paths                                | `ROUTE_PATHS.CASES` / `CASE_NEW` / `CASE_DETAIL` + `buildRoute.caseDetail` (already added). Never hardcode paths.                                                                                   |
+| shadcn primitives                          | Reuse `src/shared/components/ui/*` (Table, Input, Select, Dialog, Tabs…) and `src/shared/custom/*` (StatusBadge, Money, DateText, Loading/Empty/Error states, record primitives). No raw HTML tags. |
+| All copy                                   | Through `t()` — keys under `cases.*` / `enums.*` (uz/en/ru).                                                                                                                                        |
+
+**Progress**
+
+- [x] Route paths + nav item + `cases.*` i18n scaffolding
+- [ ] Step 4.2 — Case list (`/cases`) — `useCases` hook + `views/cases/cases.tsx`
+- [ ] Step 4.1 — Dashboard work queues
+- [ ] Step 4.3 — Case creation wizard (`/cases/new`)
+- [ ] Step 4.4 — Case detail (`/cases/:caseId`)
+- [ ] Step 4.5 — Participant management
+- [ ] Step 4.6 — Vocabulary panel
+- [ ] Step 4.7 — Hearing setup (depends on Phase 05)
 
 **Goal:** UC-01 complete — a clerk can create a case with participants bound to procedural roles, and the case vocabulary (§9.7) is visible and editable, because it directly determines STT accuracy later.
 
@@ -41,16 +72,19 @@ Empty states differ: no cases at all invites creation; no cases matching filters
 Three steps. UC-01 has real cognitive load — a single long form invites abandonment mid-way.
 
 ### Step 1 — Ish maʼlumotlari
+
 `case_number`, `court_name`, `court_type`, `case_type`, `judge_id` (select from users with the judge role).
 
 Case number gets a format hint and Mono input.
 
 ### Step 2 — Ishtirokchilar
+
 Repeatable rows: `display_name`, `organization_name` (optional), `role` (ParticipantRole select), `identifier`.
 
 Zod cross-field validation enforces **at least one claimant and at least one defendant**, and rejects duplicate names within a role. Add-row keyboard shortcut; role select defaults to the next unfilled required role, which removes most of the clicking.
 
 ### Step 3 — Tekshirish
+
 Read-only summary of both prior steps with edit links. Then create.
 
 ### Draft persistence
@@ -67,13 +101,13 @@ Header: case number (Mono, large), court, status badge, judge, created-by, archi
 
 Tabs:
 
-| Tab | Contents |
-|---|---|
-| Umumiy | Case requisites, editable inline by capability |
-| Ishtirokchilar | Participant management (Step 4.5) |
-| Majlislar | Hearing list + "Yangi majlis" |
-| Hujjatlar | Documents generated for this case |
-| Lugʻat | Case vocabulary (Step 4.6) |
+| Tab            | Contents                                       |
+| -------------- | ---------------------------------------------- |
+| Umumiy         | Case requisites, editable inline by capability |
+| Ishtirokchilar | Participant management (Step 4.5)              |
+| Majlislar      | Hearing list + "Yangi majlis"                  |
+| Hujjatlar      | Documents generated for this case              |
+| Lugʻat         | Case vocabulary (Step 4.6)                     |
 
 **Archive** requires a confirmation dialog naming the case number — §16.6 requires confirmation on audited actions, and archiving is audited (FR-12).
 
@@ -85,7 +119,7 @@ Inline add / edit / delete within the tab, no separate page.
 
 - Optimistic updates with rollback on failure (permitted by the Phase 02 policy)
 - Role select from `ParticipantRoleSchema`
-- **Deleting a participant referenced by transcript segments is blocked** with a specific message — *"Bu ishtirokchi transkriptdagi 34 ta segmentga bogʻlangan. Avval segmentlardagi bogʻlanishni oʻzgartiring."* — plus a link to the affected segments. A generic 409 toast here would be a dead end for the clerk.
+- **Deleting a participant referenced by transcript segments is blocked** with a specific message — _"Bu ishtirokchi transkriptdagi 34 ta segmentga bogʻlangan. Avval segmentlardagi bogʻlanishni oʻzgartiring."_ — plus a link to the affected segments. A generic 409 toast here would be a dead end for the clerk.
 - Voice reference upload (`voice_reference_uri`, §14.3) is stubbed as a disabled control with a "keyingi bosqichda" note. It exists in the schema but not in MVP scope.
 
 ---

@@ -21,10 +21,12 @@ export const ru: Messages = {
   },
   nav: {
     dashboard: "Панель управления",
+    cases: "Дела",
     users: "Пользователи",
   },
   pages: {
     dashboard: "Панель управления",
+    cases: "Дела",
     users: "Пользователи",
     login: "Вход",
     register: "Регистрация",
@@ -150,6 +152,20 @@ export const ru: Messages = {
       lastLogin: "Последний вход",
       email: "Email",
       phone: "Телефон",
+    },
+  },
+  cases: {
+    description: "Создавайте и управляйте судебными делами.",
+    newCase: "Новое дело",
+    allStatuses: "Все статусы",
+    columns: {
+      caseNumber: "Номер дела",
+      court: "Суд",
+      type: "Тип",
+      status: "Статус",
+      participants: "Участники",
+      updated: "Обновлено",
+      organization: "Организация",
     },
   },
 };

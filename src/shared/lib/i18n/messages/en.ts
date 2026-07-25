@@ -21,10 +21,12 @@ export const en: Messages = {
   },
   nav: {
     dashboard: "Dashboard",
+    cases: "Cases",
     users: "Users",
   },
   pages: {
     dashboard: "Dashboard",
+    cases: "Cases",
     users: "Users",
     login: "Sign in",
     register: "Sign up",
@@ -150,6 +152,20 @@ export const en: Messages = {
       lastLogin: "Last login",
       email: "Email",
       phone: "Phone",
+    },
+  },
+  cases: {
+    description: "Create and manage court cases.",
+    newCase: "New case",
+    allStatuses: "All statuses",
+    columns: {
+      caseNumber: "Case number",
+      court: "Court",
+      type: "Type",
+      status: "Status",
+      participants: "Participants",
+      updated: "Updated",
+      organization: "Organization",
     },
   },
 };

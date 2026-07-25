@@ -24,10 +24,12 @@ export const uz = {
   },
   nav: {
     dashboard: "Boshqaruv paneli",
+    cases: "Sud ishlari",
     users: "Foydalanuvchilar",
   },
   pages: {
     dashboard: "Boshqaruv paneli",
+    cases: "Sud ishlari",
     users: "Foydalanuvchilar",
     login: "Tizimga kirish",
     register: "Ro‘yxatdan o‘tish",
@@ -153,6 +155,20 @@ export const uz = {
       lastLogin: "Oxirgi kirish",
       email: "Email",
       phone: "Telefon",
+    },
+  },
+  cases: {
+    description: "Sud ishlarini yarating va boshqaring.",
+    newCase: "Yangi ish",
+    allStatuses: "Barcha holatlar",
+    columns: {
+      caseNumber: "Ish raqami",
+      court: "Sud",
+      type: "Turi",
+      status: "Holat",
+      participants: "Ishtirokchilar",
+      updated: "Yangilangan",
+      organization: "Tashkilot",
     },
   },
 };
