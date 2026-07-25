@@ -17,6 +17,7 @@ import {
   Tag,
   ListChecks,
   ShieldCheck,
+  AudioLines,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
@@ -36,6 +37,12 @@ import { PermissionDenied } from "@/shared/custom/permission-denied";
 import { Can } from "@/shared/custom/can";
 import { usePermission } from "@/features/auth/use-permission";
 import { useAuth } from "@/features/auth/use-auth";
+import { Timestamp } from "@/shared/custom/record/timestamp";
+import { SpeakerChip } from "@/shared/custom/record/speaker-chip";
+import { ConfidenceBar } from "@/shared/custom/record/confidence-bar";
+import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
+import { CriticalFieldMark } from "@/shared/custom/record/critical-field-mark";
+import { RecordSpine } from "@/shared/custom/record/record-spine";
 
 export default function ToolsPage() {
   const { locale, t, formatMoney, formatDate } = useTranslation();
@@ -585,6 +592,92 @@ export default function ToolsPage() {
                 <StatusBadge label="Warning" tone="warning" />
                 <StatusBadge label="Destructive" tone="destructive" />
                 <StatusBadge label="Info" tone="info" />
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Record primitives (LexKotib) */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.87 }}
+          className="mb-16"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <AudioLines className="text-primary" size={32} />
+            <h2 className="text-3xl font-bold text-primary">Record primitives (LexKotib)</h2>
+          </div>
+          <div className="bg-card rounded-2xl shadow-lg p-8 border border-border space-y-8">
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-3">Timestamp</h3>
+              <div className="flex flex-wrap items-center gap-4">
+                <Timestamp ms={70_000} />
+                <Timestamp ms={5_062_000} />
+                <Timestamp ms={862_000} onSeek={() => undefined} />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-3">Speaker chip</h3>
+              <div className="flex flex-wrap items-center gap-3">
+                <SpeakerChip label="SPEAKER_02" />
+                <SpeakerChip label="SPEAKER_01" roleLabel={t("enums.participantRole.JUDGE")} />
+                <SpeakerChip
+                  label="SPEAKER_03"
+                  roleLabel={t("enums.participantRole.CLAIMANT_REPRESENTATIVE")}
+                  conflicting
+                />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-3">Confidence bar</h3>
+              <div className="max-w-sm space-y-3">
+                <ConfidenceBar value={0.94} />
+                <ConfidenceBar value={0.62} />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-3">Record state badge</h3>
+              <div className="flex flex-wrap gap-3">
+                <RecordStateBadge kind="hearing" status="RECORDING" />
+                <RecordStateBadge kind="segment" status="VERIFIED" />
+                <RecordStateBadge kind="document" status="AI_GENERATED" />
+                <RecordStateBadge kind="document" status="APPROVED" />
+                <RecordStateBadge kind="job" status="FAILED" />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-3">Critical field mark</h3>
+              <p className="text-sm text-foreground">
+                <CriticalFieldMark>250 000 000 so‘m</CriticalFieldMark> ·{" "}
+                <CriticalFieldMark reviewed>4-2101-2604/13</CriticalFieldMark>
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-3">Record spine</h3>
+              <div className="flex h-64 gap-4 overflow-hidden rounded-lg border border-border">
+                <RecordSpine
+                  durationMs={2_040_000}
+                  playheadMs={862_000}
+                  visibleRange={{ startMs: 700_000, endMs: 1_100_000 }}
+                  events={[
+                    { id: "e1", atMs: 60_000, type: "HEARING_OPENED", verified: true },
+                    { id: "e2", atMs: 300_000, type: "RIGHTS_EXPLAINED", verified: true },
+                    { id: "e3", atMs: 862_000, type: "MOTION_SUBMITTED", verified: false },
+                    { id: "e4", atMs: 1_500_000, type: "EVIDENCE_EXAMINED", verified: false },
+                    { id: "e5", atMs: 1_980_000, type: "HEARING_CLOSED", verified: true },
+                  ]}
+                  onSeek={() => undefined}
+                />
+                <p className="flex-1 p-4 text-sm text-muted-foreground">
+                  56px vertical rail — ticks (hollow = unverified, filled = verified), a red
+                  playhead line and a shaded visible-range band. Click the rail or a tick to seek.
+                </p>
               </div>
             </div>
           </div>

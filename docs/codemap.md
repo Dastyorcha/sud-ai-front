@@ -61,6 +61,12 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/custom/theme-toggle.tsx` · `ThemeToggle` · icon button flipping `next-themes`' resolved theme; localized `aria-label`.
 - `src/shared/custom/coming-soon.tsx` · `ComingSoon`, `ComingSoonProps` · centered "coming soon" state for placeholder views (dashboard); optional `titleKey`.
 - `src/shared/custom/status-badge.tsx` · `StatusBadge`, `StatusBadgeProps` · generic `cva` tone badge (`neutral|primary|success|warning|destructive|info`) — localized `label` + optional `icon`/`dotClassName`.
+- `src/shared/custom/record/timestamp.tsx` · `Timestamp` · mono, tabular hearing-relative `HH:MM:SS`/`MM:SS`; clickable variant emits `onSeek(ms)` (spec §16.3).
+- `src/shared/custom/record/speaker-chip.tsx` · `SpeakerChip` · speaker attribution chip — unmapped (mono, dashed) / mapped (role) / conflicting (destructive) states (spec §9.6).
+- `src/shared/custom/record/confidence-bar.tsx` · `ConfidenceBar` · 3px STT confidence meter, `warning` below 0.75, numeric value via ARIA (spec §16.3).
+- `src/shared/custom/record/record-state-badge.tsx` · `RecordStateBadge` · single badge for document/segment/hearing/job status; one tone table per enum, label via `enums.*` (spec §16, FR-11).
+- `src/shared/custom/record/critical-field-mark.tsx` · `CriticalFieldMark` · inline dotted-underline mark for critical fields; reviewed=success, unreviewed=destructive (spec §10.3).
+- `src/shared/custom/record/record-spine.tsx` · `RecordSpine`, `RecordSpineEvent` · signature vertical timeline rail — event ticks (hollow/filled), playhead, visible-range band; click/tick seeks (spec §16, design §1.3).
 - `src/shared/custom/money.tsx` · `Money`, `MoneyProps` · localized money amount (`formatMoney`), `tabular-nums`.
 - `src/shared/custom/date-text.tsx` · `DateText`, `DateTextProps` · localized date display (`formatDate`).
 - `src/shared/custom/detail-grid.tsx` · `DetailGrid`, `DetailGridProps`, `DetailGridItem` · read-only key/value grid for detail/summary views.
@@ -99,7 +105,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Shared — lib / constants / types (FSD `src/shared/`)
 
-- `src/shared/types/models.ts` · `Organization`, `User` · example domain entity interfaces consumed by the mock API layer; add your real entities here, backend-shaped (ISO date strings, enum IDs from `enums.ts`).
+- `src/shared/types/models.ts` · `Organization`, `User`, `CourtUser`, `CourtCase`, `Participant`, `Hearing`, `AudioTrack`, `TranscriptSegment`, `ProceduralEvent`, `DocumentTemplate`, `GeneratedDocument`, `DocumentVersion`, `AuditLog`, `Job` · domain entity interfaces consumed by the mock API layer; backend-shaped (ISO date strings, ms offsets, enum IDs from `enums.ts`). `Organization`/`User` are the template's examples; the rest are the LexKotib court domain (spec §14).
 - `src/shared/types/query-types.ts` · `ListParams`, `SortSpec`, `Paginated` · generic server-style list request/response shapes used by every mock service.
 - `src/shared/lib/utils.ts` · `cn` · Tailwind class merge (`clsx` + `tailwind-merge`).
 - `src/shared/hooks/use-debounce.ts` · `useDebounce` · returns a value delayed until it stops changing (throttles search input, etc.).
@@ -113,7 +119,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/constants/page-names.ts` · `PAGE_NAMES` · i18n page-title message keys keyed by `ROUTE_PATHS` key — resolve with `t(PAGE_NAMES.KEY)`.
 - `src/shared/constants/nav-items.ts` · `NAV_ITEMS`, `NavItem` · sidebar sections; each carries a `labelKey` resolved via `t()`.
 - `src/shared/constants/permissions.ts` · `PERMISSION_ACTION`, `PermissionAction`, `PERMISSIONS` · typed role×action matrix (admin/editor/viewer example) consumed by `usePermission`/`Can`.
-- `src/shared/types/enums.ts` · `USER_ROLE`, `SORT_DIRECTION` · core enum IDs; labels live in i18n messages under `enums.*` (see `docs/i18n.md`).
+- `src/shared/types/enums.ts` · `USER_ROLE`, `SORT_DIRECTION`, `COURT_ROLE`, `COURT_TYPE`, `CASE_TYPE`, `CASE_STATUS`, `PARTICIPANT_ROLE`, `HEARING_STATUS`, `SEGMENT_STATUS`, `PROCEDURAL_EVENT_TYPE`, `EVENT_REVIEW_STATUS`, `CRITICAL_FIELD_TYPE`, `DOCUMENT_TYPE`, `DOCUMENT_STATUS`, `TEMPLATE_STATUS`, `JOB_STATUS`, `EXPORT_FORMAT` · core enum IDs (LexKotib court domain keeps the spec's exact UPPER_SNAKE values); labels live in i18n messages under `enums.*` (see `docs/i18n.md`).
 - `src/shared/lib/i18n/locale.ts` · `LOCALES`, `Locale`, `DEFAULT_LOCALE`, `LOCALE_LABELS`, `LOCALE_STORAGE_KEY`, `isLocale` · locale model.
 - `src/shared/lib/i18n/format.ts` · `formatMoney`, `formatDate`, `formatNumber` · `Intl`-based, locale-aware formatting.
 - `src/shared/lib/i18n/locale-context.tsx` · `LocaleProvider`, `useTranslation`, `LocaleContextValue` · derives locale from the `:lang` route param; provides `t()` + formatters.
@@ -130,6 +136,11 @@ See `docs/architecture.md` → "Mock API / data layer" for the swap-to-real-API 
 
 - `src/shared/lib/mock-api/delay.ts` · `delay` · simulated latency helper (timer-based `Promise`) every mock service awaits.
 - `src/shared/lib/mock-api/user.service.ts` · `listUsers`, `getUser` · server-shaped user directory service — list + single lookup by id.
+- `src/shared/lib/mock-api/court-case.service.ts` · `listCases`, `getCase`, `createCase`, `updateCase`, `archiveCase`, `CaseFilters`, `CaseSortField`, `CreateCaseInput` · server-shaped case service (spec §14.2/FR-02) with search/filter/sort/paging over a session-mutable store.
+- `src/shared/lib/mock-api/participant.service.ts` · `listParticipants`, `createParticipant`, `updateParticipant`, `deleteParticipant`, `CreateParticipantInput` · server-shaped participant service (spec §14.3) that keeps the owning case's `participantCount` in sync.
 - `src/shared/lib/mock-api/data/organization.ts` · `ORGANIZATION` · the single mock organization/tenant.
 - `src/shared/lib/mock-api/data/users.ts` · `USERS` · mock users across the example admin/editor/viewer roles.
-- `src/shared/lib/mock-api/data/index.ts` · re-exports `ORGANIZATION`, `USERS` · single import surface for the services — add new seed exports here as you add entities.
+- `src/shared/lib/mock-api/data/court-users.ts` · `COURT_USERS` · mock app users, one per court role (spec §4); the accounts auth authenticates and `judgeId` points at.
+- `src/shared/lib/mock-api/data/court-cases.ts` · `COURT_CASES` · mock court cases (spec §14.2); `case-1` is the fully-populated economic-court demo fixture, the rest give the list volume/filters.
+- `src/shared/lib/mock-api/data/participants.ts` · `PARTICIPANTS` · mock participants (spec §14.3); `case-1` has the four-party dispute, others a claimant/defendant pair.
+- `src/shared/lib/mock-api/data/index.ts` · re-exports `ORGANIZATION`, `USERS`, `COURT_USERS`, `COURT_CASES`, `PARTICIPANTS` · single import surface for the services — add new seed exports here as you add entities.
