@@ -168,6 +168,15 @@ export const en: Messages = {
       organization: "Organization",
     },
   },
+  participants: {
+    add: "Add participant",
+    edit: "Edit",
+    addTitle: "Add participant",
+    editTitle: "Edit participant",
+    deleteTitle: "Delete participant",
+    deleteConfirm: 'Delete participant "{name}"?',
+    delete: "Delete",
+  },
   caseForm: {
     detailsTitle: "Case details",
     participantsTitle: "Participants",

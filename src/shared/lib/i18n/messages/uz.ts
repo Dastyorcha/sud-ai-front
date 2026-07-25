@@ -171,6 +171,15 @@ export const uz = {
       organization: "Tashkilot",
     },
   },
+  participants: {
+    add: "Ishtirokchi qo'shish",
+    edit: "Tahrirlash",
+    addTitle: "Ishtirokchi qo'shish",
+    editTitle: "Ishtirokchini tahrirlash",
+    deleteTitle: "Ishtirokchini o'chirish",
+    deleteConfirm: "\"{name}\" ishtirokchisini o'chirmoqchimisiz?",
+    delete: "O'chirish",
+  },
   caseForm: {
     detailsTitle: "Ish ma'lumotlari",
     participantsTitle: "Ishtirokchilar",

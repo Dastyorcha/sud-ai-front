@@ -58,6 +58,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/features/cases/use-cases.ts` · `useCases`, `UseCasesParams`, `UseCasesResult` · case-list hook over `court-case.service.listCases` — re-fetches on filter/page change (debounce search at call site).
 - `src/features/cases/use-case.ts` · `useCase`, `UseCaseResult` · single-case hook over `court-case.service.getCase`.
 - `src/features/participants/use-participants.ts` · `useParticipants`, `UseParticipantsResult` · a case's participants hook over `participant.service.listParticipants`.
+- `src/features/participants/participant-form-dialog.tsx` · `ParticipantFormDialog`, `ParticipantFormDialogProps` · add/edit participant dialog (spec §14.3, UC-01 Step 4.5) — create/update via the service, `onSaved` for refetch.
 
 ## Shared — custom (`src/shared/custom/`)
 

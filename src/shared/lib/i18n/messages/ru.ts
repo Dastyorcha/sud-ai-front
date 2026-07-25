@@ -168,6 +168,15 @@ export const ru: Messages = {
       organization: "Организация",
     },
   },
+  participants: {
+    add: "Добавить участника",
+    edit: "Изменить",
+    addTitle: "Добавить участника",
+    editTitle: "Изменить участника",
+    deleteTitle: "Удалить участника",
+    deleteConfirm: 'Удалить участника «{name}»?',
+    delete: "Удалить",
+  },
   caseForm: {
     detailsTitle: "Данные дела",
     participantsTitle: "Участники",

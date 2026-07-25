@@ -1,4 +1,5 @@
-import { ChevronLeft } from "lucide-react";
+import { useState } from "react";
+import { ChevronLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import {
   Table,
@@ -9,6 +10,14 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { StatusBadge } from "@/shared/custom/status-badge";
 import { DateText } from "@/shared/custom/date-text";
 import { DetailGrid } from "@/shared/custom/detail-grid";
@@ -17,10 +26,14 @@ import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { useCase } from "@/features/cases/use-case";
 import { useParticipants } from "@/features/participants/use-participants";
+import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
+import { deleteParticipant } from "@/shared/lib/mock-api/participant.service";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
+import type { Participant } from "@/shared/types/models";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { notify } from "@/shared/lib/toast";
 
 /**
  * Case detail (spec §16.1 #5, UC-01). Compact first cut: requisites +
@@ -31,7 +44,36 @@ export default function CaseDetailView() {
   const { t, locale } = useTranslation();
   const { caseId = "" } = useParams<{ caseId: string }>();
   const { data: courtCase, isLoading, error } = useCase(caseId);
-  const { data: participants } = useParticipants(caseId);
+  const { data: participants, refetch: refetchParticipants } = useParticipants(caseId);
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Participant | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  function openAdd() {
+    setEditing(null);
+    setFormOpen(true);
+  }
+
+  function openEdit(participant: Participant) {
+    setEditing(participant);
+    setFormOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteParticipant(deleteTarget.id);
+      setDeleteTarget(null);
+      refetchParticipants();
+    } catch {
+      notify.error(t("errors.genericTitle"));
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const backLink = (
     <Button variant="ghost" size="sm" asChild>
@@ -116,7 +158,15 @@ export default function CaseDetailView() {
       />
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-foreground">{t("cases.columns.participants")}</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-foreground">
+            {t("cases.columns.participants")}
+          </h2>
+          <Button size="sm" onClick={openAdd}>
+            <Plus className="size-4" />
+            {t("participants.add")}
+          </Button>
+        </div>
         {participants && participants.length > 0 ? (
           <div className="rounded-lg border border-border">
             <Table>
@@ -125,6 +175,7 @@ export default function CaseDetailView() {
                   <TableHead>{t("users.columns.name")}</TableHead>
                   <TableHead>{t("users.columns.role")}</TableHead>
                   <TableHead>{t("cases.columns.organization")}</TableHead>
+                  <TableHead className="w-24 text-right" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -133,6 +184,26 @@ export default function CaseDetailView() {
                     <TableCell className="font-medium text-foreground">{p.displayName}</TableCell>
                     <TableCell>{t(`enums.participantRole.${p.role}` as MessageKey)}</TableCell>
                     <TableCell>{p.organizationName ?? "—"}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t("participants.edit")}
+                          onClick={() => openEdit(p)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t("participants.delete")}
+                          onClick={() => setDeleteTarget(p)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -142,6 +213,33 @@ export default function CaseDetailView() {
           <EmptyState />
         )}
       </section>
+
+      <ParticipantFormDialog
+        caseId={caseId}
+        participant={editing}
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        onSaved={refetchParticipants}
+      />
+
+      <Dialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("participants.deleteTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("participants.deleteConfirm", { name: deleteTarget?.displayName ?? "" })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+              {t("common.cancel")}
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
+              {t("participants.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
