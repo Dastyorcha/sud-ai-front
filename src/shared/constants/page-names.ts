@@ -12,6 +12,7 @@ export const PAGE_NAMES: Record<RoutePathKey, MessageKey> = {
   CASES: "pages.cases",
   CASE_NEW: "pages.cases",
   CASE_DETAIL: "pages.cases",
+  HEARING_DETAIL: "pages.hearing",
   LOGIN: "pages.login",
   REGISTER: "pages.register",
   RESET_PASSWORD: "pages.resetPassword",

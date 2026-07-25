@@ -18,6 +18,8 @@ export const ROUTE_PATHS = {
   CASE_NEW: "/cases/new",
   /** Detail route pattern for `<Route path>`; build a concrete URL with `buildRoute.caseDetail`. */
   CASE_DETAIL: "/cases/:caseId",
+  /** Hearing workspace (live/transcript/events/protocol via `?tab=`). */
+  HEARING_DETAIL: "/hearings/:hearingId",
 
   // Auth / session
   LOGIN: "/auth/login",
@@ -44,6 +46,7 @@ export type RoutePathKey = keyof typeof ROUTE_PATHS;
 export const buildRoute = {
   userDetail: (userId: string) => `${ROUTE_PATHS.USERS}?user=${userId}`,
   caseDetail: (caseId: string) => `${ROUTE_PATHS.CASES}/${caseId}`,
+  hearingDetail: (hearingId: string) => `/hearings/${hearingId}`,
 } as const;
 
 /** Query-param key for the user detail drawer. */
