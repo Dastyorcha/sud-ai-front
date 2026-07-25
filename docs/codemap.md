@@ -66,6 +66,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/custom/record/confidence-bar.tsx` · `ConfidenceBar` · 3px STT confidence meter, `warning` below 0.75, numeric value via ARIA (spec §16.3).
 - `src/shared/custom/record/record-state-badge.tsx` · `RecordStateBadge` · single badge for document/segment/hearing/job status; one tone table per enum, label via `enums.*` (spec §16, FR-11).
 - `src/shared/custom/record/critical-field-mark.tsx` · `CriticalFieldMark` · inline dotted-underline mark for critical fields; reviewed=success, unreviewed=destructive (spec §10.3).
+- `src/shared/custom/record/record-spine.tsx` · `RecordSpine`, `RecordSpineEvent` · signature vertical timeline rail — event ticks (hollow/filled), playhead, visible-range band; click/tick seeks (spec §16, design §1.3).
 - `src/shared/custom/money.tsx` · `Money`, `MoneyProps` · localized money amount (`formatMoney`), `tabular-nums`.
 - `src/shared/custom/date-text.tsx` · `DateText`, `DateTextProps` · localized date display (`formatDate`).
 - `src/shared/custom/detail-grid.tsx` · `DetailGrid`, `DetailGridProps`, `DetailGridItem` · read-only key/value grid for detail/summary views.
