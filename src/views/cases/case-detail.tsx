@@ -27,6 +27,7 @@ import { EmptyState } from "@/shared/custom/empty-state";
 import { useCase } from "@/features/cases/use-case";
 import { useParticipants } from "@/features/participants/use-participants";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
+import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
 import { deleteParticipant } from "@/shared/lib/mock-api/participant.service";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
 import type { Participant } from "@/shared/types/models";
@@ -213,6 +214,8 @@ export default function CaseDetailView() {
           <EmptyState />
         )}
       </section>
+
+      <VocabularyPanel courtCase={courtCase} participants={participants ?? []} />
 
       <ParticipantFormDialog
         caseId={caseId}

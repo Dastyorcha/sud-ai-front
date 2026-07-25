@@ -168,6 +168,22 @@ export const ru: Messages = {
       organization: "Организация",
     },
   },
+  vocab: {
+    title: "Словарь дела",
+    note: "Эти термины передаются в STT для повышения точности транскрипции.",
+    groups: {
+      participants: "Участники",
+      court: "Состав суда",
+      legal: "Юридические термины",
+    },
+    weight: "Вес",
+  },
+  dashboard: {
+    activeCases: "Активные дела",
+    recentCases: "Недавние дела",
+    quickActions: "Быстрые действия",
+    viewAll: "Показать все",
+  },
   participants: {
     add: "Добавить участника",
     edit: "Изменить",

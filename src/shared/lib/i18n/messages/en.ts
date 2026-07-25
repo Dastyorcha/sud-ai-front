@@ -168,6 +168,22 @@ export const en: Messages = {
       organization: "Organization",
     },
   },
+  vocab: {
+    title: "Case vocabulary",
+    note: "These terms are fed to the STT provider to improve transcription accuracy.",
+    groups: {
+      participants: "Participants",
+      court: "Court composition",
+      legal: "Legal terms",
+    },
+    weight: "Weight",
+  },
+  dashboard: {
+    activeCases: "Active cases",
+    recentCases: "Recent cases",
+    quickActions: "Quick actions",
+    viewAll: "View all",
+  },
   participants: {
     add: "Add participant",
     edit: "Edit",

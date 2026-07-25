@@ -171,6 +171,22 @@ export const uz = {
       organization: "Tashkilot",
     },
   },
+  vocab: {
+    title: "Maxsus lug‘at",
+    note: "Bu terminlar transkripsiya aniqligini oshirish uchun STT tizimiga uzatiladi.",
+    groups: {
+      participants: "Ishtirokchilar",
+      court: "Sud tarkibi",
+      legal: "Yuridik terminlar",
+    },
+    weight: "Og‘irlik",
+  },
+  dashboard: {
+    activeCases: "Faol ishlar",
+    recentCases: "So‘nggi ishlar",
+    quickActions: "Tezkor amallar",
+    viewAll: "Barchasini ko‘rish",
+  },
   participants: {
     add: "Ishtirokchi qo'shish",
     edit: "Tahrirlash",
