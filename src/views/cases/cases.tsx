@@ -11,12 +11,20 @@ import {
 } from "@/shared/components/ui/table";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { StatusBadge } from "@/shared/custom/status-badge";
 import { DateText } from "@/shared/custom/date-text";
 import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { useCases } from "@/features/cases/use-cases";
+import { CASE_STATUS, type CaseStatus } from "@/shared/types/enums";
 import { ROUTE_PATHS, buildRoute, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
@@ -32,13 +40,17 @@ export default function CasesView() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [status, setStatus] = useState<"ALL" | CaseStatus>("ALL");
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 400);
     return () => clearTimeout(id);
   }, [search]);
 
-  const filters = useMemo(() => ({ search: debouncedSearch }), [debouncedSearch]);
+  const filters = useMemo(
+    () => ({ search: debouncedSearch, ...(status !== "ALL" ? { status } : {}) }),
+    [debouncedSearch, status],
+  );
   const { data, isLoading, error } = useCases({ filters });
   const cases = data?.items ?? [];
 
@@ -63,12 +75,27 @@ export default function CasesView() {
         </Button>
       </div>
 
-      <Input
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        placeholder={t("common.search")}
-        className="max-w-sm"
-      />
+      <div className="flex flex-wrap gap-3">
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder={t("common.search")}
+          className="max-w-sm"
+        />
+        <Select value={status} onValueChange={(v) => setStatus(v as "ALL" | CaseStatus)}>
+          <SelectTrigger className="w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">{t("cases.allStatuses")}</SelectItem>
+            {(Object.values(CASE_STATUS) as CaseStatus[]).map((s) => (
+              <SelectItem key={s} value={s}>
+                {t(`enums.caseStatus.${s}` as MessageKey)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {isLoading && <LoadingState rows={5} />}
       {error && <ErrorState />}
