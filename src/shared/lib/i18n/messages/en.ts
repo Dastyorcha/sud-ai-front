@@ -165,6 +165,7 @@ export const en: Messages = {
       status: "Status",
       participants: "Participants",
       updated: "Updated",
+      organization: "Organization",
     },
   },
 };

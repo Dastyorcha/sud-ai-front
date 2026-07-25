@@ -165,6 +165,7 @@ export const ru: Messages = {
       status: "Статус",
       participants: "Участники",
       updated: "Обновлено",
+      organization: "Организация",
     },
   },
 };

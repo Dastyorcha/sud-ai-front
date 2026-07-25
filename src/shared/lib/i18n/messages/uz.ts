@@ -168,6 +168,7 @@ export const uz = {
       status: "Holat",
       participants: "Ishtirokchilar",
       updated: "Yangilangan",
+      organization: "Tashkilot",
     },
   },
 };
