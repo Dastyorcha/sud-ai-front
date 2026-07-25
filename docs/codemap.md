@@ -132,4 +132,7 @@ See `docs/architecture.md` → "Mock API / data layer" for the swap-to-real-API 
 - `src/shared/lib/mock-api/user.service.ts` · `listUsers`, `getUser` · server-shaped user directory service — list + single lookup by id.
 - `src/shared/lib/mock-api/data/organization.ts` · `ORGANIZATION` · the single mock organization/tenant.
 - `src/shared/lib/mock-api/data/users.ts` · `USERS` · mock users across the example admin/editor/viewer roles.
-- `src/shared/lib/mock-api/data/index.ts` · re-exports `ORGANIZATION`, `USERS` · single import surface for the services — add new seed exports here as you add entities.
+- `src/shared/lib/mock-api/data/court-users.ts` · `COURT_USERS` · mock app users, one per court role (spec §4); the accounts auth authenticates and `judgeId` points at.
+- `src/shared/lib/mock-api/data/court-cases.ts` · `COURT_CASES` · mock court cases (spec §14.2); `case-1` is the fully-populated economic-court demo fixture, the rest give the list volume/filters.
+- `src/shared/lib/mock-api/data/participants.ts` · `PARTICIPANTS` · mock participants (spec §14.3); `case-1` has the four-party dispute, others a claimant/defendant pair.
+- `src/shared/lib/mock-api/data/index.ts` · re-exports `ORGANIZATION`, `USERS`, `COURT_USERS`, `COURT_CASES`, `PARTICIPANTS` · single import surface for the services — add new seed exports here as you add entities.
