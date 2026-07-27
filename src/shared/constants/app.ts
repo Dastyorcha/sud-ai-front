@@ -5,8 +5,9 @@
  * examples). Never hardcode the brand string in components or message files;
  * change it here once and it propagates everywhere.
  */
-export const APP_NAME = "React Admin Template";
+export const APP_NAME = "Court AI Assistant";
 
-/** Full/legal display name — same as `APP_NAME` today; kept separate so a
- *  longer legal name can be introduced later without touching call sites. */
-export const APP_FULL_NAME = APP_NAME;
+/** Native-language display name, shown alongside `APP_NAME` in the app
+ *  header/logo lockup (spec mockup: "Court AI Assistant / Sud AI
+ *  Yordamchisi") — a fixed bilingual brand mark, not locale-switched. */
+export const APP_FULL_NAME = "Sud AI Yordamchisi";

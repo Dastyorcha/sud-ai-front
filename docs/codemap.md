@@ -44,11 +44,11 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Widgets (`src/widgets/`)
 
-- `src/widgets/layout/app-shell/app-shell.tsx` · `AppShell` · product shell: fixed sidebar on desktop, `Sheet` drawer on mobile (owns open state), `Topbar`, scrollable `<Outlet>`.
+- `src/widgets/layout/app-shell/app-shell.tsx` · `AppShell` · product shell: fixed sidebar on desktop, `Sheet` drawer on mobile (owns open state), `AppHeader`, scrollable `<Outlet>`.
 - `src/widgets/layout/sidebar/sidebar.tsx` · `Sidebar` · dark nav: brand (`APP_NAME` + mark), `NAV_ITEMS` rows with active-state, footer (`allRightsReserved`).
 - `src/widgets/layout/sidebar/sidebar-nav-item.tsx` · `SidebarNavItem` · one nav row (`Button asChild` + `Link`, icon, label, optional count badge).
-- `src/widgets/layout/topbar/topbar.tsx` · `Topbar` · mobile menu button, `ThemeToggle`, `LangSwitcher`, profile `DropdownMenu` (name/role/org/logout) from `useAuth`.
 - `src/widgets/layout/auth-guard/auth-guard.tsx` · `AuthGuard` · stub guard: redirects to `ROUTE_PATHS.LOGIN` when `useAuth().isAuthenticated` is false (always true today).
+- `src/widgets/app-header/app-header.tsx` · `AppHeader` · court app header (supersedes the old `Topbar`): mobile menu button, gold logo lockup (`APP_NAME`/`APP_FULL_NAME`, links to dashboard), breadcrumb (dashboard → active case number via `matchPath(ROUTE_PATHS.CASE_DETAIL)` + `useCase`), `ThemeToggle`, `LangSwitcher`, user block (avatar initials, name, role) from `useCourtAuth()`.
 
 ## Widgets (→ target `src/widgets/`, pre-FSD)
 
@@ -133,7 +133,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/lib/toast.ts` · `notify` · typed `sonner` toast wrappers (success/error/info/warning) for consistent app toasts.
 - `src/shared/lib/errors/error-map.ts` · `errorMessageKey`, `ErrorCode` · maps a thrown error/`{ code }` to a localized `errors.codes.*` message key; resolve with `t()` and surface via `notify.error`.
 - `src/shared/constants/navbarData.ts` · `NAVBAR_DATA` · nav config for the legacy `MainLayout` header/footer (pre-FSD; superseded by `nav-items.ts` for the app shell).
-- `src/shared/constants/app.ts` · `APP_NAME`, `APP_FULL_NAME` · central brand name — single source of truth; reference instead of hardcoding a product name.
+- `src/shared/constants/app.ts` · `APP_NAME`, `APP_FULL_NAME` · central brand name — `APP_NAME` ("Court AI Assistant") + `APP_FULL_NAME` (native "Sud AI Yordamchisi"), shown together as a fixed bilingual mark in the app header/sidebar/footer.
 - `src/shared/constants/route-paths.ts` · `ROUTE_PATHS`, `RoutePathKey`, `buildRoute`, `DETAIL_PARAM`, `withLocale` · single source of truth for route strings; `buildRoute.userDetail` returns a query-param URL (`/users?user=`) for cross-page detail opens; `DETAIL_PARAM` holds the `user` query key; `withLocale(locale, path)` builds a concrete `/:lang`-prefixed URL.
 - `src/shared/constants/page-names.ts` · `PAGE_NAMES` · i18n page-title message keys keyed by `ROUTE_PATHS` key — resolve with `t(PAGE_NAMES.KEY)`.
 - `src/shared/constants/nav-items.ts` · `NAV_ITEMS`, `NavItem` · sidebar sections; each carries a `labelKey` resolved via `t()`.

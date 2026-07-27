@@ -126,6 +126,9 @@ export const uz = {
     confidence: "Ishonch darajasi",
     unmappedSpeaker: "Bog‘lanmagan gapiruvchi",
   },
+  header: {
+    breadcrumbLabel: "Yo‘naltiruvchi yo‘l",
+  },
   errors: {
     notFoundTitle: "Sahifa topilmadi",
     notFoundDescription: "Siz izlagan sahifa mavjud emas yoki koʻchirilgan.",
@@ -204,7 +207,8 @@ export const uz = {
     edit: "Tahrirlash",
     originalText: "Asl matn",
     mapSpeakers: "Gapiruvchilarni bog'lash",
-    mapSpeakersDesc: "Har bir diarizatsiya yorlig'ini protsessual rolga bog'lang — barcha segmentlarga qo'llanadi.",
+    mapSpeakersDesc:
+      "Har bir diarizatsiya yorlig'ini protsessual rolga bog'lang — barcha segmentlarga qo'llanadi.",
     apply: "Qo'llash",
     filterAll: "Barchasi",
     filterLow: "Past ishonch",
@@ -281,7 +285,7 @@ export const uz = {
     addTitle: "Ishtirokchi qo'shish",
     editTitle: "Ishtirokchini tahrirlash",
     deleteTitle: "Ishtirokchini o'chirish",
-    deleteConfirm: "\"{name}\" ishtirokchisini o'chirmoqchimisiz?",
+    deleteConfirm: '"{name}" ishtirokchisini o\'chirmoqchimisiz?',
     delete: "O'chirish",
   },
   caseForm: {

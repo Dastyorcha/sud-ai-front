@@ -41,9 +41,9 @@ Dependencies point **downward only**. A layer may import from layers below it, n
 
 ### App shell (`src/widgets/layout/`)
 
-- `AppShell` (`app-shell/app-shell.tsx`) composes a fixed dark sidebar on desktop (`md:` breakpoint), a `Sheet` drawer with the same `Sidebar` content on mobile (state owned by `AppShell`), the `Topbar`, and a scrollable `<Outlet>` for the active view.
+- `AppShell` (`app-shell/app-shell.tsx`) composes a fixed dark sidebar on desktop (`md:` breakpoint), a `Sheet` drawer with the same `Sidebar` content on mobile (state owned by `AppShell`), the `AppHeader`, and a scrollable `<Outlet>` for the active view.
 - `Sidebar` (`sidebar/sidebar.tsx`) renders the brand (`APP_NAME` + a mark), the `NAV_ITEMS` rows (`sidebar-nav-item.tsx`, active state by matching `useLocation().pathname` against `withLocale(locale, item.path)`), and a footer line. Uses the `sidebar`/`sidebar-accent`/`sidebar-foreground`/… tokens (dark regardless of the app's light/dark theme).
-- `Topbar` (`topbar/topbar.tsx`) has the mobile menu button (opens the `Sheet`), `ThemeToggle`, `LangSwitcher`, and a profile `DropdownMenu` (name/role/org/logout) sourced from `useAuth`.
+- `AppHeader` (`src/widgets/app-header/app-header.tsx`) is the court header: mobile menu button (opens the `Sheet`), a gold logo lockup (`APP_NAME`/`APP_FULL_NAME`), a breadcrumb (dashboard → active case number, matched off the URL with `matchPath(ROUTE_PATHS.CASE_DETAIL)` — no router change needed), `ThemeToggle`, `LangSwitcher`, and a user block (avatar initials, name, role) sourced from `useCourtAuth`. Supersedes the old `Topbar`.
 - `src/views/dashboard/dashboard.tsx` renders a shared `ComingSoon` (`src/shared/custom/coming-soon.tsx`) — replace it with real KPI/summary widgets when you build the dashboard out. `src/views/users/users.tsx` is the real reference CRUD page — see "Admin-panel patterns" below.
 
 ## Internationalization (i18n)

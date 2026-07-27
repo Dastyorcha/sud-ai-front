@@ -123,6 +123,9 @@ export const ru: Messages = {
     confidence: "Уверенность",
     unmappedSpeaker: "Несопоставленный говорящий",
   },
+  header: {
+    breadcrumbLabel: "Хлебные крошки",
+  },
   errors: {
     notFoundTitle: "Страница не найдена",
     notFoundDescription: "Страница, которую вы ищете, не существует или была перемещена.",
@@ -201,7 +204,8 @@ export const ru: Messages = {
     edit: "Редактировать",
     originalText: "Исходный текст",
     mapSpeakers: "Сопоставить говорящих",
-    mapSpeakersDesc: "Свяжите каждую метку диаризации с процессуальной ролью — применяется ко всем сегментам.",
+    mapSpeakersDesc:
+      "Свяжите каждую метку диаризации с процессуальной ролью — применяется ко всем сегментам.",
     apply: "Применить",
     filterAll: "Все",
     filterLow: "Низкая уверенность",
@@ -278,7 +282,7 @@ export const ru: Messages = {
     addTitle: "Добавить участника",
     editTitle: "Изменить участника",
     deleteTitle: "Удалить участника",
-    deleteConfirm: 'Удалить участника «{name}»?',
+    deleteConfirm: "Удалить участника «{name}»?",
     delete: "Удалить",
   },
   caseForm: {

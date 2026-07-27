@@ -123,6 +123,9 @@ export const en: Messages = {
     confidence: "Confidence",
     unmappedSpeaker: "Unmapped speaker",
   },
+  header: {
+    breadcrumbLabel: "Breadcrumb",
+  },
   errors: {
     notFoundTitle: "Page not found",
     notFoundDescription: "The page you're looking for doesn't exist or has moved.",
