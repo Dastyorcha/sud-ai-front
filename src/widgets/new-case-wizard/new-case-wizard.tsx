@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/compo
 import { Button } from "@/shared/components/ui/button";
 import { Form } from "@/shared/components/ui/form";
 import { StepIndicator } from "@/widgets/new-case-wizard/step-indicator";
+import { CaseTypeStep } from "@/widgets/new-case-wizard/steps/case-type-step";
+import { PartiesStep } from "@/widgets/new-case-wizard/steps/parties-step";
 import {
   CASE_WIZARD_DEFAULTS,
   caseWizardSchema,
@@ -83,13 +85,12 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
         </p>
 
         <Form {...form}>
-          <form className="flex min-h-64 flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-            {step === 1 && (
-              <p className="text-sm text-muted-foreground">{t("caseWizard.steps.type")}</p>
-            )}
-            {step === 2 && (
-              <p className="text-sm text-muted-foreground">{t("caseWizard.steps.parties")}</p>
-            )}
+          <form
+            className="flex max-h-[60vh] min-h-64 flex-col gap-4 overflow-y-auto pr-1"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            {step === 1 && <CaseTypeStep />}
+            {step === 2 && <PartiesStep />}
             {step === 3 && (
               <p className="text-sm text-muted-foreground">{t("caseWizard.steps.claim")}</p>
             )}
