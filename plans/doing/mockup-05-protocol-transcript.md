@@ -15,22 +15,22 @@ The "Sud majlisi bayonnomasi" tab per mockup: action row (upload audio, live rec
 
 ## Affected files
 
-| Path (FSD layer)                     | New? | Intent                                        |
-| ------------------------------------ | ---- | --------------------------------------------- |
-| `src/widgets/protocol-workspace/`    | yes  | tab module: actions + player + panels (lazy)  |
-| `src/widgets/audio-player-bar/`      | yes  | waveform bar player (reuse phase-05 hooks)    |
-| `src/widgets/speakers-panel/`        | ?    | speaker list with color dots (reuse phase-07 pieces) |
-| `src/features/transcript/`           | no   | search + speaker-filter selectors             |
-| existing transcript editor files     | no   | restyle rows: time, speaker tag, editable text |
+| Path (FSD layer)                  | New? | Intent                                               |
+| --------------------------------- | ---- | ---------------------------------------------------- |
+| `src/widgets/protocol-workspace/` | yes  | tab module: actions + player + panels (lazy)         |
+| `src/widgets/audio-player-bar/`   | yes  | waveform bar player (reuse phase-05 hooks)           |
+| `src/widgets/speakers-panel/`     | ?    | speaker list with color dots (reuse phase-07 pieces) |
+| `src/features/transcript/`        | no   | search + speaker-filter selectors                    |
+| existing transcript editor files  | no   | restyle rows: time, speaker tag, editable text       |
 
 ## Steps
 
-1. [ ] Actions row: upload/record buttons wired to phase-05 capture, status badge, timer — `feat: protocol actions row`
-2. [ ] Audio player bar: play toggle, mock progress clock, waveform bars + progress fill, speed select — `feat: audio player bar with waveform`
-3. [ ] Speakers panel with speaker-color tokens; transcript restyled to mockup rows — `feat: speakers panel and transcript restyle`
-4. [ ] Transcript search + speaker filter — `feat: transcript search and speaker filter`
-5. [ ] Generate bar (FPK 273 note + gold CTA → phase-09 protocol editor) — `feat: protocol generate bar`
-6. [ ] i18n + codemap sync — `docs: sync codemap`
+1. [x] Actions row: upload/record buttons wired to phase-05 capture, status badge, timer — `feat: protocol actions row`
+2. [x] Audio player bar: play toggle, mock progress clock, waveform bars + progress fill, speed select — `feat: audio player bar with waveform`
+3. [x] Speakers panel with speaker-color tokens; transcript restyled to mockup rows — `feat: speakers panel and transcript restyle`
+4. [x] Transcript search + speaker filter — `feat: transcript search and speaker filter`
+5. [x] Generate bar (FPK 273 note + gold CTA → phase-09 protocol editor) — `feat: protocol generate bar`
+6. [x] i18n + codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 
