@@ -47,12 +47,19 @@ export const COURT_TYPE = {
 } as const;
 export type CourtType = (typeof COURT_TYPE)[keyof typeof COURT_TYPE];
 
-/** Category of the case (spec §14.2 `case_type`). Provisional. */
+/**
+ * Category of the case (spec §14.2 `case_type`). Provisional.
+ * `CIVIL` and `SPECIAL` were added additively for the new-case wizard's
+ * "case kind" step (mockup-03: Fuqarolik / Iqtisodiy / Maxsus), reusing the
+ * existing `ECONOMIC_DISPUTE` value for "Iqtisodiy".
+ */
 export const CASE_TYPE = {
   ECONOMIC_DISPUTE: "ECONOMIC_DISPUTE",
   DEBT_RECOVERY: "DEBT_RECOVERY",
   CONTRACT_DISPUTE: "CONTRACT_DISPUTE",
   BANKRUPTCY: "BANKRUPTCY",
+  CIVIL: "CIVIL",
+  SPECIAL: "SPECIAL",
   OTHER: "OTHER",
 } as const;
 export type CaseType = (typeof CASE_TYPE)[keyof typeof CASE_TYPE];

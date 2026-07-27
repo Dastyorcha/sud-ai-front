@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -16,9 +16,12 @@ import { EmptyState } from "@/shared/custom/empty-state";
 import { CaseCard } from "@/widgets/case-card/case-card";
 import { useCases } from "@/features/cases/use-cases";
 import { CASE_STAGE, CASE_TYPE, type CaseStage, type CaseType } from "@/shared/types/enums";
-import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
+import { buildRoute, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { notify } from "@/shared/lib/toast";
+
+const NewCaseWizard = lazy(() => import("@/widgets/new-case-wizard/new-case-wizard"));
 
 /**
  * Case dashboard grid (mockup-02): search + type/stage filters over
@@ -28,10 +31,12 @@ import type { MessageKey } from "@/shared/lib/i18n/messages";
  */
 export default function CasesView() {
   const { t, locale } = useTranslation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [caseType, setCaseType] = useState<"ALL" | CaseType>("ALL");
   const [stage, setStage] = useState<"ALL" | CaseStage>("ALL");
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 400);
@@ -58,11 +63,9 @@ export default function CasesView() {
           </h1>
           <p className="text-sm text-muted-foreground">{t("cases.description")}</p>
         </div>
-        <Button variant="gold" asChild>
-          <Link to={withLocale(locale, ROUTE_PATHS.CASE_NEW)}>
-            <Plus className="size-4" />
-            {t("cases.newCaseCta")}
-          </Link>
+        <Button variant="gold" onClick={() => setWizardOpen(true)}>
+          <Plus className="size-4" />
+          {t("cases.newCaseCta")}
         </Button>
       </div>
 
@@ -116,6 +119,20 @@ export default function CasesView() {
             <CaseCard key={courtCase.id} courtCase={courtCase} />
           ))}
         </div>
+      )}
+
+      {wizardOpen && (
+        <Suspense fallback={null}>
+          <NewCaseWizard
+            open={wizardOpen}
+            onOpenChange={setWizardOpen}
+            onCreated={(caseId) => {
+              setWizardOpen(false);
+              notify.success(t("caseWizard.createdToast"));
+              navigate(withLocale(locale, buildRoute.caseDetail(caseId)));
+            }}
+          />
+        </Suspense>
       )}
     </div>
   );
