@@ -5,6 +5,7 @@ import { LoadingState } from "@/shared/custom/loading-state";
 import { useHearings } from "@/features/hearings/use-hearings";
 import { TranscriptPanel } from "@/features/transcript/transcript-panel";
 import { ProtocolActionsRow } from "@/widgets/protocol-workspace/protocol-actions-row";
+import { ProtocolGenerateBar } from "@/widgets/protocol-workspace/protocol-generate-bar";
 import { AudioPlayerBar } from "@/widgets/audio-player-bar/audio-player-bar";
 import { SpeakersPanel } from "@/widgets/speakers-panel/speakers-panel";
 import { transitionHearing } from "@/shared/lib/mock-api/hearing.service";
@@ -78,6 +79,8 @@ export default function ProtocolWorkspace({ caseId }: ProtocolWorkspaceProps) {
               />
             </div>
           </div>
+
+          <ProtocolGenerateBar hearingId={hearing.id} />
         </>
       ) : (
         <EmptyState icon={FileAudio} description={t("protocolWorkspace.processingNotice")} />
