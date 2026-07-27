@@ -208,6 +208,11 @@ export const ru: Messages = {
       participants: "Участники",
       claimAmount: "Сумма иска",
     },
+    tabs: {
+      protocol: "Протокол",
+      documents: "Судебные документы",
+      copilot: "Помощник судьи",
+    },
   },
   hearing: {
     listTitle: "Заседания",

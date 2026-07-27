@@ -211,6 +211,11 @@ export const uz = {
       participants: "Ishtirokchilar",
       claimAmount: "Da'vo summasi",
     },
+    tabs: {
+      protocol: "Bayonnoma",
+      documents: "Sud hujjatlari",
+      copilot: "Sudya maslahatchisi",
+    },
   },
   hearing: {
     listTitle: "Majlislar",

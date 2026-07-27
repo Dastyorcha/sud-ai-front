@@ -208,6 +208,11 @@ export const en: Messages = {
       participants: "Participants",
       claimAmount: "Claim amount",
     },
+    tabs: {
+      protocol: "Protocol",
+      documents: "Court documents",
+      copilot: "Judge copilot",
+    },
   },
   hearing: {
     listTitle: "Hearings",

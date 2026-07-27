@@ -25,7 +25,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/views/dashboard/dashboard.tsx` · `Dashboard` (default) · dashboard placeholder — renders `ComingSoon`. Replace with real KPI/summary widgets.
 - `src/views/cases/cases.tsx` · `CasesView` (default) · court-case dashboard grid (mockup-02, spec FR-02/UC-01) — debounced search + type/stage `Select` filters over `useCases()`, live result count, gold "Yangi ish ochish" CTA, responsive 1/2/3-col grid of `CaseCard`s.
 - `src/views/cases/case-new.tsx` · `CaseNewView` (default) · case creation form (spec UC-01) — requisites + participants field array (RHF + Zod, ≥1 claimant/defendant), `sessionStorage` draft, creates case + participants then opens detail.
-- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · case detail (mockup-04 shell in progress) — back nav, case number/parties headline, `StageBadge`/`CaseTypeTag`, `CaseStats`, requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`/`useDocuments`; reads `:caseId`.
+- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · case-detail shell (mockup-04): back nav, case number/parties headline, `StageBadge`/`CaseTypeTag`, `CaseStats`, then Bayonnoma/Sud hujjatlari/Sudya maslahatchisi `Tabs` (lazy `ProtocolWorkspace`/`DocumentsWorkspace`/`CopilotGrid`); requisites (`DetailGrid`) + participants/hearings management + `VocabularyPanel` stay reachable below via `useCase`/`useParticipants`/`useDocuments`/`useHearings`; reads `:caseId`.
 - `src/views/hearings/hearing-detail.tsx` · `HearingDetailView` (default) · hearing workspace (spec §16.1 #6–9) — tabs: live / transcript / events / protocol; canonical approval transitions the hearing.
 - `src/views/documents/documents.tsx` · `DocumentsView` (default) · generated documents + read-only template catalogue (spec §16.1 #10/#12, D-14).
 - `src/views/admin/admin.tsx` · `AdminView` (default) · read-only audit log + provider status (spec §16.1 #13–14, FR-12, NFR-05).
@@ -52,6 +52,9 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/widgets/app-footer/app-footer.tsx` · `AppFooter`, `SystemStatus` · status footer under the routed content: status dot (`status-ok`/`-warning`/`-error` tokens), last-updated timestamp, version (`APP_VERSION`), tagline.
 - `src/widgets/case-card/case-card.tsx` · `CaseCard`, `CaseCardProps` · dashboard grid card (mockup): case number + `StageBadge`, "X vs Y" parties, subject, `CaseTypeTag`, claim `Money`, updated `DateText`; whole card links to `buildRoute.caseDetail`.
 - `src/widgets/case-stats/case-stats.tsx` · `CaseStats`, `CaseStatsProps` · case-detail shell's 4 stat cards (mockup-04): documents count, days-since-filing duration, participants count, claim `Money`; icon avatar on `gold-soft`.
+- `src/widgets/protocol-workspace/protocol-workspace.tsx` · `ProtocolWorkspace` (default) · "Bayonnoma" tab placeholder (`EmptyState`, `common.comingSoon*`) — lazy-loaded from `case-detail`; real content lands in mockup-05.
+- `src/widgets/documents-workspace/documents-workspace.tsx` · `DocumentsWorkspace` (default) · "Sud hujjatlari" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-06.
+- `src/widgets/copilot-grid/copilot-grid.tsx` · `CopilotGrid` (default) · "Sudya maslahatchisi" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-07.
 
 ## Widgets (→ target `src/widgets/`, pre-FSD)
 
