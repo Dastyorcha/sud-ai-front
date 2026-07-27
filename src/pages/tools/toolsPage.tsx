@@ -111,6 +111,25 @@ export default function ToolsPage() {
     { name: "Sidebar Ring", value: "#4f7cff", class: "bg-sidebar-ring" },
   ];
 
+  const courtThemeColors = [
+    { name: "Gold", value: "#b7862a", class: "bg-gold" },
+    { name: "Gold Foreground", value: "#ffffff", class: "bg-gold-foreground" },
+    { name: "Gold Soft", value: "#fdf3e0", class: "bg-gold-soft" },
+    { name: "Stage 1", value: "#2457d6", class: "bg-stage-1" },
+    { name: "Stage 2", value: "#7047c8", class: "bg-stage-2" },
+    { name: "Stage 3", value: "#0891b2", class: "bg-stage-3" },
+    { name: "Stage 4", value: "#a15c00", class: "bg-stage-4" },
+    { name: "Stage 5", value: "#14804a", class: "bg-stage-5" },
+    { name: "Stage 6", value: "#667085", class: "bg-stage-6" },
+    { name: "Speaker 1", value: "#d6336c", class: "bg-speaker-1" },
+    { name: "Speaker 2", value: "#2457d6", class: "bg-speaker-2" },
+    { name: "Speaker 3", value: "#14804a", class: "bg-speaker-3" },
+    { name: "Speaker 4", value: "#a15c00", class: "bg-speaker-4" },
+    { name: "Status OK", value: "#14804a", class: "bg-status-ok" },
+    { name: "Status Warning", value: "#a15c00", class: "bg-status-warning" },
+    { name: "Status Error", value: "#b42318", class: "bg-status-error" },
+  ];
+
   const tabs = [
     {
       id: "home",
@@ -351,6 +370,49 @@ export default function ToolsPage() {
           </div>
         </motion.section>
 
+        {/* Court Theme Colors Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="mb-16"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <Circle className="text-gold" size={32} />
+            <h2 className="text-3xl font-bold text-primary">Court Theme Colors</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {courtThemeColors.map((color, index) => (
+              <motion.div
+                key={color.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className="bg-card rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-border"
+              >
+                <div className={`h-24 ${color.class}`}></div>
+                <div className="p-5 flex items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">{color.name}</h3>
+                    <p className="text-xs text-muted-foreground font-mono">{color.value}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(color.value, color.name)}
+                  >
+                    {copiedColor === color.name ? (
+                      <Check size={20} className="text-success" />
+                    ) : (
+                      <Copy size={20} className="text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
         {/* Buttons Section */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -467,6 +529,12 @@ export default function ToolsPage() {
                 <p className="text-sm text-muted-foreground font-mono">
                   text-sm text-muted-foreground
                 </p>
+              </div>
+              <div>
+                <p className="font-serif text-lg text-foreground mb-2">
+                  Font Serif — Court identity fallback stack for formal document copy.
+                </p>
+                <p className="text-sm text-muted-foreground font-mono">font-serif</p>
               </div>
             </div>
           </div>

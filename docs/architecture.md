@@ -77,8 +77,10 @@ Full spec: `docs/i18n.md`. A lightweight **custom** layer — no library:
 - **Color families** (light + dark defined):
   - shadcn base: `background`, `foreground`, `card`, `popover`, `primary` (+ `primary-foreground`, `primary-soft`), `secondary`, `muted` (+ `muted-foreground`), `accent` (+ `accent-foreground`), `border`, `input`, `ring`.
   - status: `destructive` (+ `-foreground`, `-soft`), `success` (+ `-foreground`, `-soft`), `warning` (+ `-foreground`, `-soft`).
-  - charts: `chart-1..5`.
+  - charts: `chart-1..5`; risk badges: `risk-low..critical`.
   - sidebar: `sidebar` (dark nav surface) + `sidebar-foreground`/`-primary`/`-accent`/`-border`/`-ring`.
+  - court theme (mockup): `gold` (+ `-foreground`, `-soft`) accent; `stage-1..6` (case pipeline badges); `speaker-1..4` (transcript diarization); `status-ok`/`status-warning`/`status-error` (system status dot — distinct from form `success`/`warning`/`destructive`).
+  - fonts: `font-sans` (Inter, system fallback), `font-serif` (Noto Serif, system fallback) — system/self-hosted fallback stacks only, no font package or external `<link>`.
 - A new token → add it in `@theme inline` **and** `:root` **and** `.dark`, then use the utility; add a swatch to `/tools`.
 - Full UI ruleset: `.claude/skills/ui-designer/SKILL.md`.
 

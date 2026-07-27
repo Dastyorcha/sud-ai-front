@@ -15,17 +15,17 @@ Give the app the mockup's court identity: header with ⚖️ logo + "Court AI As
 
 ## Affected files
 
-| Path (FSD layer)                      | New? | Intent                                        |
-| ------------------------------------- | ---- | --------------------------------------------- |
-| `src/index.css`                       | no   | gold/stage/speaker/status tokens, fonts       |
-| `src/widgets/app-header/`             | ?    | logo, breadcrumb, user info (create or restyle existing header) |
-| `src/widgets/app-footer/`             | yes  | version, system status dot, tagline           |
-| `src/app/` layout                     | no   | mount header/footer around routed views       |
-| `src/shared/lib/i18n/` messages       | no   | header/footer strings uz/en/ru                |
+| Path (FSD layer)                | New? | Intent                                                          |
+| ------------------------------- | ---- | --------------------------------------------------------------- |
+| `src/index.css`                 | no   | gold/stage/speaker/status tokens, fonts                         |
+| `src/widgets/app-header/`       | ?    | logo, breadcrumb, user info (create or restyle existing header) |
+| `src/widgets/app-footer/`       | yes  | version, system status dot, tagline                             |
+| `src/app/` layout               | no   | mount header/footer around routed views                         |
+| `src/shared/lib/i18n/` messages | no   | header/footer strings uz/en/ru                                  |
 
 ## Steps
 
-1. [ ] Add tokens to `src/index.css` (gold accent, 6 stage colors, 4 speaker colors, status green/amber/red) with dark-mode variants — `feat: court theme tokens`
+1. [x] Add tokens to `src/index.css` (gold accent, 6 stage colors, 4 speaker colors, status green/amber/red) with dark-mode variants — `feat: court theme tokens`
 2. [ ] Header widget: logo block, breadcrumb (home / active case number), user avatar+name+role from auth state — `feat: court app header with breadcrumb`
 3. [ ] Footer widget: version, status dot, last-update, tagline — `feat: app status footer`
 4. [ ] i18n messages + codemap sync — `docs: sync codemap`
