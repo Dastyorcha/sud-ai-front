@@ -28,7 +28,7 @@ Case detail page frame per mockup: back button ("Ishlar ro'yxati"), case number 
 1. [x] Detail header: back button, number, parties line, stage badge; wire breadcrumb — `feat: case detail header`
 2. [x] Stat cards widget fed from case + participants + documents services — `feat: case detail stat cards`
 3. [x] Sub-tabs with lazy `Suspense` modules (placeholder panels until 05/06/07 land) — `feat: case detail sub tabs`
-4. [ ] i18n + codemap sync — `docs: sync codemap`
+4. [x] i18n + codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 
