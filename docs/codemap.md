@@ -60,6 +60,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/widgets/documents-workspace/documents-workspace.tsx` · `DocumentsWorkspace` (default) · "Sud hujjatlari" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-06.
 - `src/widgets/template-selector/template-selector.tsx` · `TemplateSelector` (default), `TemplateSelectorProps` (`selectedId`, `onSelect`) · mockup-06 template picker — 5 grouped card rows over `PROCEDURAL_DOCUMENT_TEMPLATES`, active-selection state.
 - `src/widgets/case-facts-panel/case-facts-panel.tsx` · `CaseFactsPanel` (default), `CaseFactsPanelProps` (`courtCase`) · mockup-06 "Ish ma'lumotlari" panel — case number/parties/subject/claim/filed date, plus a local (non-persisted) evidence checklist.
+- `src/widgets/document-editor/document-editor.tsx` · `DocumentEditor` (default), `DocumentEditorProps`, `DocumentSectionId`, `DocumentSections`, `DOCUMENT_SECTION_ORDER`, `DOCUMENT_EDITOR_PRINT_AREA_ID` · mockup-06 sectioned editor — collapsible bordered block per section I–IV (`intro|descriptive|reasoning|conclusion`), "AI yordamida" badge on III, controlled `Textarea` per section; content wrapper carries `DOCUMENT_EDITOR_PRINT_AREA_ID` for `src/shared/styles/print.css`; subscribes to `document-fill`'s `onAppendToSection` so mockup-07's copilot can insert text into an open section.
 - `src/widgets/copilot-grid/copilot-grid.tsx` · `CopilotGrid` (default) · "Sudya maslahatchisi" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-07.
 
 ## Widgets (→ target `src/widgets/`, pre-FSD)
@@ -82,6 +83,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/features/participants/use-participants.ts` · `useParticipants`, `UseParticipantsResult` · a case's participants hook over `participant.service.listParticipants`.
 - `src/features/participants/participant-form-dialog.tsx` · `ParticipantFormDialog`, `ParticipantFormDialogProps` · add/edit participant dialog (spec §14.3, UC-01 Step 4.5) — create/update via the service, `onSaved` for refetch.
 - `src/features/documents/use-documents.ts` · `useDocuments`, `UseDocumentsResult` · a case's generated-documents hook over `document.service.listDocuments`.
+- `src/features/document-fill/document-append-bus.ts` · `onAppendToSection`, `appendToSection` · module-singleton pub/sub letting another feature (mockup-07 judge copilot) push text into an open `DocumentEditor` section without prop-drilling or a context provider.
 
 ## Shared — custom (`src/shared/custom/`)
 
@@ -164,6 +166,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/lib/i18n/messages/ru.ts` · `ru` · RU messages, typed against `Messages`.
 - `src/shared/lib/i18n/messages/index.ts` · `MESSAGES`, `MessageKey`, `Messages` · aggregated messages + the typed dot-path key union for `t()`.
 - `src/shared/styles/tag-styles.css` · — · non-token global styles.
+- `src/shared/styles/print.css` · — · `@media print` scoping (mockup-06 "Chop etish") — hides app chrome, prints only `#document-editor-print-area`; imported from `src/index.css`.
 - `src/index.css` · — · Tailwind v4 entry + design tokens (`:root` / `.dark`, mapped via `@theme inline`).
 
 ## Shared — mock API / data layer (`src/shared/lib/mock-api/`)
