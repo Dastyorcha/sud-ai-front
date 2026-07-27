@@ -52,7 +52,8 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/widgets/app-footer/app-footer.tsx` · `AppFooter`, `SystemStatus` · status footer under the routed content: status dot (`status-ok`/`-warning`/`-error` tokens), last-updated timestamp, version (`APP_VERSION`), tagline.
 - `src/widgets/case-card/case-card.tsx` · `CaseCard`, `CaseCardProps` · dashboard grid card (mockup): case number + `StageBadge`, "X vs Y" parties, subject, `CaseTypeTag`, claim `Money`, updated `DateText`; whole card links to `buildRoute.caseDetail`.
 - `src/widgets/case-stats/case-stats.tsx` · `CaseStats`, `CaseStatsProps` · case-detail shell's 4 stat cards (mockup-04): documents count, days-since-filing duration, participants count, claim `Money`; icon avatar on `gold-soft`.
-- `src/widgets/protocol-workspace/protocol-workspace.tsx` · `ProtocolWorkspace` (default) · "Bayonnoma" tab placeholder (`EmptyState`, `common.comingSoon*`) — lazy-loaded from `case-detail`; real content lands in mockup-05.
+- `src/widgets/protocol-workspace/protocol-workspace.tsx` · `ProtocolWorkspace` (default), `ProtocolWorkspaceProps` (`caseId`) · "Bayonnoma" tab (mockup-05): picks the case's processed hearing (or its most recent) via `useHearings`, renders `ProtocolActionsRow` + (once processed) the audio player/speakers/transcript/generate-bar workspace; `NoData` when the case has no hearing — lazy-loaded from `case-detail`.
+- `src/widgets/protocol-workspace/protocol-actions-row.tsx` · `ProtocolActionsRow` · mockup-05 toolbar: upload-audio dialog (`FileDropzone`, demo-only), record/pause/stop wired to the same §17.3 `transitionHearing` state machine + phase-05 mic-level meter as `LiveHearingPanel`, elapsed timer, `RecordStateBadge`, duration.
 - `src/widgets/documents-workspace/documents-workspace.tsx` · `DocumentsWorkspace` (default) · "Sud hujjatlari" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-06.
 - `src/widgets/copilot-grid/copilot-grid.tsx` · `CopilotGrid` (default) · "Sudya maslahatchisi" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-07.
 
@@ -89,6 +90,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/custom/case-type-tag.tsx` · `CaseTypeTag`, `CaseTypeTagProps` · neutral outline `Badge` for a case's `CaseType`, label via `enums.caseType.*`.
 - `src/shared/custom/record/timestamp.tsx` · `Timestamp` · mono, tabular hearing-relative `HH:MM:SS`/`MM:SS`; clickable variant emits `onSeek(ms)` (spec §16.3).
 - `src/shared/custom/record/speaker-chip.tsx` · `SpeakerChip` · speaker attribution chip — unmapped (mono, dashed) / mapped (role) / conflicting (destructive) states (spec §9.6).
+- `src/shared/custom/record/speaker-color.ts` · `speakerColorClass` · stable `speaker-1..4` dot-color class for a diarization label (string hash) — shared by `SpeakersPanel` and the transcript rows (mockup-05).
 - `src/shared/custom/record/confidence-bar.tsx` · `ConfidenceBar` · 3px STT confidence meter, `warning` below 0.75, numeric value via ARIA (spec §16.3).
 - `src/shared/custom/record/record-state-badge.tsx` · `RecordStateBadge` · single badge for document/segment/hearing/job status; one tone table per enum, label via `enums.*` (spec §16, FR-11).
 - `src/shared/custom/record/critical-field-mark.tsx` · `CriticalFieldMark` · inline dotted-underline mark for critical fields; reviewed=success, unreviewed=destructive (spec §10.3).

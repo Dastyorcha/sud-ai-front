@@ -176,7 +176,7 @@ export default function CaseDetailView() {
             label: t("caseDetail.tabs.protocol"),
             content: (
               <Suspense fallback={<LoadingState rows={4} />}>
-                <ProtocolWorkspace />
+                <ProtocolWorkspace caseId={caseId} />
               </Suspense>
             ),
           },
