@@ -28,7 +28,7 @@ Rebuild the cases list page as the mockup's dashboard: search bar, "Yangi ish oc
 1. [x] `StageBadge` + `CaseTypeTag` shared components using stage tokens — `feat: stage badge and case type tag`
 2. [x] `CaseCard` widget (header/body/footer layout, click → case detail route) — `feat: case card widget`
 3. [x] Dashboard view: search input, type/stage selects, count label, grid; filter logic on fixture data — `feat: dashboard case grid with filters`
-4. [ ] i18n for case types/stages/labels; codemap sync — `docs: sync codemap`
+4. [x] i18n for case types/stages/labels; codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 

@@ -452,6 +452,10 @@ export default function ToolsPage() {
                   <Button variant="icon" size="icon">
                     <Eye size={20} />
                   </Button>
+                  <Button variant="gold">
+                    <Zap size={20} />
+                    Gold Button
+                  </Button>
                 </div>
               </div>
 
