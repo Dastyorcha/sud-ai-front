@@ -345,6 +345,21 @@ export const en: Messages = {
         "Note: this text is a generated sample — have it reviewed by legal counsel before printing.",
     },
   },
+  copilotGrid: {
+    defects: {
+      title: "Procedural defects",
+      empty: "No defects detected.",
+      severity: {
+        danger: "High risk",
+        warning: "Medium risk",
+        info: "For information",
+      },
+    },
+    lawArticles: {
+      title: "Relevant law articles",
+      empty: "No relevant articles found.",
+    },
+  },
   admin: {
     description: "Templates, audit log and system status (read-only).",
     auditLog: "Audit log",

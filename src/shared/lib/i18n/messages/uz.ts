@@ -349,6 +349,21 @@ export const uz = {
         "Diqqat: matn namuna sifatida yaratilgan, chop etishdan oldin yuridik ko'rikdan o'tkazing.",
     },
   },
+  copilotGrid: {
+    defects: {
+      title: "Protsessual kamchiliklar",
+      empty: "Kamchiliklar aniqlanmadi.",
+      severity: {
+        danger: "Yuqori xavf",
+        warning: "O'rta xavf",
+        info: "Ma'lumot uchun",
+      },
+    },
+    lawArticles: {
+      title: "Tegishli qonun moddalari",
+      empty: "Tegishli moddalar topilmadi.",
+    },
+  },
   admin: {
     description: "Shablonlar, audit jurnali va tizim holati (faqat o'qish).",
     auditLog: "Audit jurnali",
