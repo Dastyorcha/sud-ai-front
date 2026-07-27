@@ -28,7 +28,7 @@ Give the app the mockup's court identity: header with ⚖️ logo + "Court AI As
 1. [x] Add tokens to `src/index.css` (gold accent, 6 stage colors, 4 speaker colors, status green/amber/red) with dark-mode variants — `feat: court theme tokens`
 2. [x] Header widget: logo block, breadcrumb (home / active case number), user avatar+name+role from auth state — `feat: court app header with breadcrumb`
 3. [x] Footer widget: version, status dot, last-update, tagline — `feat: app status footer`
-4. [ ] i18n messages + codemap sync — `docs: sync codemap`
+4. [x] i18n messages + codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 
