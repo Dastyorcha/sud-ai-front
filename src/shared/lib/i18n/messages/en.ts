@@ -359,6 +359,23 @@ export const en: Messages = {
       title: "Relevant law articles",
       empty: "No relevant articles found.",
     },
+    deadlines: {
+      title: "Procedural deadlines",
+      empty: "No deadlines being tracked.",
+      daysLeft: "{count} days left",
+      overdue: "Overdue",
+      urgency: {
+        urgent: "Urgent",
+        warning: "Needs attention",
+        normal: "On schedule",
+      },
+    },
+    suggestions: {
+      title: "AI conclusions & recommendations",
+      empty: "No recommendations available.",
+      addToDocument: "Add to document",
+      addedToast: 'Added to the draft\'s "Reasoning" section',
+    },
   },
   admin: {
     description: "Templates, audit log and system status (read-only).",

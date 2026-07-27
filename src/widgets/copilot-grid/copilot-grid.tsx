@@ -1,20 +1,33 @@
-import { Sparkles } from "lucide-react";
-import { EmptyState } from "@/shared/custom/empty-state";
-import { useTranslation } from "@/shared/lib/i18n/locale-context";
+import { LoadingState } from "@/shared/custom/loading-state";
+import { ErrorState } from "@/shared/custom/error-state";
+import { useCopilot } from "@/features/copilot/use-copilot";
+import { DefectsCard } from "@/widgets/copilot-grid/components/defects-card";
+import { LawArticlesCard } from "@/widgets/copilot-grid/components/law-articles-card";
+import { DeadlinesCard } from "@/widgets/copilot-grid/components/deadlines-card";
+import { AiSuggestionsCard } from "@/widgets/copilot-grid/components/ai-suggestions-card";
+
+export interface CopilotGridProps {
+  caseId: string;
+}
 
 /**
- * "Sudya maslahatchisi" tab placeholder — defects, law-article suggestions,
- * deadlines and AI recommendations land in mockup-07. Lazy-loaded from
- * `case-detail`.
+ * "Sudya maslahatchisi" tab (mockup-07): a 2×2 card grid — procedural
+ * defects, relevant law articles, procedural deadlines and AI conclusions —
+ * collapsing to a single column on narrow widths. All data is per-case
+ * fixtures via `useCopilot` (mock service). Lazy-loaded from `case-detail`.
  */
-export default function CopilotGrid() {
-  const { t } = useTranslation();
+export default function CopilotGrid({ caseId }: CopilotGridProps) {
+  const { data, isLoading, error, refetch } = useCopilot(caseId);
+
+  if (isLoading) return <LoadingState rows={6} />;
+  if (error || !data) return <ErrorState onRetry={refetch} />;
 
   return (
-    <EmptyState
-      icon={Sparkles}
-      title={t("common.comingSoonTitle")}
-      description={t("common.comingSoonDescription")}
-    />
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <DefectsCard defects={data.defects} />
+      <LawArticlesCard lawArticles={data.lawArticles} />
+      <DeadlinesCard deadlines={data.deadlines} />
+      <AiSuggestionsCard suggestions={data.suggestions} />
+    </div>
   );
 }

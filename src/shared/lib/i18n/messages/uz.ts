@@ -363,6 +363,23 @@ export const uz = {
       title: "Tegishli qonun moddalari",
       empty: "Tegishli moddalar topilmadi.",
     },
+    deadlines: {
+      title: "Protsessual muddatlar",
+      empty: "Kuzatilayotgan muddatlar yo'q.",
+      daysLeft: "{count} kun qoldi",
+      overdue: "Muddati o'tgan",
+      urgency: {
+        urgent: "Zudlik bilan",
+        warning: "Diqqat talab qiladi",
+        normal: "Rejadagi",
+      },
+    },
+    suggestions: {
+      title: "AI xulosalari va tavsiyalari",
+      empty: "Tavsiyalar mavjud emas.",
+      addToDocument: "Hujjatga qo'shish",
+      addedToast: 'Hujjat loyihasining "Asoslantiruvchi" qismiga qo\'shildi',
+    },
   },
   admin: {
     description: "Shablonlar, audit jurnali va tizim holati (faqat o'qish).",

@@ -194,7 +194,7 @@ export default function CaseDetailView() {
             label: t("caseDetail.tabs.copilot"),
             content: (
               <Suspense fallback={<LoadingState rows={4} />}>
-                <CopilotGrid />
+                <CopilotGrid caseId={caseId} />
               </Suspense>
             ),
           },
