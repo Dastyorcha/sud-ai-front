@@ -25,8 +25,10 @@ import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { StageBadge } from "@/shared/custom/stage-badge";
 import { CaseTypeTag } from "@/shared/custom/case-type-tag";
+import { CaseStats } from "@/widgets/case-stats/case-stats";
 import { useCase } from "@/features/cases/use-case";
 import { useParticipants } from "@/features/participants/use-participants";
+import { useDocuments } from "@/features/documents/use-documents";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
 import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
 import { useHearings } from "@/features/hearings/use-hearings";
@@ -51,6 +53,7 @@ export default function CaseDetailView() {
   const { caseId = "" } = useParams<{ caseId: string }>();
   const { data: courtCase, isLoading, error } = useCase(caseId);
   const { data: participants, refetch: refetchParticipants } = useParticipants(caseId);
+  const { data: documents } = useDocuments(caseId);
   const { data: hearings, refetch: refetchHearings } = useHearings(caseId);
 
   async function addHearing() {
@@ -149,6 +152,12 @@ export default function CaseDetailView() {
           <p className="text-sm text-muted-foreground">{courtCase.subject}</p>
         </div>
       </div>
+
+      <CaseStats
+        courtCase={courtCase}
+        documentsCount={documents?.length ?? 0}
+        participantsCount={participants?.length ?? courtCase.participantCount}
+      />
 
       <DetailGrid
         items={[

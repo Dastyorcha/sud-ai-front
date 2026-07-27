@@ -201,6 +201,13 @@ export const en: Messages = {
   },
   caseDetail: {
     backToList: "Case list",
+    stats: {
+      documents: "Documents",
+      duration: "Duration",
+      durationValue: "{count} days",
+      participants: "Participants",
+      claimAmount: "Claim amount",
+    },
   },
   hearing: {
     listTitle: "Hearings",

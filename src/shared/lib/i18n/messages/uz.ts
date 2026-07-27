@@ -204,6 +204,13 @@ export const uz = {
   },
   caseDetail: {
     backToList: "Ishlar ro'yxati",
+    stats: {
+      documents: "Hujjatlar",
+      duration: "Davomiylik",
+      durationValue: "{count} kun",
+      participants: "Ishtirokchilar",
+      claimAmount: "Da'vo summasi",
+    },
   },
   hearing: {
     listTitle: "Majlislar",

@@ -201,6 +201,13 @@ export const ru: Messages = {
   },
   caseDetail: {
     backToList: "Список дел",
+    stats: {
+      documents: "Документы",
+      duration: "Длительность",
+      durationValue: "{count} дн.",
+      participants: "Участники",
+      claimAmount: "Сумма иска",
+    },
   },
   hearing: {
     listTitle: "Заседания",
