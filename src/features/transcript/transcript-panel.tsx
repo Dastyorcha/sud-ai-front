@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { Check, Pencil, Users } from "lucide-react";
+import { Check, Pencil, Search, Users } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import {
   Dialog,
@@ -41,6 +42,7 @@ import { cn } from "@/shared/lib/utils";
 
 type Filter = "all" | "low" | "critical" | "unverified";
 const NONE = "NONE";
+const ALL_SPEAKERS = "ALL";
 
 export interface TranscriptPanelProps {
   hearing: Hearing;
@@ -64,24 +66,35 @@ export function TranscriptPanel({ hearing, onApproved, activeMs }: TranscriptPan
   } = useMockQuery(() => listSegments(hearing.id), [hearing.id]);
   const { data: participants } = useParticipants(hearing.caseId);
   const [filter, setFilter] = useState<Filter>("all");
+  const [search, setSearch] = useState("");
+  const [speakerFilter, setSpeakerFilter] = useState(ALL_SPEAKERS);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [mapOpen, setMapOpen] = useState(false);
   const [mapping, setMapping] = useState<Record<string, string>>({});
 
   const filtered = useMemo(() => {
-    const all = segments ?? [];
+    let all = segments ?? [];
     switch (filter) {
       case "low":
-        return all.filter((s) => (s.confidence ?? 1) < 0.75);
+        all = all.filter((s) => (s.confidence ?? 1) < 0.75);
+        break;
       case "critical":
-        return all.filter((s) => !s.isCriticalReviewed);
+        all = all.filter((s) => !s.isCriticalReviewed);
+        break;
       case "unverified":
-        return all.filter((s) => s.status !== "VERIFIED");
-      default:
-        return all;
+        all = all.filter((s) => s.status !== "VERIFIED");
+        break;
     }
-  }, [segments, filter]);
+    if (speakerFilter !== ALL_SPEAKERS) {
+      all = all.filter((s) => s.speakerLabel === speakerFilter);
+    }
+    const query = search.trim().toLowerCase();
+    if (query) {
+      all = all.filter((s) => s.canonicalText.toLowerCase().includes(query));
+    }
+    return all;
+  }, [segments, filter, speakerFilter, search]);
 
   const unreviewedCritical = (segments ?? []).filter((s) => !s.isCriticalReviewed).length;
   const speakerLabels = useMemo(
@@ -123,6 +136,36 @@ export function TranscriptPanel({ hearing, onApproved, activeMs }: TranscriptPan
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative w-full sm:w-56">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("transcript.searchPlaceholder")}
+            className="pl-8"
+            aria-label={t("transcript.searchPlaceholder")}
+          />
+        </div>
+
+        <Select value={speakerFilter} onValueChange={setSpeakerFilter}>
+          <SelectTrigger className="w-full sm:w-48" aria-label={t("transcript.allSpeakers")}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_SPEAKERS}>{t("transcript.allSpeakers")}</SelectItem>
+            {speakerLabels.map((label) => (
+              <SelectItem key={label} value={label}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
           <Button
