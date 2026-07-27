@@ -9,6 +9,8 @@ import { StepIndicator } from "@/widgets/new-case-wizard/step-indicator";
 import { CaseTypeStep } from "@/widgets/new-case-wizard/steps/case-type-step";
 import { PartiesStep } from "@/widgets/new-case-wizard/steps/parties-step";
 import { ClaimStep } from "@/widgets/new-case-wizard/steps/claim-step";
+import { DocumentsStep } from "@/widgets/new-case-wizard/steps/documents-step";
+import { SummaryStep } from "@/widgets/new-case-wizard/steps/summary-step";
 import {
   CASE_WIZARD_DEFAULTS,
   caseWizardSchema,
@@ -16,8 +18,14 @@ import {
   WIZARD_STEP_FIELDS,
   type CaseWizardValues,
 } from "@/features/case-create/schema";
+import {
+  REQUIRED_DOCUMENT_KEYS,
+  type RequiredDocumentKey,
+} from "@/features/case-create/categories";
+import { useCreateCase } from "@/features/case-create/use-create-case";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { notify } from "@/shared/lib/toast";
 
 export interface NewCaseWizardProps {
   open: boolean;
@@ -44,6 +52,9 @@ const STEP_LABEL_KEYS: MessageKey[] = [
 export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCaseWizardProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
+  const [files, setFiles] = useState<File[]>([]);
+  const [checkedDocs, setCheckedDocs] = useState<RequiredDocumentKey[]>([]);
+  const { submit, isSubmitting } = useCreateCase();
 
   const form = useForm<CaseWizardValues>({
     resolver: zodResolver(caseWizardSchema),
@@ -53,6 +64,8 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
 
   function resetWizard() {
     setStep(1);
+    setFiles([]);
+    setCheckedDocs([]);
     form.reset(CASE_WIZARD_DEFAULTS);
   }
 
@@ -70,6 +83,18 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
 
   function goBack() {
     setStep((s) => Math.max(s - 1, 1));
+  }
+
+  async function handleFinish() {
+    const valid = await form.trigger();
+    if (!valid) return;
+    try {
+      const created = await submit(form.getValues());
+      resetWizard();
+      onCreated(created.id);
+    } catch {
+      notify.error(t("errors.genericTitle"));
+    }
   }
 
   return (
@@ -94,16 +119,30 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
             {step === 2 && <PartiesStep />}
             {step === 3 && <ClaimStep />}
             {step === 4 && (
-              <p className="text-sm text-muted-foreground">{t("caseWizard.steps.documents")}</p>
+              <DocumentsStep
+                files={files}
+                onFilesChange={setFiles}
+                checkedDocs={checkedDocs}
+                onCheckedDocsChange={setCheckedDocs}
+              />
             )}
             {step === 5 && (
-              <p className="text-sm text-muted-foreground">{t("caseWizard.steps.summary")}</p>
+              <SummaryStep
+                fileCount={files.length}
+                checkedDocsCount={checkedDocs.length}
+                requiredDocsCount={REQUIRED_DOCUMENT_KEYS.length}
+              />
             )}
           </form>
         </Form>
 
         <div className="flex items-center justify-between border-t border-border pt-4">
-          <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={() => handleOpenChange(false)}
+          >
             {t("caseWizard.cancel")}
           </Button>
           <div className="flex gap-2">
@@ -118,8 +157,8 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
               </Button>
             )}
             {step === WIZARD_STEP_COUNT && (
-              <Button type="button" variant="gold" onClick={() => onCreated("")}>
-                {t("caseWizard.finish")}
+              <Button type="button" variant="gold" disabled={isSubmitting} onClick={handleFinish}>
+                {isSubmitting ? t("caseWizard.creating") : t("caseWizard.finish")}
               </Button>
             )}
           </div>
