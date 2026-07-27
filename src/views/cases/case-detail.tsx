@@ -185,7 +185,7 @@ export default function CaseDetailView() {
             label: t("caseDetail.tabs.documents"),
             content: (
               <Suspense fallback={<LoadingState rows={4} />}>
-                <DocumentsWorkspace />
+                <DocumentsWorkspace caseId={caseId} />
               </Suspense>
             ),
           },

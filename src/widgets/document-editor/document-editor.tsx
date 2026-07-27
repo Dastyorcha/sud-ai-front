@@ -5,22 +5,16 @@ import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { onAppendToSection } from "@/features/document-fill/document-append-bus";
+import {
+  DOCUMENT_SECTION_ORDER,
+  type DocumentSectionId,
+  type DocumentSections,
+} from "@/features/document-fill/document-sections";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 import { cn } from "@/shared/lib/utils";
 
-/** The four fixed sections of every procedural document (mockup-06). */
-export type DocumentSectionId = "intro" | "descriptive" | "reasoning" | "conclusion";
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const DOCUMENT_SECTION_ORDER: DocumentSectionId[] = [
-  "intro",
-  "descriptive",
-  "reasoning",
-  "conclusion",
-];
-
-export type DocumentSections = Record<DocumentSectionId, string>;
+export type { DocumentSectionId, DocumentSections };
 
 export interface DocumentEditorProps {
   /** Selected template's title key, or `undefined` for the untitled placeholder. */
