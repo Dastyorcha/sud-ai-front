@@ -15,21 +15,21 @@ The "Sud hujjatlari" tab per mockup: a template selector of 5 grouped card rows 
 
 ## Affected files
 
-| Path (FSD layer)                        | New? | Intent                                      |
-| --------------------------------------- | ---- | ------------------------------------------- |
-| `src/shared/constants/document-templates.ts` | yes | 17 templates in 5 groups w/ articles     |
-| `src/widgets/template-selector/`        | yes  | grouped card grid, active state (lazy)      |
-| `src/widgets/case-facts-panel/`         | yes  | facts + evidence checklist                  |
-| `src/widgets/document-editor/`          | ?    | collapsible sections I–IV (reuse phase-09/10 editor internals) |
-| `src/features/document-fill/`           | yes  | template → prefilled section text from case |
+| Path (FSD layer)                             | New? | Intent                                                         |
+| -------------------------------------------- | ---- | -------------------------------------------------------------- |
+| `src/shared/constants/document-templates.ts` | yes  | 17 templates in 5 groups w/ articles                           |
+| `src/widgets/template-selector/`             | yes  | grouped card grid, active state (lazy)                         |
+| `src/widgets/case-facts-panel/`              | yes  | facts + evidence checklist                                     |
+| `src/widgets/document-editor/`               | ?    | collapsible sections I–IV (reuse phase-09/10 editor internals) |
+| `src/features/document-fill/`                | yes  | template → prefilled section text from case                    |
 
 ## Steps
 
-1. [ ] Template catalog constant + selector widget — `feat: procedural document template selector`
-2. [ ] Facts panel from case/participant services + evidence checklist — `feat: case facts panel`
-3. [ ] Sectioned editor: collapsible I–IV, section badges, AI badge on III — `feat: sectioned document editor`
-4. [ ] Mock AI fill + export/print stubs — `feat: ai fill and export stubs`
-5. [ ] i18n + codemap sync — `docs: sync codemap`
+1. [x] Template catalog constant + selector widget — `feat: procedural document template selector`
+2. [x] Facts panel from case/participant services + evidence checklist — `feat: case facts panel`
+3. [x] Sectioned editor: collapsible I–IV, section badges, AI badge on III — `feat: sectioned document editor`
+4. [x] Mock AI fill + export/print stubs — `feat: ai fill and export stubs`
+5. [x] i18n + codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 
