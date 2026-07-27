@@ -15,20 +15,20 @@
 
 ## Affected files
 
-| Path (FSD layer)                     | New? | Intent                                    |
-| ------------------------------------ | ---- | ----------------------------------------- |
-| `src/widgets/new-case-wizard/`       | yes  | modal, steps, footer nav (lazy)           |
-| `src/features/case-create/`          | yes  | form schema (zod), boj calc, submit hook  |
-| `src/views/dashboard/`               | no   | wire button → open wizard                 |
-| `src/shared/components/ui/`          | ?    | add missing shadcn primitives (stepper via composition; ask before new packages) |
+| Path (FSD layer)               | New? | Intent                                                                           |
+| ------------------------------ | ---- | -------------------------------------------------------------------------------- |
+| `src/widgets/new-case-wizard/` | yes  | modal, steps, footer nav (lazy)                                                  |
+| `src/features/case-create/`    | yes  | form schema (zod), boj calc, submit hook                                         |
+| `src/views/dashboard/`         | no   | wire button → open wizard                                                        |
+| `src/shared/components/ui/`    | ?    | add missing shadcn primitives (stepper via composition; ask before new packages) |
 
 ## Steps
 
-1. [ ] Wizard shell: `ReusableModal`/Dialog, step indicators, prev/next/finish footer, step counter — `feat: new case wizard shell`
-2. [ ] Steps 1–2: kind cards, category select, parties form (react-hook-form + zod) — `feat: wizard case type and parties steps`
-3. [ ] Step 3: claim fields + boj calculator — `feat: wizard claim step with fee calculator`
-4. [ ] Steps 4–5: upload dropzone + required-docs list, summary + confirm → create case, toast, navigate — `feat: wizard documents and confirm steps`
-5. [ ] i18n + codemap sync — `docs: sync codemap`
+1. [x] Wizard shell: `ReusableModal`/Dialog, step indicators, prev/next/finish footer, step counter — `feat: new case wizard shell`
+2. [x] Steps 1–2: kind cards, category select, parties form (react-hook-form + zod) — `feat: wizard case type and parties steps`
+3. [x] Step 3: claim fields + boj calculator — `feat: wizard claim step with fee calculator`
+4. [x] Steps 4–5: upload dropzone + required-docs list, summary + confirm → create case, toast, navigate — `feat: wizard documents and confirm steps`
+5. [x] i18n + codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 
