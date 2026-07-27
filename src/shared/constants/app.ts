@@ -11,3 +11,7 @@ export const APP_NAME = "Court AI Assistant";
  *  header/logo lockup (spec mockup: "Court AI Assistant / Sud AI
  *  Yordamchisi") — a fixed bilingual brand mark, not locale-switched. */
 export const APP_FULL_NAME = "Sud AI Yordamchisi";
+
+/** Displayed in `AppFooter` — bump manually until a real release pipeline
+ *  wires this to `package.json`/CI. */
+export const APP_VERSION = "0.1.0";

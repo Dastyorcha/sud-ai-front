@@ -129,6 +129,16 @@ export const uz = {
   header: {
     breadcrumbLabel: "Yo‘naltiruvchi yo‘l",
   },
+  footer: {
+    tagline: "{app} — sud jarayonlarini AI yordamida tezlashtiruvchi platforma.",
+    version: "Versiya {version}",
+    lastUpdated: "Yangilangan: {date}",
+    status: {
+      ok: "Tizim barqaror ishlamoqda",
+      warning: "Tizimda tanaffuslar mavjud",
+      error: "Tizim ishlamayapti",
+    },
+  },
   errors: {
     notFoundTitle: "Sahifa topilmadi",
     notFoundDescription: "Siz izlagan sahifa mavjud emas yoki koʻchirilgan.",

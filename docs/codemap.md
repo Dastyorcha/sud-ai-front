@@ -44,11 +44,12 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Widgets (`src/widgets/`)
 
-- `src/widgets/layout/app-shell/app-shell.tsx` · `AppShell` · product shell: fixed sidebar on desktop, `Sheet` drawer on mobile (owns open state), `AppHeader`, scrollable `<Outlet>`.
+- `src/widgets/layout/app-shell/app-shell.tsx` · `AppShell` · product shell: fixed sidebar on desktop, `Sheet` drawer on mobile (owns open state), `AppHeader`, scrollable `<Outlet>`, `AppFooter`.
 - `src/widgets/layout/sidebar/sidebar.tsx` · `Sidebar` · dark nav: brand (`APP_NAME` + mark), `NAV_ITEMS` rows with active-state, footer (`allRightsReserved`).
 - `src/widgets/layout/sidebar/sidebar-nav-item.tsx` · `SidebarNavItem` · one nav row (`Button asChild` + `Link`, icon, label, optional count badge).
 - `src/widgets/layout/auth-guard/auth-guard.tsx` · `AuthGuard` · stub guard: redirects to `ROUTE_PATHS.LOGIN` when `useAuth().isAuthenticated` is false (always true today).
 - `src/widgets/app-header/app-header.tsx` · `AppHeader` · court app header (supersedes the old `Topbar`): mobile menu button, gold logo lockup (`APP_NAME`/`APP_FULL_NAME`, links to dashboard), breadcrumb (dashboard → active case number via `matchPath(ROUTE_PATHS.CASE_DETAIL)` + `useCase`), `ThemeToggle`, `LangSwitcher`, user block (avatar initials, name, role) from `useCourtAuth()`.
+- `src/widgets/app-footer/app-footer.tsx` · `AppFooter`, `SystemStatus` · status footer under the routed content: status dot (`status-ok`/`-warning`/`-error` tokens), last-updated timestamp, version (`APP_VERSION`), tagline.
 
 ## Widgets (→ target `src/widgets/`, pre-FSD)
 

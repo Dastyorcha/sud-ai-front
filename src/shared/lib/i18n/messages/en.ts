@@ -126,6 +126,16 @@ export const en: Messages = {
   header: {
     breadcrumbLabel: "Breadcrumb",
   },
+  footer: {
+    tagline: "{app} — an AI-assisted platform for faster court proceedings.",
+    version: "Version {version}",
+    lastUpdated: "Last updated: {date}",
+    status: {
+      ok: "System running normally",
+      warning: "System experiencing disruptions",
+      error: "System is down",
+    },
+  },
   errors: {
     notFoundTitle: "Page not found",
     notFoundDescription: "The page you're looking for doesn't exist or has moved.",

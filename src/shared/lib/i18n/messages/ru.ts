@@ -126,6 +126,16 @@ export const ru: Messages = {
   header: {
     breadcrumbLabel: "Хлебные крошки",
   },
+  footer: {
+    tagline: "{app} — платформа для ускорения судебных процессов с помощью ИИ.",
+    version: "Версия {version}",
+    lastUpdated: "Обновлено: {date}",
+    status: {
+      ok: "Система работает стабильно",
+      warning: "В системе возможны сбои",
+      error: "Система не работает",
+    },
+  },
   errors: {
     notFoundTitle: "Страница не найдена",
     notFoundDescription: "Страница, которую вы ищете, не существует или была перемещена.",
