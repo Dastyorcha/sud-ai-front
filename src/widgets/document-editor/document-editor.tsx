@@ -98,7 +98,7 @@ export function DocumentEditor({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-7 print:hidden"
+                  className="print:hidden"
                   aria-label={t(
                     isCollapsed
                       ? "documentsWorkspace.editor.expand"
