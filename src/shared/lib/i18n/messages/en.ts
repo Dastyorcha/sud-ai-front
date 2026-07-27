@@ -313,6 +313,8 @@ export const en: Messages = {
       "The player and transcript will appear here once final transcription is ready.",
     speakersTitle: "Speakers",
     noSpeakers: "No speakers identified yet",
+    play: "Play",
+    pause: "Pause",
     speed: "Speed",
     generateNote: "The official protocol is drafted per Civil Procedure Code Article 273.",
     generateCta: "Generate official protocol",

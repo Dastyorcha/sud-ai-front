@@ -317,6 +317,8 @@ export const uz = {
       "Yakuniy transkripsiya tayyor bo'lgach, pleer va transkript shu yerda ko'rinadi.",
     speakersTitle: "Gapiruvchilar",
     noSpeakers: "Gapiruvchilar hali aniqlanmagan",
+    play: "Ijro etish",
+    pause: "Pauza",
     speed: "Tezlik",
     generateNote:
       "Rasmiy bayonnoma Fuqarolik protsessual kodeksining 273-moddasi talablariga muvofiq shakllantiriladi.",

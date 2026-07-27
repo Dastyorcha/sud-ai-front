@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FileAudio } from "lucide-react";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { LoadingState } from "@/shared/custom/loading-state";
 import { useHearings } from "@/features/hearings/use-hearings";
 import { ProtocolActionsRow } from "@/widgets/protocol-workspace/protocol-actions-row";
+import { AudioPlayerBar } from "@/widgets/audio-player-bar/audio-player-bar";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 
 export interface ProtocolWorkspaceProps {
@@ -20,6 +21,8 @@ export interface ProtocolWorkspaceProps {
 export default function ProtocolWorkspace({ caseId }: ProtocolWorkspaceProps) {
   const { t } = useTranslation();
   const { data: hearings, isLoading, refetch } = useHearings(caseId);
+  // Mock playback clock from the player, consumed by the transcript's active-row highlight.
+  const [, setCurrentMs] = useState(0);
 
   const hearing = useMemo(() => {
     if (!hearings || hearings.length === 0) return null;
@@ -47,7 +50,9 @@ export default function ProtocolWorkspace({ caseId }: ProtocolWorkspaceProps) {
     <div className="flex flex-col gap-6">
       <ProtocolActionsRow hearing={hearing} onChanged={refetch} />
 
-      {!isProcessed && (
+      {isProcessed ? (
+        <AudioPlayerBar durationMs={hearing.audioDurationMs} onTimeChange={setCurrentMs} />
+      ) : (
         <EmptyState icon={FileAudio} description={t("protocolWorkspace.processingNotice")} />
       )}
     </div>
