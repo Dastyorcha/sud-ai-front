@@ -75,6 +75,14 @@ export const uz = {
       ACTIVE: "Faol",
       ARCHIVED: "Arxivlangan",
     },
+    caseStage: {
+      INTAKE: "Qabul",
+      PREPARATION: "Tayyorgarlik",
+      HEARING: "Sud ko‘rishi",
+      DECISION: "Qaror",
+      APPEAL: "Apellyatsiya",
+      EXECUTION: "Ijro",
+    },
     participantRole: {
       JUDGE: "Sudya",
       CLERK: "Kotib",
@@ -178,7 +186,12 @@ export const uz = {
   cases: {
     description: "Sud ishlarini yarating va boshqaring.",
     newCase: "Yangi ish",
+    newCaseCta: "Yangi ish ochish",
     allStatuses: "Barcha holatlar",
+    allTypes: "Barcha turlar",
+    allStages: "Barcha bosqichlar",
+    vs: "qarshi",
+    resultsCount: "{count} ta ish topildi",
     columns: {
       caseNumber: "Ish raqami",
       court: "Sud",

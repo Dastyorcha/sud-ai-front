@@ -15,17 +15,17 @@ Rebuild the cases list page as the mockup's dashboard: search bar, "Yangi ish oc
 
 ## Affected files
 
-| Path (FSD layer)                        | New? | Intent                                  |
-| --------------------------------------- | ---- | --------------------------------------- |
-| `src/views/dashboard/` (or restyle existing cases view) | ?  | search + filters + grid composition |
-| `src/widgets/case-card/`                | yes  | card per mockup layout                  |
-| `src/shared/components/custom/stage-badge` | yes | colored badge per stage (tokens from mockup-01) |
-| `src/shared/types/`                     | no   | ensure case type covers stage/type/amount |
-| `src/shared/constants/route-paths.ts`   | no   | dashboard + case-detail paths           |
+| Path (FSD layer)                                        | New? | Intent                                          |
+| ------------------------------------------------------- | ---- | ----------------------------------------------- |
+| `src/views/dashboard/` (or restyle existing cases view) | ?    | search + filters + grid composition             |
+| `src/widgets/case-card/`                                | yes  | card per mockup layout                          |
+| `src/shared/components/custom/stage-badge`              | yes  | colored badge per stage (tokens from mockup-01) |
+| `src/shared/types/`                                     | no   | ensure case type covers stage/type/amount       |
+| `src/shared/constants/route-paths.ts`                   | no   | dashboard + case-detail paths                   |
 
 ## Steps
 
-1. [ ] `StageBadge` + `CaseTypeTag` shared components using stage tokens — `feat: stage badge and case type tag`
+1. [x] `StageBadge` + `CaseTypeTag` shared components using stage tokens — `feat: stage badge and case type tag`
 2. [ ] `CaseCard` widget (header/body/footer layout, click → case detail route) — `feat: case card widget`
 3. [ ] Dashboard view: search input, type/stage selects, count label, grid; filter logic on fixture data — `feat: dashboard case grid with filters`
 4. [ ] i18n for case types/stages/labels; codemap sync — `docs: sync codemap`

@@ -10,6 +10,7 @@ import type {
   CourtType,
   CaseType,
   CaseStatus,
+  CaseStage,
   ParticipantRole,
   HearingStatus,
   SegmentStatus,
@@ -68,6 +69,16 @@ export interface CourtCase {
   caseType: CaseType;
   judgeId: string | null;
   status: CaseStatus;
+  /** Procedural stage for the dashboard card/filter (mockup — see `CASE_STAGE`). */
+  stage: CaseStage;
+  /** Short description of the dispute, shown on the dashboard card. */
+  subject: string;
+  /** Claimant display name for the "X vs Y" card heading; `null` if not yet set. */
+  claimantName: string | null;
+  /** Defendant display name for the "X vs Y" card heading; `null` if not yet set. */
+  defendantName: string | null;
+  /** Integer UZS claim amount shown on the card (`Money`); `null` when not applicable. */
+  claimAmount: number | null;
   /** Free-form structured extras (spec §14.2 `metadata JSONB`). */
   metadata: Record<string, unknown>;
   participantCount: number;

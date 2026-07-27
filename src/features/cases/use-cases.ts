@@ -21,9 +21,10 @@ export function useCases({ filters, page = 1, pageSize }: UseCasesParams = {}): 
   const status = filters?.status;
   const caseType = filters?.caseType;
   const courtType = filters?.courtType;
+  const stage = filters?.stage;
 
   return useMockQuery(
-    () => listCases({ filters: { search, status, caseType, courtType }, page, pageSize }),
-    [search, status, caseType, courtType, page, pageSize],
+    () => listCases({ filters: { search, status, caseType, courtType, stage }, page, pageSize }),
+    [search, status, caseType, courtType, stage, page, pageSize]
   );
 }

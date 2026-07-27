@@ -64,6 +64,22 @@ export const CASE_STATUS = {
 } as const;
 export type CaseStatus = (typeof CASE_STATUS)[keyof typeof CASE_STATUS];
 
+/**
+ * Procedural stage of a case within its lifecycle (mockup dashboard —
+ * qabul/tayyorgarlik/sudkorishi/qaror/apellyatsiya/ijro). Distinct from
+ * `CaseStatus` (active/archived): a case stays `ACTIVE` while moving through
+ * every stage below. Provisional until the legal expert freezes the taxonomy.
+ */
+export const CASE_STAGE = {
+  INTAKE: "INTAKE",
+  PREPARATION: "PREPARATION",
+  HEARING: "HEARING",
+  DECISION: "DECISION",
+  APPEAL: "APPEAL",
+  EXECUTION: "EXECUTION",
+} as const;
+export type CaseStage = (typeof CASE_STAGE)[keyof typeof CASE_STAGE];
+
 /** Procedural role of a participant (spec §9.6, §11.2). */
 export const PARTICIPANT_ROLE = {
   JUDGE: "JUDGE",

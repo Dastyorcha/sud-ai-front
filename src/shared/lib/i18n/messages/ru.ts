@@ -72,6 +72,14 @@ export const ru: Messages = {
       ACTIVE: "Активно",
       ARCHIVED: "В архиве",
     },
+    caseStage: {
+      INTAKE: "Приём",
+      PREPARATION: "Подготовка",
+      HEARING: "Судебное заседание",
+      DECISION: "Решение",
+      APPEAL: "Апелляция",
+      EXECUTION: "Исполнение",
+    },
     participantRole: {
       JUDGE: "Судья",
       CLERK: "Секретарь",
@@ -175,7 +183,12 @@ export const ru: Messages = {
   cases: {
     description: "Создавайте и управляйте судебными делами.",
     newCase: "Новое дело",
+    newCaseCta: "Открыть новое дело",
     allStatuses: "Все статусы",
+    allTypes: "Все типы",
+    allStages: "Все этапы",
+    vs: "против",
+    resultsCount: "Найдено дел: {count}",
     columns: {
       caseNumber: "Номер дела",
       court: "Суд",

@@ -72,6 +72,14 @@ export const en: Messages = {
       ACTIVE: "Active",
       ARCHIVED: "Archived",
     },
+    caseStage: {
+      INTAKE: "Intake",
+      PREPARATION: "Preparation",
+      HEARING: "Hearing",
+      DECISION: "Decision",
+      APPEAL: "Appeal",
+      EXECUTION: "Execution",
+    },
     participantRole: {
       JUDGE: "Judge",
       CLERK: "Clerk",
@@ -175,7 +183,12 @@ export const en: Messages = {
   cases: {
     description: "Create and manage court cases.",
     newCase: "New case",
+    newCaseCta: "Open a new case",
     allStatuses: "All statuses",
+    allTypes: "All types",
+    allStages: "All stages",
+    vs: "vs",
+    resultsCount: "{count} cases found",
     columns: {
       caseNumber: "Case number",
       court: "Court",

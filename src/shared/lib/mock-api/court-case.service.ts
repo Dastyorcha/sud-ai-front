@@ -8,16 +8,17 @@
 import { delay } from "@/shared/lib/mock-api/delay";
 import { COURT_CASES } from "@/shared/lib/mock-api/data";
 import type { CourtCase } from "@/shared/types/models";
-import type { CaseStatus, CaseType, CourtType } from "@/shared/types/enums";
+import type { CaseStage, CaseStatus, CaseType, CourtType } from "@/shared/types/enums";
 import type { ListParams, Paginated } from "@/shared/types/query-types";
 
 /** Filters accepted by the case list (spec §15.1 `GET /cases`). */
 export interface CaseFilters {
-  /** Free-text match against case number and court name. */
+  /** Free-text match against case number, court name and parties. */
   search: string;
   status: CaseStatus;
   caseType: CaseType;
   courtType: CourtType;
+  stage: CaseStage;
 }
 
 /** Sortable case-list columns. */
@@ -30,6 +31,10 @@ export interface CreateCaseInput {
   courtType: CourtType;
   caseType: CaseType;
   judgeId: string | null;
+  subject?: string;
+  claimantName?: string | null;
+  defendantName?: string | null;
+  claimAmount?: number | null;
   metadata?: Record<string, unknown>;
 }
 
@@ -42,9 +47,14 @@ function matches(c: CourtCase, filters: Partial<CaseFilters>): boolean {
   if (filters.status && c.status !== filters.status) return false;
   if (filters.caseType && c.caseType !== filters.caseType) return false;
   if (filters.courtType && c.courtType !== filters.courtType) return false;
+  if (filters.stage && c.stage !== filters.stage) return false;
   if (filters.search) {
     const q = filters.search.trim().toLowerCase();
-    if (q && !`${c.caseNumber} ${c.courtName}`.toLowerCase().includes(q)) return false;
+    const haystack = [c.caseNumber, c.courtName, c.subject, c.claimantName, c.defendantName]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    if (q && !haystack.includes(q)) return false;
   }
   return true;
 }
@@ -98,6 +108,11 @@ export async function createCase(
     caseType: input.caseType,
     judgeId: input.judgeId,
     status: "ACTIVE",
+    stage: "INTAKE",
+    subject: input.subject ?? "",
+    claimantName: input.claimantName ?? null,
+    defendantName: input.defendantName ?? null,
+    claimAmount: input.claimAmount ?? null,
     metadata: input.metadata ?? {},
     participantCount: 0,
     createdBy,
