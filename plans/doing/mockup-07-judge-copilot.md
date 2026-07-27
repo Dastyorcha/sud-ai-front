@@ -15,20 +15,20 @@ The "Sudya maslahatchisi" tab per mockup: a 2×2 card grid — 1) procedural def
 
 ## Affected files
 
-| Path (FSD layer)                     | New? | Intent                                     |
-| ------------------------------------ | ---- | ------------------------------------------ |
-| `src/widgets/copilot-grid/`          | yes  | tab module composing 4 cards (lazy)        |
-| `src/widgets/copilot-grid/components/` | yes | defects, articles, deadlines, suggestions cards |
-| `src/shared/types/`                  | yes? | `CopilotDefect`, `LawArticleRef`, `Deadline`, `Suggestion` types |
-| mock services/fixtures               | yes  | copilot service returning per-case fixtures |
-| `src/features/document-fill/`        | no   | expose "append suggestion to section" action |
+| Path (FSD layer)                       | New? | Intent                                                           |
+| -------------------------------------- | ---- | ---------------------------------------------------------------- |
+| `src/widgets/copilot-grid/`            | yes  | tab module composing 4 cards (lazy)                              |
+| `src/widgets/copilot-grid/components/` | yes  | defects, articles, deadlines, suggestions cards                  |
+| `src/shared/types/`                    | yes? | `CopilotDefect`, `LawArticleRef`, `Deadline`, `Suggestion` types |
+| mock services/fixtures                 | yes  | copilot service returning per-case fixtures                      |
+| `src/features/document-fill/`          | no   | expose "append suggestion to section" action                     |
 
 ## Steps
 
-1. [ ] Types + copilot fixture service — `feat: copilot types and mock service`
-2. [ ] Defects card (severity styles, risk badges) + articles card (relevance bars) — `feat: defects and law articles cards`
-3. [ ] Deadlines card (countdown, mini progress) + suggestions card with add-to-document — `feat: deadlines and ai suggestions cards`
-4. [ ] i18n + codemap sync — `docs: sync codemap`
+1. [x] Types + copilot fixture service — `feat: copilot types and mock service`
+2. [x] Defects card (severity styles, risk badges) + articles card (relevance bars) — `feat: defects and law articles cards`
+3. [x] Deadlines card (countdown, mini progress) + suggestions card with add-to-document — `feat: deadlines and ai suggestions cards`
+4. [x] i18n + codemap sync — `docs: sync codemap`
 
 ## Risks / ripple / escalation
 
