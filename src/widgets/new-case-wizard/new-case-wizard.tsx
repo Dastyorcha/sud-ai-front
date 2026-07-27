@@ -8,6 +8,7 @@ import { Form } from "@/shared/components/ui/form";
 import { StepIndicator } from "@/widgets/new-case-wizard/step-indicator";
 import { CaseTypeStep } from "@/widgets/new-case-wizard/steps/case-type-step";
 import { PartiesStep } from "@/widgets/new-case-wizard/steps/parties-step";
+import { ClaimStep } from "@/widgets/new-case-wizard/steps/claim-step";
 import {
   CASE_WIZARD_DEFAULTS,
   caseWizardSchema,
@@ -91,9 +92,7 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
           >
             {step === 1 && <CaseTypeStep />}
             {step === 2 && <PartiesStep />}
-            {step === 3 && (
-              <p className="text-sm text-muted-foreground">{t("caseWizard.steps.claim")}</p>
-            )}
+            {step === 3 && <ClaimStep />}
             {step === 4 && (
               <p className="text-sm text-muted-foreground">{t("caseWizard.steps.documents")}</p>
             )}
