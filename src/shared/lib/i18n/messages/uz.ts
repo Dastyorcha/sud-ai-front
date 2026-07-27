@@ -202,6 +202,9 @@ export const uz = {
       organization: "Tashkilot",
     },
   },
+  caseDetail: {
+    backToList: "Ishlar ro'yxati",
+  },
   hearing: {
     listTitle: "Majlislar",
     newHearing: "Yangi majlis",

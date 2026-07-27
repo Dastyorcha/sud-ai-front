@@ -199,6 +199,9 @@ export const en: Messages = {
       organization: "Organization",
     },
   },
+  caseDetail: {
+    backToList: "Case list",
+  },
   hearing: {
     listTitle: "Hearings",
     newHearing: "New hearing",

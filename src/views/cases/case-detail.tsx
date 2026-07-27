@@ -18,12 +18,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { StatusBadge } from "@/shared/custom/status-badge";
 import { DateText } from "@/shared/custom/date-text";
 import { DetailGrid } from "@/shared/custom/detail-grid";
 import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
+import { StageBadge } from "@/shared/custom/stage-badge";
+import { CaseTypeTag } from "@/shared/custom/case-type-tag";
 import { useCase } from "@/features/cases/use-case";
 import { useParticipants } from "@/features/participants/use-participants";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
@@ -88,10 +89,10 @@ export default function CaseDetailView() {
   }
 
   const backLink = (
-    <Button variant="ghost" size="sm" asChild>
+    <Button variant="ghost" size="sm" asChild className="self-start">
       <Link to={withLocale(locale, ROUTE_PATHS.CASES)}>
         <ChevronLeft className="size-4" />
-        {t("common.back")}
+        {t("caseDetail.backToList")}
       </Link>
     </Button>
   );
@@ -127,21 +128,26 @@ export default function CaseDetailView() {
   }
 
   const judge = COURT_USERS.find((u) => u.id === courtCase.judgeId);
+  const parties =
+    courtCase.claimantName && courtCase.defendantName
+      ? `${courtCase.claimantName} ${t("cases.vs")} ${courtCase.defendantName}`
+      : null;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {backLink}
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
-            {courtCase.caseNumber}
-          </h1>
-          <StatusBadge
-            label={t(`enums.caseStatus.${courtCase.status}` as MessageKey)}
-            tone={courtCase.status === "ACTIVE" ? "success" : "neutral"}
-          />
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
+              {courtCase.caseNumber}
+            </h1>
+            <StageBadge stage={courtCase.stage} />
+            <CaseTypeTag caseType={courtCase.caseType} />
+          </div>
+          {parties && <p className="text-lg font-semibold text-foreground">{parties}</p>}
+          <p className="text-sm text-muted-foreground">{courtCase.subject}</p>
         </div>
-        <p className="text-sm text-muted-foreground">{courtCase.courtName}</p>
       </div>
 
       <DetailGrid

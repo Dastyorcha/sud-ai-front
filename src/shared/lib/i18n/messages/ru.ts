@@ -199,6 +199,9 @@ export const ru: Messages = {
       organization: "Организация",
     },
   },
+  caseDetail: {
+    backToList: "Список дел",
+  },
   hearing: {
     listTitle: "Заседания",
     newHearing: "Новое заседание",

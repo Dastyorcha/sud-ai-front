@@ -25,7 +25,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/views/dashboard/dashboard.tsx` · `Dashboard` (default) · dashboard placeholder — renders `ComingSoon`. Replace with real KPI/summary widgets.
 - `src/views/cases/cases.tsx` · `CasesView` (default) · court-case dashboard grid (mockup-02, spec FR-02/UC-01) — debounced search + type/stage `Select` filters over `useCases()`, live result count, gold "Yangi ish ochish" CTA, responsive 1/2/3-col grid of `CaseCard`s.
 - `src/views/cases/case-new.tsx` · `CaseNewView` (default) · case creation form (spec UC-01) — requisites + participants field array (RHF + Zod, ≥1 claimant/defendant), `sessionStorage` draft, creates case + participants then opens detail.
-- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · compact case detail — requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`; reads `:caseId`.
+- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · case detail (mockup-04 shell in progress) — back nav, case number/parties headline, `StageBadge`/`CaseTypeTag`, requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`; reads `:caseId`.
 - `src/views/hearings/hearing-detail.tsx` · `HearingDetailView` (default) · hearing workspace (spec §16.1 #6–9) — tabs: live / transcript / events / protocol; canonical approval transitions the hearing.
 - `src/views/documents/documents.tsx` · `DocumentsView` (default) · generated documents + read-only template catalogue (spec §16.1 #10/#12, D-14).
 - `src/views/admin/admin.tsx` · `AdminView` (default) · read-only audit log + provider status (spec §16.1 #13–14, FR-12, NFR-05).
