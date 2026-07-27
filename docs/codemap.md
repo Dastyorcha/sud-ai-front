@@ -59,6 +59,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/widgets/speakers-panel/speakers-panel.tsx` · `SpeakersPanel`, `SpeakersPanelProps` (`caseId`, `hearingId`) · mockup-05 speakers list beside the transcript — one row per distinct diarization label with a `speakerColorClass` dot and its mapped participant name/role (or the raw label when unmapped).
 - `src/widgets/documents-workspace/documents-workspace.tsx` · `DocumentsWorkspace` (default) · "Sud hujjatlari" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-06.
 - `src/widgets/template-selector/template-selector.tsx` · `TemplateSelector` (default), `TemplateSelectorProps` (`selectedId`, `onSelect`) · mockup-06 template picker — 5 grouped card rows over `PROCEDURAL_DOCUMENT_TEMPLATES`, active-selection state.
+- `src/widgets/case-facts-panel/case-facts-panel.tsx` · `CaseFactsPanel` (default), `CaseFactsPanelProps` (`courtCase`) · mockup-06 "Ish ma'lumotlari" panel — case number/parties/subject/claim/filed date, plus a local (non-persisted) evidence checklist.
 - `src/widgets/copilot-grid/copilot-grid.tsx` · `CopilotGrid` (default) · "Sudya maslahatchisi" tab placeholder — lazy-loaded from `case-detail`; real content lands in mockup-07.
 
 ## Widgets (→ target `src/widgets/`, pre-FSD)
