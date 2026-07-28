@@ -1,4 +1,4 @@
-import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { createRequestId, setLastRequestId } from "@/shared/lib/http/request-id";
 import { parseApiError } from "@/shared/lib/http/api-error";
 
@@ -14,6 +14,24 @@ let getAccessToken: AccessTokenGetter = () => undefined;
 /** Wires the real token getter — called once by the auth store (integration-03). */
 export function setAccessTokenGetter(getter: AccessTokenGetter): void {
   getAccessToken = getter;
+}
+
+/**
+ * Handles a `401` that survived `parseApiError` — return the retried
+ * request's response to recover, or `undefined` to let the `401` propagate
+ * as-is. Wired once by `shared/lib/auth/refresh-manager.ts` (single-flight
+ * refresh-then-retry, guide §2); defaults to a no-op so this module stays
+ * standalone/testable before auth exists.
+ */
+export type UnauthorizedHandler = (
+  originalRequest: InternalAxiosRequestConfig
+) => Promise<AxiosResponse | undefined>;
+
+let handleUnauthorized: UnauthorizedHandler = () => Promise.resolve(undefined);
+
+/** Wires the real 401 handler — called once by `refresh-manager` at app init. */
+export function setUnauthorizedHandler(handler: UnauthorizedHandler): void {
+  handleUnauthorized = handler;
 }
 
 /**
@@ -44,9 +62,15 @@ apiClient.interceptors.response.use(
     setLastRequestId(response.headers["x-request-id"] as string | undefined);
     return response;
   },
-  (error: unknown) => {
+  async (error: unknown) => {
     const apiError = parseApiError(error);
     setLastRequestId(apiError.requestId);
+
+    if (apiError.status === 401 && isAxiosError(error) && error.config) {
+      const retried = await handleUnauthorized(error.config);
+      if (retried) return retried;
+    }
+
     return Promise.reject(apiError);
   }
 );

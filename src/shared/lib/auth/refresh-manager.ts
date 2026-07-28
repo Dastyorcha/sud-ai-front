@@ -1,17 +1,30 @@
-import { apiClient } from "@/shared/lib/http/api-client";
+import type { InternalAxiosRequestConfig } from "axios";
+import { apiClient, setUnauthorizedHandler } from "@/shared/lib/http/api-client";
 import { API_PREFIX } from "@/shared/config/env";
-import { getRefreshToken, setTokens, type AuthTokens } from "@/shared/lib/auth/token-store";
+import {
+  forceLogoutRedirect,
+  getAccessToken,
+  getRefreshToken,
+  hasValidRefreshToken,
+  setTokens,
+  type AuthTokens,
+} from "@/shared/lib/auth/token-store";
 
 /**
- * Single-flight token refresh (guide §2, mandatory). Lives in `shared/` (not
- * `features/auth/auth.service.ts`) because `api-client.ts`'s response
- * interceptor calls it directly (see `handleUnauthorized`, wired in the
- * `401`-retry step) and FSD forbids a `shared/` module importing
- * `features/` — so it keeps its own minimal copy of the `POST /auth/refresh`
- * call instead of reusing the service.
+ * Single-flight token refresh + `401` retry (guide §2, mandatory). Lives in
+ * `shared/` (not `features/auth/auth.service.ts`) because it's wired
+ * directly into `api-client.ts`'s response interceptor and FSD forbids a
+ * `shared/` module importing `features/` — so it keeps its own minimal copy
+ * of the `POST /auth/refresh` call instead of reusing the service.
  */
 
+type RetryableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+
 let refreshPromise: Promise<void> | null = null;
+
+function isAuthEndpoint(url: string | undefined): boolean {
+  return Boolean(url) && (url!.includes("/auth/login") || url!.includes("/auth/refresh"));
+}
 
 /** Raw `POST /auth/refresh` (guide §7.2) — see the module doc for why this
  * isn't shared with `features/auth/auth.service.ts`. */
@@ -43,3 +56,35 @@ export function refreshSession(): Promise<void> {
   }
   return refreshPromise;
 }
+
+/**
+ * `api-client`'s injected `401` handler: skips auth endpoints and
+ * already-retried requests (never loops), refreshes once (single-flight, via
+ * `refreshSession`), retries the original request with the new access
+ * token, and forces a logout + redirect on any failure along the way (no
+ * refresh token, or the refresh call itself fails).
+ */
+async function handleUnauthorized(original: InternalAxiosRequestConfig) {
+  const config = original as RetryableConfig;
+
+  if (isAuthEndpoint(config.url) || config._retry || !hasValidRefreshToken()) {
+    forceLogoutRedirect();
+    return undefined;
+  }
+
+  config._retry = true;
+  try {
+    await refreshSession();
+  } catch {
+    forceLogoutRedirect();
+    return undefined;
+  }
+
+  const token = getAccessToken();
+  if (token) {
+    config.headers.set("Authorization", `Bearer ${token}`);
+  }
+  return apiClient(config);
+}
+
+setUnauthorizedHandler(handleUnauthorized);
