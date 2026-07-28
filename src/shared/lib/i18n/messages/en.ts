@@ -55,6 +55,13 @@ export const en: Messages = {
       LEGAL_EXPERT: "Legal expert",
       DEMO_OPERATOR: "Demo operator",
     },
+    apiRoles: {
+      Administrator: "Administrator",
+      Secretary: "Secretary",
+      Judge: "Judge",
+      LegalExpert: "Legal expert",
+      DemoOperator: "Demo operator",
+    },
     courtType: {
       ECONOMIC: "Economic",
       CIVIL: "Civil",
@@ -393,7 +400,7 @@ export const en: Messages = {
     actor: "Actor",
     entity: "Entity",
     time: "Time",
-    activeRole: "Active role (demo)",
+    activeRole: "Active role",
     liveProvider: "Live STT provider",
     finalProvider: "Final STT provider",
     model: "Model",

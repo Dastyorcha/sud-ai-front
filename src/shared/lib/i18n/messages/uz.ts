@@ -58,6 +58,13 @@ export const uz = {
       LEGAL_EXPERT: "Yuridik ekspert",
       DEMO_OPERATOR: "Demo operator",
     },
+    apiRoles: {
+      Administrator: "Administrator",
+      Secretary: "Kotib",
+      Judge: "Sudya",
+      LegalExpert: "Yuridik ekspert",
+      DemoOperator: "Demo operator",
+    },
     courtType: {
       ECONOMIC: "Iqtisodiy",
       CIVIL: "Fuqarolik",
@@ -398,7 +405,7 @@ export const uz = {
     actor: "Bajaruvchi",
     entity: "Obyekt",
     time: "Vaqt",
-    activeRole: "Faol rol (demo)",
+    activeRole: "Faol rol",
     liveProvider: "Jonli STT provayderi",
     finalProvider: "Yakuniy STT provayderi",
     model: "Model",

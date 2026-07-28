@@ -55,6 +55,13 @@ export const ru: Messages = {
       LEGAL_EXPERT: "Юридический эксперт",
       DEMO_OPERATOR: "Демо-оператор",
     },
+    apiRoles: {
+      Administrator: "Администратор",
+      Secretary: "Секретарь",
+      Judge: "Судья",
+      LegalExpert: "Юридический эксперт",
+      DemoOperator: "Демо-оператор",
+    },
     courtType: {
       ECONOMIC: "Экономический",
       CIVIL: "Гражданский",
@@ -394,7 +401,7 @@ export const ru: Messages = {
     actor: "Исполнитель",
     entity: "Объект",
     time: "Время",
-    activeRole: "Активная роль (демо)",
+    activeRole: "Активная роль",
     liveProvider: "Live STT провайдер",
     finalProvider: "Финальный STT провайдер",
     model: "Модель",
