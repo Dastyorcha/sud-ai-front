@@ -1,5 +1,3 @@
-import type { CourtRole } from "@/shared/types/enums";
-
 /**
  * Court capability map (spec §4, plan phase-03 Step 3.4). Components ask for
  * capabilities, never roles — when a role gains powers, only this file
@@ -36,10 +34,18 @@ export type ApiRole = (typeof API_ROLE)[keyof typeof API_ROLE];
 
 const ALL: CourtAction[] = Object.values(COURT_ACTION);
 
-/** Role × action matrix (spec §4.1–4.5). */
-export const COURT_CAPABILITIES: Record<CourtRole, readonly CourtAction[]> = {
-  ADMIN: ALL,
-  CLERK: [
+/**
+ * Role × action matrix (spec §4.1–4.5), reconciled to the guide's five API
+ * roles (was keyed by the mock `CourtRole` enum — `ADMIN|CLERK|JUDGE|
+ * LEGAL_EXPERT|DEMO_OPERATOR`). `canCourt()`'s signature and every `can()`
+ * call site (`useCourtAuth`, `ProtocolPanel`, `AppHeader`) are unchanged —
+ * only these matrix keys/values moved. `LegalExpert` has no protected
+ * workflow permissions (guide §2 — advisory-only role); `DemoOperator` is
+ * demo read-flows only.
+ */
+export const COURT_CAPABILITIES: Record<ApiRole, readonly CourtAction[]> = {
+  Administrator: ALL,
+  Secretary: [
     "case.create",
     "case.archive",
     "participant.edit",
@@ -49,18 +55,11 @@ export const COURT_CAPABILITIES: Record<CourtRole, readonly CourtAction[]> = {
     "document.submit",
     "document.export",
   ],
-  JUDGE: ["document.approve", "document.export"],
-  LEGAL_EXPERT: ["admin.view"],
-  DEMO_OPERATOR: [
-    "case.create",
-    "participant.edit",
-    "hearing.record",
-    "transcript.edit",
-    "transcript.approve",
-    "document.submit",
-  ],
+  Judge: ["document.approve", "document.export"],
+  LegalExpert: [],
+  DemoOperator: [],
 } as const;
 
-export function canCourt(role: CourtRole, action: CourtAction): boolean {
+export function canCourt(role: ApiRole, action: CourtAction): boolean {
   return COURT_CAPABILITIES[role].includes(action);
 }
