@@ -19,10 +19,20 @@ export interface ListParams<TFilters = Record<string, unknown>, TField extends s
   pageSize?: number;
 }
 
-/** Server-style paginated response envelope. */
+/**
+ * Server-style paginated response envelope — matches the guide's cases/
+ * participants shape (§5): `{ items, page, pageSize, totalCount }`. The audit
+ * endpoint (§13) returns `total` instead of `totalCount`; adapt it at the
+ * service boundary in integration-09 rather than branching this type.
+ */
 export interface Paginated<T> {
   items: T[];
-  total: number;
   page: number;
   pageSize: number;
+  totalCount: number;
+}
+
+/** `Paginated<T>.totalCount` / `pageSize` → total page count (min 1 page for an empty list's UI). */
+export function totalPages(paginated: Pick<Paginated<unknown>, "totalCount" | "pageSize">): number {
+  return Math.max(1, Math.ceil(paginated.totalCount / paginated.pageSize));
 }
