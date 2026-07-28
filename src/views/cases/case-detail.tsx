@@ -28,7 +28,10 @@ import { StageBadge } from "@/shared/custom/stage-badge";
 import { CaseTypeTag } from "@/shared/custom/case-type-tag";
 import { CaseStats } from "@/widgets/case-stats/case-stats";
 import { useCase } from "@/features/cases/use-case";
-import { useParticipants } from "@/features/participants/use-participants";
+import {
+  useDeactivateParticipant,
+  useParticipants,
+} from "@/features/participants/use-participants";
 import { useDocuments } from "@/features/documents/use-documents";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
 import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
@@ -36,13 +39,11 @@ import { useHearings } from "@/features/hearings/use-hearings";
 import { createHearing } from "@/shared/lib/mock-api/hearing.service";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { buildRoute } from "@/shared/constants/route-paths";
-import { deleteParticipant } from "@/shared/lib/mock-api/participant.service";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
 import type { Participant } from "@/shared/types/models";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
-import { notify } from "@/shared/lib/toast";
 
 // Sub-tab modules (mockup-05/06/07) — lazy so the shell stays light until a
 // tab is opened.
@@ -74,7 +75,7 @@ export default function CaseDetailView() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Participant | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const deactivateMutation = useDeactivateParticipant(caseId);
 
   function openAdd() {
     setEditing(null);
@@ -88,15 +89,11 @@ export default function CaseDetailView() {
 
   async function confirmDelete() {
     if (!deleteTarget) return;
-    setDeleting(true);
     try {
-      await deleteParticipant(deleteTarget.id);
+      await deactivateMutation.mutateAsync(deleteTarget.id);
       setDeleteTarget(null);
-      refetchParticipants();
     } catch {
-      notify.error(t("errors.genericTitle"));
-    } finally {
-      setDeleting(false);
+      // Errors are already toasted by useApiMutation.
     }
   }
 
@@ -345,7 +342,11 @@ export default function CaseDetailView() {
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
               {t("common.cancel")}
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deactivateMutation.isPending}
+            >
               {t("participants.delete")}
             </Button>
           </DialogFooter>

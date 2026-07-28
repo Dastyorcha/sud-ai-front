@@ -17,14 +17,13 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import {
-  createParticipant,
-  updateParticipant,
-} from "@/shared/lib/mock-api/participant.service";
+  useCreateParticipant,
+  useUpdateParticipant,
+} from "@/features/participants/use-participants";
 import { PARTICIPANT_ROLE, type ParticipantRole } from "@/shared/types/enums";
 import type { Participant } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
-import { notify } from "@/shared/lib/toast";
 
 const roleValues = Object.values(PARTICIPANT_ROLE) as [ParticipantRole, ...ParticipantRole[]];
 
@@ -53,7 +52,9 @@ export function ParticipantFormDialog({
   const [displayName, setDisplayName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
   const [role, setRole] = useState<ParticipantRole>("CLAIMANT");
-  const [submitting, setSubmitting] = useState(false);
+  const createMutation = useCreateParticipant(caseId);
+  const updateMutation = useUpdateParticipant(caseId);
+  const submitting = createMutation.isPending || updateMutation.isPending;
 
   // Sync form state whenever the dialog opens or the target participant changes.
   useEffect(() => {
@@ -64,16 +65,18 @@ export function ParticipantFormDialog({
 
   async function handleSave() {
     if (!displayName.trim()) return;
-    setSubmitting(true);
     try {
       if (participant) {
-        await updateParticipant(participant.id, {
-          displayName: displayName.trim(),
-          organizationName: organizationName.trim() || null,
-          role,
+        await updateMutation.mutateAsync({
+          id: participant.id,
+          patch: {
+            displayName: displayName.trim(),
+            organizationName: organizationName.trim() || null,
+            role,
+          },
         });
       } else {
-        await createParticipant({
+        await createMutation.mutateAsync({
           caseId,
           displayName: displayName.trim(),
           organizationName: organizationName.trim() || null,
@@ -83,9 +86,7 @@ export function ParticipantFormDialog({
       onSaved();
       onOpenChange(false);
     } catch {
-      notify.error(t("errors.genericTitle"));
-    } finally {
-      setSubmitting(false);
+      // Errors are already toasted by useApiMutation.
     }
   }
 
