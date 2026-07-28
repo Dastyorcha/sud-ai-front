@@ -1,6 +1,6 @@
 # Integration 02 — TanStack Query layer, job polling & concurrency
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §5 (paging), §9/§12 (jobs), §16 (optimistic concurrency)
@@ -61,12 +61,12 @@ DocumentGeneration | DocumentPdfExport`. On `Failed`, expose `errorCode` +
 
 ## Steps
 
-1. [ ] Install `@tanstack/react-query`; add `query-provider.tsx` and mount it in `app.tsx` — `feat: add tanstack query provider`
-2. [ ] Add `query-keys.ts` factory — `feat: typed query key factory`
-3. [ ] Align `Paginated<T>` in `query-types.ts` with the guide envelope — `refactor: match paged response envelope to api`
-4. [ ] Add `use-job-polling.ts` (1.5s interval, terminal stop, error fields) — `feat: background job polling hook`
-5. [ ] Add `use-api-mutation.ts` (error toast + concurrency refetch, field errors) — `feat: api mutation wrapper with concurrency handling`
-6. [ ] docs: sync `docs/codemap.md` + `docs/architecture.md` — `docs: document tanstack query data layer`
+1. [x] Install `@tanstack/react-query`; add `query-provider.tsx` and mount it in `app.tsx` — `feat: add tanstack query provider`
+2. [x] Add `query-keys.ts` factory — `feat: typed query key factory`
+3. [x] Align `Paginated<T>` in `query-types.ts` with the guide envelope — `refactor: match paged response envelope to api`
+4. [x] Add `use-job-polling.ts` (1.5s interval, terminal stop, error fields) — `feat: background job polling hook`
+5. [x] Add `use-api-mutation.ts` (error toast + concurrency refetch, field errors) — `feat: api mutation wrapper with concurrency handling`
+6. [x] docs: sync `docs/codemap.md` + `docs/architecture.md` — `docs: document tanstack query data layer`
 
 ## Risks / ripple / escalation
 
