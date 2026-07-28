@@ -33,13 +33,15 @@ export function CaseCard({ courtCase }: CaseCardProps) {
           <span className="font-mono text-sm font-medium text-foreground">
             {courtCase.caseNumber}
           </span>
-          <StageBadge stage={courtCase.stage} />
+          {courtCase.stage && <StageBadge stage={courtCase.stage} />}
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {parties && (
             <p className="text-sm font-semibold leading-snug text-foreground">{parties}</p>
           )}
-          <p className="line-clamp-2 text-sm text-muted-foreground">{courtCase.subject}</p>
+          <p className="line-clamp-2 text-sm text-muted-foreground">
+            {courtCase.subject ?? courtCase.description}
+          </p>
           <CaseTypeTag caseType={courtCase.caseType} className="w-fit" />
           <div className="flex items-center justify-between border-t border-border pt-3">
             {courtCase.claimAmount != null ? (

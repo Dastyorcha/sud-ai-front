@@ -22,10 +22,11 @@ export function fillDocumentSections(
   courtCase: CourtCase,
   t: Translate
 ): DocumentSections {
+  const subject = courtCase.subject ?? courtCase.description ?? "";
   const parties =
     courtCase.claimantName && courtCase.defendantName
       ? `${courtCase.claimantName} ${t("cases.vs")} ${courtCase.defendantName}`
-      : courtCase.subject;
+      : subject;
   const templateTitle = t(template.titleKey);
   const article = t("documentsWorkspace.templateSelector.article", {
     code: template.articleCode,
@@ -37,7 +38,7 @@ export function fillDocumentSections(
       `${t("documentsWorkspace.factsPanel.caseNumber")}: ${courtCase.caseNumber}`,
       `${parties}`,
     ].join("\n"),
-    descriptive: `${courtCase.subject}${
+    descriptive: `${subject}${
       courtCase.claimAmount != null
         ? ` (${t("documentsWorkspace.factsPanel.claimAmount")}: ${courtCase.claimAmount.toLocaleString()})`
         : ""

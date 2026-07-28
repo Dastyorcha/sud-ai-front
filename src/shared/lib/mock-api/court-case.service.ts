@@ -108,6 +108,8 @@ export async function createCase(
     caseType: input.caseType,
     judgeId: input.judgeId,
     status: "ACTIVE",
+    description: input.subject ?? null,
+    isDemo: false,
     stage: "INTAKE",
     subject: input.subject ?? "",
     claimantName: input.claimantName ?? null,

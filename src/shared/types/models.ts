@@ -60,7 +60,16 @@ export interface CourtUser {
   lastLoginAt: string | null;
 }
 
-/** A court case — the root aggregate everything else hangs off (spec §14.2). */
+/**
+ * A court case — the root aggregate everything else hangs off (spec §14.2).
+ * Fields through `archivedAt` mirror the real `CourtCaseResponse` (integration
+ * guide §8) exactly — that's what `features/cases/case.service.ts` returns.
+ * The fields below `archivedAt` are mockup-only additions (dashboard card
+ * parties/claim/stage) with no live-API equivalent yet; the real service
+ * leaves them `undefined`, while `shared/lib/mock-api/court-case.service.ts`
+ * (kept for `views/cases/case-new.tsx` until integration-11) still populates
+ * them. Consumers must treat them as optional.
+ */
 export interface CourtCase {
   id: string;
   caseNumber: string;
@@ -69,37 +78,50 @@ export interface CourtCase {
   caseType: CaseType;
   judgeId: string | null;
   status: CaseStatus;
-  /** Procedural stage for the dashboard card/filter (mockup — see `CASE_STAGE`). */
-  stage: CaseStage;
-  /** Short description of the dispute, shown on the dashboard card. */
-  subject: string;
-  /** Claimant display name for the "X vs Y" card heading; `null` if not yet set. */
-  claimantName: string | null;
-  /** Defendant display name for the "X vs Y" card heading; `null` if not yet set. */
-  defendantName: string | null;
-  /** Integer UZS claim amount shown on the card (`Money`); `null` when not applicable. */
-  claimAmount: number | null;
-  /** Free-form structured extras (spec §14.2 `metadata JSONB`). */
-  metadata: Record<string, unknown>;
-  participantCount: number;
+  /** Free-text case description (guide §8, ≤4000 chars server-side). */
+  description: string | null;
+  /** Demo/seed flag (guide §8) — distinct from the mock's `isDemo`-less fixtures. */
+  isDemo: boolean;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;
+
+  /** Procedural stage for the dashboard card/filter (mockup — see `CASE_STAGE`). Not in the live API response. */
+  stage?: CaseStage;
+  /** Short description of the dispute, shown on the dashboard card (mockup — prefer `description` for real data). */
+  subject?: string;
+  /** Claimant display name for the "X vs Y" card heading (mockup); `null`/`undefined` if not yet set. */
+  claimantName?: string | null;
+  /** Defendant display name for the "X vs Y" card heading (mockup); `null`/`undefined` if not yet set. */
+  defendantName?: string | null;
+  /** Integer UZS claim amount shown on the card (mockup `Money`); `null`/`undefined` when not applicable. */
+  claimAmount?: number | null;
+  /** Free-form structured extras (mockup `metadata JSONB`). Not in the live API response. */
+  metadata?: Record<string, unknown>;
+  participantCount?: number;
 }
 
-/** A party or actor attached to a case with a procedural role (spec §14.3). */
+/**
+ * A party or actor attached to a case with a procedural role (spec §14.3).
+ * Mirrors the real `ParticipantResponse` (integration guide §8):
+ * `courtCaseId`/`language`/`isActive`/`updatedAt` replace the mock's former
+ * `caseId`/`languagePreferences`/`voiceReferenceUri`.
+ */
 export interface Participant {
   id: string;
-  caseId: string;
+  courtCaseId: string;
   displayName: string;
   organizationName: string | null;
   role: ParticipantRole;
   /** Identity payload (passport, TIN, etc.) — kept opaque (spec §14.3 `identifier JSONB`). */
   identifier: Record<string, unknown>;
-  languagePreferences: string[];
-  voiceReferenceUri: string | null;
+  /** Primary spoken language for STT (guide §8) — a single code, e.g. `"uz"`. */
+  language: string;
+  /** `false` once soft-deleted via `DELETE /participants/{id}` (guide §8, §17). */
+  isActive: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 /** A single sitting of a case; owns audio and transcript (spec §14.4). */

@@ -154,18 +154,20 @@ export default function CaseDetailView() {
             <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
               {courtCase.caseNumber}
             </h1>
-            <StageBadge stage={courtCase.stage} />
+            {courtCase.stage && <StageBadge stage={courtCase.stage} />}
             <CaseTypeTag caseType={courtCase.caseType} />
           </div>
           {parties && <p className="text-lg font-semibold text-foreground">{parties}</p>}
-          <p className="text-sm text-muted-foreground">{courtCase.subject}</p>
+          <p className="text-sm text-muted-foreground">
+            {courtCase.subject ?? courtCase.description}
+          </p>
         </div>
       </div>
 
       <CaseStats
         courtCase={courtCase}
         documentsCount={documents?.length ?? 0}
-        participantsCount={participants?.length ?? courtCase.participantCount}
+        participantsCount={participants?.length ?? courtCase.participantCount ?? 0}
       />
 
       <Tabs
