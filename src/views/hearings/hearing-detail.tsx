@@ -7,6 +7,7 @@ import { EmptyState } from "@/shared/custom/empty-state";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { useHearingSession } from "@/features/hearings/use-hearing-session";
 import { HearingLifecyclePanel } from "@/features/hearings/hearing-lifecycle-panel";
+import { RealTranscriptPanel } from "@/features/transcript/real-transcript-panel";
 import { useCase } from "@/features/cases/use-case";
 import { EventsPanel } from "@/features/events/events-panel";
 import { ProtocolPanel } from "@/features/protocol/protocol-panel";
@@ -72,7 +73,7 @@ export default function HearingDetailView() {
     {
       id: "transcript",
       label: t("hearing.transcriptTab"),
-      content: <HearingTranscriptTab hearingId={hearing.id} reloadKey={transcriptReloadKey} />,
+      content: <RealTranscriptPanel hearingId={hearing.id} reloadKey={transcriptReloadKey} />,
     },
     {
       id: "events",
@@ -104,14 +105,4 @@ export default function HearingDetailView() {
       <Tabs tabs={tabs} variant="underline" defaultTab="live" />
     </div>
   );
-}
-
-// Placeholder for the transcript tab — real segments load in the next step
-// (`getTranscript`), keyed by `reloadKey` so a successful transcribe job
-// refetches it.
-function HearingTranscriptTab({ hearingId, reloadKey }: { hearingId: string; reloadKey: number }) {
-  const { t } = useTranslation();
-  void hearingId;
-  void reloadKey;
-  return <EmptyState description={t("hearing.transcriptEmpty")} />;
 }
