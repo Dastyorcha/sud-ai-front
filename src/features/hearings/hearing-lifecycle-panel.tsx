@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Mic, Square } from "lucide-react";
+import { Mic, RotateCw, Square, Wand2 } from "lucide-react";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
+import { Progress } from "@/shared/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +15,12 @@ import { FileDropzone } from "@/shared/components/ui/file-dropzone";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { Timestamp } from "@/shared/custom/record/timestamp";
 import { useStartHearing, useStopHearing } from "@/features/hearings/use-hearings";
-import { uploadAudio, validateAudioFile } from "@/features/hearings/hearing.service";
+import {
+  transcribeHearing,
+  uploadAudio,
+  validateAudioFile,
+} from "@/features/hearings/hearing.service";
+import { useJobPolling } from "@/shared/lib/query/use-job-polling";
 import type { Hearing } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
@@ -24,8 +30,8 @@ export interface HearingLifecyclePanelProps {
   hearing: Hearing;
   /** Called with the fresh `Hearing` after start/stop (session-carry update). */
   onHearingChanged: (hearing: Hearing) => void;
-  /** Called once an audio track has been uploaded (enables the transcribe step). */
-  onAudioUploaded?: () => void;
+  /** Called once transcription succeeds — load the transcript tab. */
+  onTranscribed?: () => void;
 }
 
 /**
@@ -40,7 +46,7 @@ export interface HearingLifecyclePanelProps {
 export function HearingLifecyclePanel({
   hearing,
   onHearingChanged,
-  onAudioUploaded,
+  onTranscribed,
 }: HearingLifecyclePanelProps) {
   const { t } = useTranslation();
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -48,12 +54,21 @@ export function HearingLifecyclePanel({
   const [stopOpen, setStopOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [hasAudio, setHasAudio] = useState(false);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [transcribing, setTranscribing] = useState(false);
   const startMutation = useStartHearing();
   const stopMutation = useStopHearing();
+  const { job, isSucceeded, isFailed } = useJobPolling(jobId);
 
   const recording = hearing.status === "Recording";
   const canStart = hearing.status === "Created" || hearing.status === "DeviceCheck";
   const canUpload = hearing.status === "Finalizing" || hearing.status === "Failed";
+  const canTranscribe = canUpload && hasAudio && !jobId;
+
+  useEffect(() => {
+    if (isSucceeded) onTranscribed?.();
+  }, [isSucceeded, onTranscribed]);
 
   useEffect(() => {
     if (!recording) return;
@@ -142,13 +157,31 @@ export function HearingLifecyclePanel({
     try {
       await uploadAudio(hearing.id, file);
       setUploadedFileName(file.name);
+      setHasAudio(true);
       notify.success(t("hearing.uploaded"));
-      onAudioUploaded?.();
     } catch (error) {
       notify.error(t(errorMessageKey(error)));
     } finally {
       setUploading(false);
     }
+  }
+
+  async function queueTranscription() {
+    setTranscribing(true);
+    try {
+      const accepted = await transcribeHearing(hearing.id);
+      setJobId(accepted.jobId);
+      notify.success(t("hearing.transcriptionQueued"));
+    } catch (error) {
+      notify.error(t(errorMessageKey(error)));
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
+  function retryTranscription() {
+    setJobId(null);
+    void queueTranscription();
   }
 
   return (
@@ -187,7 +220,7 @@ export function HearingLifecyclePanel({
         </div>
       )}
 
-      {canUpload && (
+      {canUpload && !isSucceeded && (
         <Card>
           <CardContent className="flex flex-col gap-3 pt-6">
             <h3 className="text-sm font-medium text-foreground">{t("hearing.uploadAudioTitle")}</h3>
@@ -203,6 +236,38 @@ export function HearingLifecyclePanel({
               <p className="text-sm text-success">
                 {t("hearing.uploaded")}: {uploadedFileName}
               </p>
+            )}
+
+            {canTranscribe && (
+              <Button onClick={queueTranscription} disabled={transcribing} className="self-start">
+                <Wand2 className="size-4" />
+                {t("hearing.queueTranscription")}
+              </Button>
+            )}
+
+            {jobId && !isFailed && !isSucceeded && (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted-foreground">{t("hearing.transcribing")}</p>
+                <Progress value={job?.status === "Processing" ? 60 : 15} />
+              </div>
+            )}
+
+            {isFailed && (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-destructive">
+                  {t("hearing.transcriptionFailed")}
+                  {job?.errorMessageSafe ? `: ${job.errorMessageSafe}` : ""}
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={retryTranscription}
+                  className="self-start"
+                >
+                  <RotateCw className="size-4" />
+                  {t("hearing.retryTranscription")}
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

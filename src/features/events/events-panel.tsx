@@ -12,7 +12,8 @@ import type { Hearing } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 
 export interface EventsPanelProps {
-  hearing: Hearing;
+  /** Only `id`/`caseId` are read — accepts either a full `Hearing` or the session-carried real one. */
+  hearing: Pick<Hearing, "id" | "caseId">;
 }
 
 /**
@@ -22,10 +23,11 @@ export interface EventsPanelProps {
  */
 export function EventsPanel({ hearing }: EventsPanelProps) {
   const { t } = useTranslation();
-  const { data: events, isLoading, refetch } = useMockQuery(
-    () => listEvents(hearing.id),
-    [hearing.id],
-  );
+  const {
+    data: events,
+    isLoading,
+    refetch,
+  } = useMockQuery(() => listEvents(hearing.id), [hearing.id]);
 
   if (isLoading) return <LoadingState rows={5} />;
   if (!events || events.length === 0) return <EmptyState />;
@@ -51,11 +53,7 @@ export function EventsPanel({ hearing }: EventsPanelProps) {
             )}
             {e.reviewStatus === "PENDING_REVIEW" && (
               <div className="ml-auto flex gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => verifyEvent(e.id).then(refetch)}
-                >
+                <Button size="sm" variant="outline" onClick={() => verifyEvent(e.id).then(refetch)}>
                   <Check className="size-4 text-success" />
                   {t("events.verify")}
                 </Button>
