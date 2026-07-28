@@ -1,14 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/components/ui/table";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -18,29 +10,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { StatusBadge } from "@/shared/custom/status-badge";
-import { DateText } from "@/shared/custom/date-text";
 import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
+import { CaseCard } from "@/widgets/case-card/case-card";
 import { useCases } from "@/features/cases/use-cases";
-import { CASE_STATUS, type CaseStatus } from "@/shared/types/enums";
-import { ROUTE_PATHS, buildRoute, withLocale } from "@/shared/constants/route-paths";
+import { CASE_STAGE, CASE_TYPE, type CaseStage, type CaseType } from "@/shared/types/enums";
+import { buildRoute, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { notify } from "@/shared/lib/toast";
+
+const NewCaseWizard = lazy(() => import("@/widgets/new-case-wizard/new-case-wizard"));
 
 /**
- * Case list (spec FR-02, UC-01, §16.1 #3). Searchable table backed by the
- * mock `court-case.service`, one row per case, click opens the detail page.
- * Mirrors the `views/users` reference pattern; search is debounced (400ms)
- * because it drives a server-style re-fetch.
+ * Case dashboard grid (mockup-02): search + type/stage filters over
+ * `useCases()`, live result count, gold "Yangi ish ochish" CTA, and a
+ * responsive grid of `CaseCard`s. Client-side over the mock service, mirrors
+ * `views/dashboard` for the CTA/link pattern.
  */
 export default function CasesView() {
   const { t, locale } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [status, setStatus] = useState<"ALL" | CaseStatus>("ALL");
+  const [caseType, setCaseType] = useState<"ALL" | CaseType>("ALL");
+  const [stage, setStage] = useState<"ALL" | CaseStage>("ALL");
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 400);
@@ -48,15 +44,15 @@ export default function CasesView() {
   }, [search]);
 
   const filters = useMemo(
-    () => ({ search: debouncedSearch, ...(status !== "ALL" ? { status } : {}) }),
-    [debouncedSearch, status],
+    () => ({
+      search: debouncedSearch,
+      ...(caseType !== "ALL" ? { caseType } : {}),
+      ...(stage !== "ALL" ? { stage } : {}),
+    }),
+    [debouncedSearch, caseType, stage]
   );
-  const { data, isLoading, error } = useCases({ filters });
+  const { data, isLoading, error } = useCases({ filters, pageSize: 100 });
   const cases = data?.items ?? [];
-
-  function openCase(caseId: string) {
-    navigate(withLocale(locale, buildRoute.caseDetail(caseId)));
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -67,11 +63,9 @@ export default function CasesView() {
           </h1>
           <p className="text-sm text-muted-foreground">{t("cases.description")}</p>
         </div>
-        <Button asChild>
-          <Link to={withLocale(locale, ROUTE_PATHS.CASE_NEW)}>
-            <Plus className="size-4" />
-            {t("cases.newCase")}
-          </Link>
+        <Button variant="gold" onClick={() => setWizardOpen(true)}>
+          <Plus className="size-4" />
+          {t("cases.newCaseCta")}
         </Button>
       </div>
 
@@ -82,65 +76,63 @@ export default function CasesView() {
           placeholder={t("common.search")}
           className="max-w-sm"
         />
-        <Select value={status} onValueChange={(v) => setStatus(v as "ALL" | CaseStatus)}>
-          <SelectTrigger className="w-44">
+        <Select value={caseType} onValueChange={(v) => setCaseType(v as "ALL" | CaseType)}>
+          <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">{t("cases.allStatuses")}</SelectItem>
-            {(Object.values(CASE_STATUS) as CaseStatus[]).map((s) => (
-              <SelectItem key={s} value={s}>
-                {t(`enums.caseStatus.${s}` as MessageKey)}
+            <SelectItem value="ALL">{t("cases.allTypes")}</SelectItem>
+            {(Object.values(CASE_TYPE) as CaseType[]).map((type) => (
+              <SelectItem key={type} value={type}>
+                {t(`enums.caseType.${type}` as MessageKey)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <Select value={stage} onValueChange={(v) => setStage(v as "ALL" | CaseStage)}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">{t("cases.allStages")}</SelectItem>
+            {(Object.values(CASE_STAGE) as CaseStage[]).map((s) => (
+              <SelectItem key={s} value={s}>
+                {t(`enums.caseStage.${s}` as MessageKey)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {!isLoading && !error && (
+          <span className="ml-auto self-center text-sm text-muted-foreground">
+            {t("cases.resultsCount", { count: cases.length })}
+          </span>
+        )}
       </div>
 
-      {isLoading && <LoadingState rows={5} />}
+      {isLoading && <LoadingState rows={6} />}
       {error && <ErrorState />}
       {!isLoading && !error && cases.length === 0 && <EmptyState />}
 
       {!isLoading && !error && cases.length > 0 && (
-        <div className="rounded-lg border border-border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("cases.columns.caseNumber")}</TableHead>
-                <TableHead>{t("cases.columns.court")}</TableHead>
-                <TableHead>{t("cases.columns.type")}</TableHead>
-                <TableHead>{t("cases.columns.status")}</TableHead>
-                <TableHead className="text-right">{t("cases.columns.participants")}</TableHead>
-                <TableHead>{t("cases.columns.updated")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cases.map((courtCase) => (
-                <TableRow
-                  key={courtCase.id}
-                  className="cursor-pointer"
-                  onClick={() => openCase(courtCase.id)}
-                >
-                  <TableCell className="font-mono text-sm">{courtCase.caseNumber}</TableCell>
-                  <TableCell>{courtCase.courtName}</TableCell>
-                  <TableCell>{t(`enums.caseType.${courtCase.caseType}` as MessageKey)}</TableCell>
-                  <TableCell>
-                    <StatusBadge
-                      label={t(`enums.caseStatus.${courtCase.status}` as MessageKey)}
-                      tone={courtCase.status === "ACTIVE" ? "success" : "neutral"}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {courtCase.participantCount}
-                  </TableCell>
-                  <TableCell>
-                    <DateText value={courtCase.updatedAt} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {cases.map((courtCase) => (
+            <CaseCard key={courtCase.id} courtCase={courtCase} />
+          ))}
         </div>
+      )}
+
+      {wizardOpen && (
+        <Suspense fallback={null}>
+          <NewCaseWizard
+            open={wizardOpen}
+            onOpenChange={setWizardOpen}
+            onCreated={(caseId) => {
+              setWizardOpen(false);
+              notify.success(t("caseWizard.createdToast"));
+              navigate(withLocale(locale, buildRoute.caseDetail(caseId)));
+            }}
+          />
+        </Suspense>
       )}
     </div>
   );

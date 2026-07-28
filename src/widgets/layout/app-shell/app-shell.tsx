@@ -3,11 +3,12 @@ import { Outlet } from "react-router-dom";
 import { Sheet, SheetContent, SheetTitle } from "@/shared/components/ui/sheet";
 import { APP_NAME } from "@/shared/constants/app";
 import { Sidebar } from "@/widgets/layout/sidebar/sidebar";
-import { Topbar } from "@/widgets/layout/topbar/topbar";
+import { AppHeader } from "@/widgets/app-header/app-header";
+import { AppFooter } from "@/widgets/app-footer/app-footer";
 
 /** Product shell: a fixed dark sidebar on desktop (a `Sheet` drawer on
- * mobile), the topbar, and a scrollable content outlet. Mounted inside
- * `AuthGuard` for every protected route. */
+ * mobile), the court app header, a scrollable content outlet, and the status
+ * footer. Mounted inside `AuthGuard` for every protected route. */
 export function AppShell() {
   const [isNavOpen, setIsNavOpen] = useState(false);
 
@@ -30,10 +31,11 @@ export function AppShell() {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar onOpenNav={() => setIsNavOpen(true)} />
+        <AppHeader onOpenNav={() => setIsNavOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <Outlet />
         </main>
+        <AppFooter />
       </div>
     </div>
   );

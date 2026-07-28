@@ -41,9 +41,10 @@ Dependencies point **downward only**. A layer may import from layers below it, n
 
 ### App shell (`src/widgets/layout/`)
 
-- `AppShell` (`app-shell/app-shell.tsx`) composes a fixed dark sidebar on desktop (`md:` breakpoint), a `Sheet` drawer with the same `Sidebar` content on mobile (state owned by `AppShell`), the `Topbar`, and a scrollable `<Outlet>` for the active view.
+- `AppShell` (`app-shell/app-shell.tsx`) composes a fixed dark sidebar on desktop (`md:` breakpoint), a `Sheet` drawer with the same `Sidebar` content on mobile (state owned by `AppShell`), the `AppHeader`, a scrollable `<Outlet>` for the active view, and the `AppFooter`.
 - `Sidebar` (`sidebar/sidebar.tsx`) renders the brand (`APP_NAME` + a mark), the `NAV_ITEMS` rows (`sidebar-nav-item.tsx`, active state by matching `useLocation().pathname` against `withLocale(locale, item.path)`), and a footer line. Uses the `sidebar`/`sidebar-accent`/`sidebar-foreground`/… tokens (dark regardless of the app's light/dark theme).
-- `Topbar` (`topbar/topbar.tsx`) has the mobile menu button (opens the `Sheet`), `ThemeToggle`, `LangSwitcher`, and a profile `DropdownMenu` (name/role/org/logout) sourced from `useAuth`.
+- `AppHeader` (`src/widgets/app-header/app-header.tsx`) is the court header: mobile menu button (opens the `Sheet`), a gold logo lockup (`APP_NAME`/`APP_FULL_NAME`), a breadcrumb (dashboard → active case number, matched off the URL with `matchPath(ROUTE_PATHS.CASE_DETAIL)` — no router change needed), `ThemeToggle`, `LangSwitcher`, and a user block (avatar initials, name, role) sourced from `useCourtAuth`. Supersedes the old `Topbar`.
+- `AppFooter` (`src/widgets/app-footer/app-footer.tsx`) is the status footer under the routed content: a status dot (`status-ok`/`-warning`/`-error` tokens), last-updated timestamp, `APP_VERSION`, and the product tagline — all through `t()`.
 - `src/views/dashboard/dashboard.tsx` renders a shared `ComingSoon` (`src/shared/custom/coming-soon.tsx`) — replace it with real KPI/summary widgets when you build the dashboard out. `src/views/users/users.tsx` is the real reference CRUD page — see "Admin-panel patterns" below.
 
 ## Internationalization (i18n)
@@ -77,8 +78,10 @@ Full spec: `docs/i18n.md`. A lightweight **custom** layer — no library:
 - **Color families** (light + dark defined):
   - shadcn base: `background`, `foreground`, `card`, `popover`, `primary` (+ `primary-foreground`, `primary-soft`), `secondary`, `muted` (+ `muted-foreground`), `accent` (+ `accent-foreground`), `border`, `input`, `ring`.
   - status: `destructive` (+ `-foreground`, `-soft`), `success` (+ `-foreground`, `-soft`), `warning` (+ `-foreground`, `-soft`).
-  - charts: `chart-1..5`.
+  - charts: `chart-1..5`; risk badges: `risk-low..critical`.
   - sidebar: `sidebar` (dark nav surface) + `sidebar-foreground`/`-primary`/`-accent`/`-border`/`-ring`.
+  - court theme (mockup): `gold` (+ `-foreground`, `-soft`) accent; `stage-1..6` (case pipeline badges); `speaker-1..4` (transcript diarization); `status-ok`/`status-warning`/`status-error` (system status dot — distinct from form `success`/`warning`/`destructive`).
+  - fonts: `font-sans` (Inter, system fallback), `font-serif` (Noto Serif, system fallback) — system/self-hosted fallback stacks only, no font package or external `<link>`.
 - A new token → add it in `@theme inline` **and** `:root` **and** `.dark`, then use the utility; add a swatch to `/tools`.
 - Full UI ruleset: `.claude/skills/ui-designer/SKILL.md`.
 

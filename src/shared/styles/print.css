@@ -1,0 +1,21 @@
+/*
+ * "Chop etish" (print) scoping for the document editor (mockup-06). Hides
+ * the rest of the app chrome (sidebar/header/tabs/etc.) and prints only the
+ * element with id `document-editor-print-area`.
+ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #document-editor-print-area,
+  #document-editor-print-area * {
+    visibility: visible;
+  }
+
+  #document-editor-print-area {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+  }
+}

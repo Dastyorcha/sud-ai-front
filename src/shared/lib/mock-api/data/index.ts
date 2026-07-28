@@ -15,3 +15,9 @@ export {
   DOCUMENT_VERSIONS,
 } from "@/shared/lib/mock-api/data/documents";
 export { AUDIT_LOGS } from "@/shared/lib/mock-api/data/audit-logs";
+export {
+  COPILOT_DEFECTS,
+  COPILOT_LAW_ARTICLES,
+  COPILOT_DEADLINES,
+  COPILOT_SUGGESTIONS,
+} from "@/shared/lib/mock-api/data/copilot";

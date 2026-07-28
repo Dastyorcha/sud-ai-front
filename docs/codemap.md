@@ -23,15 +23,15 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 ## Views (`src/views/`)
 
 - `src/views/dashboard/dashboard.tsx` · `Dashboard` (default) · dashboard placeholder — renders `ComingSoon`. Replace with real KPI/summary widgets.
-- `src/views/cases/cases.tsx` · `CasesView` (default) · court-case list (spec FR-02/UC-01) — debounced search over `useCases()`, a `Table`, row click opens the case detail page.
+- `src/views/cases/cases.tsx` · `CasesView` (default) · court-case dashboard grid (mockup-02, spec FR-02/UC-01) — debounced search + type/stage `Select` filters over `useCases()`, live result count, gold "Yangi ish ochish" CTA that opens the lazy `NewCaseWizard` (mockup-03), responsive 1/2/3-col grid of `CaseCard`s.
 - `src/views/cases/case-new.tsx` · `CaseNewView` (default) · case creation form (spec UC-01) — requisites + participants field array (RHF + Zod, ≥1 claimant/defendant), `sessionStorage` draft, creates case + participants then opens detail.
-- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · compact case detail — requisites (`DetailGrid`) + participants table via `useCase`/`useParticipants`; reads `:caseId`.
+- `src/views/cases/case-detail.tsx` · `CaseDetailView` (default) · case-detail shell (mockup-04): back nav, case number/parties headline, `StageBadge`/`CaseTypeTag`, `CaseStats`, then Bayonnoma/Sud hujjatlari/Sudya maslahatchisi `Tabs` (lazy `ProtocolWorkspace`/`DocumentsWorkspace`/`CopilotGrid`); requisites (`DetailGrid`) + participants/hearings management + `VocabularyPanel` stay reachable below via `useCase`/`useParticipants`/`useDocuments`/`useHearings`; reads `:caseId`.
 - `src/views/hearings/hearing-detail.tsx` · `HearingDetailView` (default) · hearing workspace (spec §16.1 #6–9) — tabs: live / transcript / events / protocol; canonical approval transitions the hearing.
 - `src/views/documents/documents.tsx` · `DocumentsView` (default) · generated documents + read-only template catalogue (spec §16.1 #10/#12, D-14).
 - `src/views/admin/admin.tsx` · `AdminView` (default) · read-only audit log + provider status (spec §16.1 #13–14, FR-12, NFR-05).
 - `src/features/hearings/use-hearings.ts` · `useHearings`, `useHearing` · hearing hooks over `hearing.service`.
 - `src/features/live-session/live-hearing-panel.tsx` · `LiveHearingPanel` · live hearing screen (§16.2) — scripted live-feed stand-in for the STT WebSocket, §17.3 controls, finalize job flow.
-- `src/features/transcript/transcript-panel.tsx` · `TranscriptPanel` · transcript editor (FR-07/UC-05) — filters, inline edit (raw preserved), verify, bulk speaker mapping (AC-03), canonical-approval gate.
+- `src/features/transcript/transcript-panel.tsx` · `TranscriptPanel`, `TranscriptPanelProps` (`hearing`, `onApproved`, `activeMs?`) · transcript editor (FR-07/UC-05) — free-text search + speaker `Select` filter (mockup-05) on top of the status filters, inline edit (raw preserved), verify, bulk speaker mapping (AC-03), canonical-approval gate; rows show a `speakerColorClass` dot and highlight (`bg-gold-soft`) when `activeMs` falls in the segment (mockup-05 playback sync).
 - `src/features/events/events-panel.tsx` · `EventsPanel` · procedural-events review (FR-08/§11) — verify/reject, sources shown, unsourced events flagged as errors.
 - `src/features/protocol/protocol-panel.tsx` · `ProtocolPanel` · protocol view (FR-09/UC-06) — sections with origin + source traceability, FR-11 approval actions, export job.
 - `src/features/cases/vocabulary-panel.tsx` · `VocabularyPanel` · case vocabulary (§9.7) — auto-derived terms grouped by origin with weights.
@@ -44,11 +44,35 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Widgets (`src/widgets/`)
 
-- `src/widgets/layout/app-shell/app-shell.tsx` · `AppShell` · product shell: fixed sidebar on desktop, `Sheet` drawer on mobile (owns open state), `Topbar`, scrollable `<Outlet>`.
+- `src/widgets/layout/app-shell/app-shell.tsx` · `AppShell` · product shell: fixed sidebar on desktop, `Sheet` drawer on mobile (owns open state), `AppHeader`, scrollable `<Outlet>`, `AppFooter`.
 - `src/widgets/layout/sidebar/sidebar.tsx` · `Sidebar` · dark nav: brand (`APP_NAME` + mark), `NAV_ITEMS` rows with active-state, footer (`allRightsReserved`).
 - `src/widgets/layout/sidebar/sidebar-nav-item.tsx` · `SidebarNavItem` · one nav row (`Button asChild` + `Link`, icon, label, optional count badge).
-- `src/widgets/layout/topbar/topbar.tsx` · `Topbar` · mobile menu button, `ThemeToggle`, `LangSwitcher`, profile `DropdownMenu` (name/role/org/logout) from `useAuth`.
 - `src/widgets/layout/auth-guard/auth-guard.tsx` · `AuthGuard` · stub guard: redirects to `ROUTE_PATHS.LOGIN` when `useAuth().isAuthenticated` is false (always true today).
+- `src/widgets/app-header/app-header.tsx` · `AppHeader` · court app header (supersedes the old `Topbar`): mobile menu button, gold logo lockup (`APP_NAME`/`APP_FULL_NAME`, links to dashboard), breadcrumb (dashboard → active case number via `matchPath(ROUTE_PATHS.CASE_DETAIL)` + `useCase`), `ThemeToggle`, `LangSwitcher`, user block (avatar initials, name, role) from `useCourtAuth()`.
+- `src/widgets/app-footer/app-footer.tsx` · `AppFooter`, `SystemStatus` · status footer under the routed content: status dot (`status-ok`/`-warning`/`-error` tokens), last-updated timestamp, version (`APP_VERSION`), tagline.
+- `src/widgets/case-card/case-card.tsx` · `CaseCard`, `CaseCardProps` · dashboard grid card (mockup): case number + `StageBadge`, "X vs Y" parties, subject, `CaseTypeTag`, claim `Money`, updated `DateText`; whole card links to `buildRoute.caseDetail`.
+- `src/widgets/case-stats/case-stats.tsx` · `CaseStats`, `CaseStatsProps` · case-detail shell's 4 stat cards (mockup-04): documents count, days-since-filing duration, participants count, claim `Money`; icon avatar on `gold-soft`.
+- `src/widgets/protocol-workspace/protocol-workspace.tsx` · `ProtocolWorkspace` (default), `ProtocolWorkspaceProps` (`caseId`) · "Bayonnoma" tab (mockup-05): picks the case's processed hearing (or its most recent) via `useHearings`, renders `ProtocolActionsRow` + (once processed) `AudioPlayerBar`, `SpeakersPanel` beside `TranscriptPanel` (wired to the player's mock clock via `activeMs`) and `ProtocolGenerateBar`; `NoData` when the case has no hearing — lazy-loaded from `case-detail`.
+- `src/widgets/protocol-workspace/protocol-actions-row.tsx` · `ProtocolActionsRow` · mockup-05 toolbar: upload-audio dialog (`FileDropzone`, demo-only), record/pause/stop wired to the same §17.3 `transitionHearing` state machine + phase-05 mic-level meter as `LiveHearingPanel`, elapsed timer, `RecordStateBadge`, duration.
+- `src/widgets/protocol-workspace/protocol-generate-bar.tsx` · `ProtocolGenerateBar`, `ProtocolGenerateBarProps` (`hearingId`) · mockup-05 generate bar: FPK 273 note + gold "Rasmiy bayonnoma yaratish" CTA that links to `buildRoute.hearingDetail` (the existing phase-09 `ProtocolPanel` flow) — no generation logic here.
+- `src/widgets/audio-player-bar/audio-player-bar.tsx` · `AudioPlayerBar`, `AudioPlayerBarProps` (`durationMs`, `onTimeChange?`) · mockup-05 waveform player: play/pause, a mock `setInterval` clock, deterministic pseudo-random waveform bars with a CSS progress-fill overlay (no audio-analysis dependency), current/total `Timestamp`, 0.5x–2x speed `Select`.
+- `src/widgets/speakers-panel/speakers-panel.tsx` · `SpeakersPanel`, `SpeakersPanelProps` (`caseId`, `hearingId`) · mockup-05 speakers list beside the transcript — one row per distinct diarization label with a `speakerColorClass` dot and its mapped participant name/role (or the raw label when unmapped).
+- `src/widgets/documents-workspace/documents-workspace.tsx` · `DocumentsWorkspace` (default), `DocumentsWorkspaceProps` (`caseId`) · "Sud hujjatlari" tab (mockup-06) — composes `TemplateSelector` + `CaseFactsPanel` + `DocumentEditor` over the selected `ProceduralDocumentTemplate`; "AI to'ldirish"/"Eksport"/"Chop etish" actions call `document-fill`; lazy-loaded from `case-detail`.
+- `src/widgets/template-selector/template-selector.tsx` · `TemplateSelector` (default), `TemplateSelectorProps` (`selectedId`, `onSelect`) · mockup-06 template picker — 5 grouped card rows over `PROCEDURAL_DOCUMENT_TEMPLATES`, active-selection state.
+- `src/widgets/case-facts-panel/case-facts-panel.tsx` · `CaseFactsPanel` (default), `CaseFactsPanelProps` (`courtCase`) · mockup-06 "Ish ma'lumotlari" panel — case number/parties/subject/claim/filed date, plus a local (non-persisted) evidence checklist.
+- `src/widgets/document-editor/document-editor.tsx` · `DocumentEditor` (default), `DocumentEditorProps`, `DOCUMENT_EDITOR_PRINT_AREA_ID` (re-exports `DocumentSectionId`/`DocumentSections` from `document-fill`) · mockup-06 sectioned editor — collapsible bordered block per section I–IV (`intro|descriptive|reasoning|conclusion`), "AI yordamida" badge on III, controlled `Textarea` per section; content wrapper carries `DOCUMENT_EDITOR_PRINT_AREA_ID` for `src/shared/styles/print.css`; subscribes to `document-fill`'s `onAppendToSection` so mockup-07's copilot can insert text into an open section.
+- `src/widgets/copilot-grid/copilot-grid.tsx` · `CopilotGrid` (default), `CopilotGridProps` (`caseId`) · "Sudya maslahatchisi" tab (mockup-07): 2×2 (1-col on narrow) grid of `DefectsCard`/`LawArticlesCard`/`DeadlinesCard`/`AiSuggestionsCard` over `useCopilot(caseId)`; lazy-loaded from `case-detail`.
+- `src/widgets/copilot-grid/components/defects-card.tsx` · `DefectsCard` (default), `DefectsCardProps` · procedural-defects list — severity (`danger|warning|info`) border/icon/`StatusBadge` risk label, demo fixture text.
+- `src/widgets/copilot-grid/components/law-articles-card.tsx` · `LawArticlesCard` (default), `LawArticlesCardProps` · relevant law-article suggestions — `FPK|FK|IPK` tag, article number/title, relevance `Progress` bar, Lex.uz-shaped source footer.
+- `src/widgets/copilot-grid/components/deadlines-card.tsx` · `DeadlinesCard` (default), `DeadlinesCardProps` · procedural deadlines — urgency (`urgent|warning|normal`) border/`StatusBadge` countdown (days-left computed vs `Date.now()` at render) + elapsed-time mini `Progress`.
+- `src/widgets/copilot-grid/components/ai-suggestions-card.tsx` · `AiSuggestionsCard` (default), `AiSuggestionsCardProps` · AI conclusions/recommendations — tag/title/text plus "Hujjatga qo'shish" (`appendToSection("reasoning", …)` + success toast).
+- `src/widgets/new-case-wizard/new-case-wizard.tsx` · `NewCaseWizard` (default), `NewCaseWizardProps` (`open`, `onOpenChange`, `onCreated`) · "Yangi ish ochish" 5-step `Dialog` wizard (mockup-03): one `react-hook-form` instance (`features/case-create/schema.ts`) spans all steps so Back never loses values; `form.trigger(...)` per-step field paths gate Next; Finish validates the whole form then calls `useCreateCase().submit`; lazy-loaded from `views/cases/cases.tsx`.
+- `src/widgets/new-case-wizard/step-indicator.tsx` · `StepIndicator`, `StepIndicatorProps` (`current`, `labels`) · numbered step row — done steps show a check, active step is gold-highlighted.
+- `src/widgets/new-case-wizard/steps/case-type-step.tsx` · `CaseTypeStep` · wizard step 1 — 3 clickable kind cards (`CASE_KIND_VALUES`: Fuqarolik/Iqtisodiy/Maxsus) + a category `Select` scoped to the chosen kind (`CASE_CATEGORY_OPTIONS`).
+- `src/widgets/new-case-wizard/steps/parties-step.tsx` · `PartiesStep` · wizard step 2 — claimant/defendant name+organization, optional representative (checkbox reveals name + role `Select`).
+- `src/widgets/new-case-wizard/steps/claim-step.tsx` · `ClaimStep` · wizard step 3 — claim text/amount/legal basis + a live state-fee (`calculateStateFee`) estimate card.
+- `src/widgets/new-case-wizard/steps/documents-step.tsx` · `DocumentsStep`, `DocumentsStepProps` · wizard step 4 — in-memory `FileDropzone` upload list (no backend) + required-documents `Checkbox` list (`REQUIRED_DOCUMENT_KEYS`).
+- `src/widgets/new-case-wizard/steps/summary-step.tsx` · `SummaryStep`, `SummaryStepProps` · wizard step 5 — read-only recap of every entered field (kind/category, parties, claim + fee, document counts) before Finish.
 
 ## Widgets (→ target `src/widgets/`, pre-FSD)
 
@@ -69,6 +93,15 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/features/cases/use-case.ts` · `useCase`, `UseCaseResult` · single-case hook over `court-case.service.getCase`.
 - `src/features/participants/use-participants.ts` · `useParticipants`, `UseParticipantsResult` · a case's participants hook over `participant.service.listParticipants`.
 - `src/features/participants/participant-form-dialog.tsx` · `ParticipantFormDialog`, `ParticipantFormDialogProps` · add/edit participant dialog (spec §14.3, UC-01 Step 4.5) — create/update via the service, `onSaved` for refetch.
+- `src/features/documents/use-documents.ts` · `useDocuments`, `UseDocumentsResult` · a case's generated-documents hook over `document.service.listDocuments`.
+- `src/features/document-fill/document-append-bus.ts` · `onAppendToSection`, `appendToSection` · module-singleton pub/sub letting another feature (mockup-07 judge copilot) push text into an open `DocumentEditor` section without prop-drilling or a context provider; unclaimed appends (no `DocumentEditor` mounted, e.g. a different case-detail tab is active) queue in a `pending` buffer and flush into the next subscriber so nothing is lost.
+- `src/features/document-fill/document-sections.ts` · `DocumentSectionId`, `DOCUMENT_SECTION_ORDER`, `DocumentSections` · the four fixed document sections (`intro|descriptive|reasoning|conclusion`) shared by the `DocumentEditor` widget and this feature's fill/export helpers (kept in `features/` so the widget depends downward, not the reverse).
+- `src/features/document-fill/document-fill.ts` · `emptyDocumentSections`, `fillDocumentSections`, `exportDocumentSections` · mockup-06 mock "AI to'ldirish" — builds placeholder section text interpolating real case facts (marked for legal/domain review), plus a `.txt`/`.html` blob-download export stub (no DOCX backend).
+- `src/features/copilot/use-copilot.ts` · `useCopilot`, `UseCopilotResult`, `CopilotData` · loads a case's defects/law-articles/deadlines/suggestions in one round trip via `copilot.service` (`Promise.all`).
+- `src/features/case-create/schema.ts` · `caseWizardSchema`, `CaseWizardValues`, `CASE_WIZARD_DEFAULTS`, `WIZARD_STEP_COUNT`, `WIZARD_STEP_FIELDS` · new-case wizard's single Zod schema (mockup-03) spanning steps 1–3 (kind/category, parties, claim); `WIZARD_STEP_FIELDS` maps each step to the field paths validated before Next.
+- `src/features/case-create/categories.ts` · `CASE_KIND_VALUES`, `CaseKind`, `CASE_CATEGORY_OPTIONS`, `CaseCategoryOption`, `REQUIRED_DOCUMENT_KEYS`, `RequiredDocumentKey` · wizard step-1 "case kind" cards (an additive `CaseType` subset: `CIVIL`/`ECONOMIC_DISPUTE`/`SPECIAL`) with per-kind category option lists (cosmetic, stored in `metadata.category`, not a domain enum), plus the step-4 required-document checklist keys.
+- `src/features/case-create/fee-calc.ts` · `calculateStateFee`, `STATE_FEE_RATE`, `STATE_FEE_MINIMUM` · state-fee ("davlat boji") estimate for the claim step — flat-rate placeholder, **TODO**: replace with the real progressive tariff table once frozen.
+- `src/features/case-create/use-create-case.ts` · `useCreateCase`, `UseCreateCaseResult` · wizard submit hook — creates the case via `court-case.service.createCase` then its claimant/defendant/optional-representative via `participant.service.createParticipant`, mirroring `case-new.tsx`'s sequencing.
 
 ## Shared — custom (`src/shared/custom/`)
 
@@ -78,8 +111,11 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/custom/theme-toggle.tsx` · `ThemeToggle` · icon button flipping `next-themes`' resolved theme; localized `aria-label`.
 - `src/shared/custom/coming-soon.tsx` · `ComingSoon`, `ComingSoonProps` · centered "coming soon" state for placeholder views (dashboard); optional `titleKey`.
 - `src/shared/custom/status-badge.tsx` · `StatusBadge`, `StatusBadgeProps` · generic `cva` tone badge (`neutral|primary|success|warning|destructive|info`) — localized `label` + optional `icon`/`dotClassName`.
+- `src/shared/custom/stage-badge.tsx` · `StageBadge`, `StageBadgeProps` · case-stage pill (mockup dashboard) — `StatusBadge` with a `stage-1..6` token dot; the one place mapping `CaseStage` → token.
+- `src/shared/custom/case-type-tag.tsx` · `CaseTypeTag`, `CaseTypeTagProps` · neutral outline `Badge` for a case's `CaseType`, label via `enums.caseType.*`.
 - `src/shared/custom/record/timestamp.tsx` · `Timestamp` · mono, tabular hearing-relative `HH:MM:SS`/`MM:SS`; clickable variant emits `onSeek(ms)` (spec §16.3).
 - `src/shared/custom/record/speaker-chip.tsx` · `SpeakerChip` · speaker attribution chip — unmapped (mono, dashed) / mapped (role) / conflicting (destructive) states (spec §9.6).
+- `src/shared/custom/record/speaker-color.ts` · `speakerColorClass` · stable `speaker-1..4` dot-color class for a diarization label (string hash) — shared by `SpeakersPanel` and the transcript rows (mockup-05).
 - `src/shared/custom/record/confidence-bar.tsx` · `ConfidenceBar` · 3px STT confidence meter, `warning` below 0.75, numeric value via ARIA (spec §16.3).
 - `src/shared/custom/record/record-state-badge.tsx` · `RecordStateBadge` · single badge for document/segment/hearing/job status; one tone table per enum, label via `enums.*` (spec §16, FR-11).
 - `src/shared/custom/record/critical-field-mark.tsx` · `CriticalFieldMark` · inline dotted-underline mark for critical fields; reviewed=success, unreviewed=destructive (spec §10.3).
@@ -96,7 +132,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Shared — ui primitives (`src/shared/components/ui/`)
 
-- `button.tsx` · `Button`, `buttonVariants`, `ButtonProps` · cva button.
+- `button.tsx` · `Button`, `buttonVariants`, `ButtonProps` · cva button; variants incl. `gold` (`bg-gold`/`text-gold-foreground`) for the mockup's primary CTA.
 - `card.tsx` · `Card` + parts · surface container.
 - `dialog.tsx` · `Dialog` + parts · radix dialog.
 - `dropdown-menu.tsx` · `DropdownMenu` + parts · radix dropdown menu.
@@ -123,8 +159,9 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 
 ## Shared — lib / constants / types (FSD `src/shared/`)
 
-- `src/shared/types/models.ts` · `Organization`, `User`, `CourtUser`, `CourtCase`, `Participant`, `Hearing`, `AudioTrack`, `TranscriptSegment`, `ProceduralEvent`, `DocumentTemplate`, `GeneratedDocument`, `DocumentVersion`, `AuditLog`, `Job` · domain entity interfaces consumed by the mock API layer; backend-shaped (ISO date strings, ms offsets, enum IDs from `enums.ts`). `Organization`/`User` are the template's examples; the rest are the LexKotib court domain (spec §14).
+- `src/shared/types/models.ts` · `Organization`, `User`, `CourtUser`, `CourtCase`, `Participant`, `Hearing`, `AudioTrack`, `TranscriptSegment`, `ProceduralEvent`, `DocumentTemplate`, `GeneratedDocument`, `DocumentVersion`, `AuditLog`, `Job` · domain entity interfaces consumed by the mock API layer; backend-shaped (ISO date strings, ms offsets, enum IDs from `enums.ts`). `Organization`/`User` are the template's examples; the rest are the LexKotib court domain (spec §14). `CourtCase` also carries dashboard-card fields: `stage` (`CaseStage`), `subject`, `claimantName`/`defendantName`, `claimAmount`.
 - `src/shared/types/query-types.ts` · `ListParams`, `SortSpec`, `Paginated` · generic server-style list request/response shapes used by every mock service.
+- `src/shared/types/copilot.ts` · `CopilotDefect`, `CopilotDefectSeverity`, `LawArticleRef`, `LawArticleSource`, `CopilotDeadline`, `CopilotDeadlineUrgency`, `CopilotSuggestion` · mockup-07 judge-copilot types, shaped like a future AI-analysis API response; current data is per-case fixtures.
 - `src/shared/lib/utils.ts` · `cn` · Tailwind class merge (`clsx` + `tailwind-merge`).
 - `src/shared/hooks/use-debounce.ts` · `useDebounce` · returns a value delayed until it stops changing (throttles search input, etc.).
 - `src/shared/hooks/use-mock-query.ts` · `useMockQuery`, `UseMockQueryResult` · generic Promise-service loader (`useState`/`useEffect`, `{ data, isLoading, error, refetch }`) — used by the user detail drawer.
@@ -133,12 +170,13 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/lib/toast.ts` · `notify` · typed `sonner` toast wrappers (success/error/info/warning) for consistent app toasts.
 - `src/shared/lib/errors/error-map.ts` · `errorMessageKey`, `ErrorCode` · maps a thrown error/`{ code }` to a localized `errors.codes.*` message key; resolve with `t()` and surface via `notify.error`.
 - `src/shared/constants/navbarData.ts` · `NAVBAR_DATA` · nav config for the legacy `MainLayout` header/footer (pre-FSD; superseded by `nav-items.ts` for the app shell).
-- `src/shared/constants/app.ts` · `APP_NAME`, `APP_FULL_NAME` · central brand name — single source of truth; reference instead of hardcoding a product name.
+- `src/shared/constants/app.ts` · `APP_NAME`, `APP_FULL_NAME` · central brand name — `APP_NAME` ("Court AI Assistant") + `APP_FULL_NAME` (native "Sud AI Yordamchisi"), shown together as a fixed bilingual mark in the app header/sidebar/footer.
 - `src/shared/constants/route-paths.ts` · `ROUTE_PATHS`, `RoutePathKey`, `buildRoute`, `DETAIL_PARAM`, `withLocale` · single source of truth for route strings; `buildRoute.userDetail` returns a query-param URL (`/users?user=`) for cross-page detail opens; `DETAIL_PARAM` holds the `user` query key; `withLocale(locale, path)` builds a concrete `/:lang`-prefixed URL.
 - `src/shared/constants/page-names.ts` · `PAGE_NAMES` · i18n page-title message keys keyed by `ROUTE_PATHS` key — resolve with `t(PAGE_NAMES.KEY)`.
 - `src/shared/constants/nav-items.ts` · `NAV_ITEMS`, `NavItem` · sidebar sections; each carries a `labelKey` resolved via `t()`.
+- `src/shared/constants/document-templates.ts` · `DOCUMENT_TEMPLATE_GROUPS`, `DocumentTemplateGroup`, `ProceduralDocumentTemplate`, `PROCEDURAL_DOCUMENT_TEMPLATES`, `groupedProceduralDocumentTemplates` · mockup-06 static catalogue of 17 procedural document templates (5 groups, FPK article ref, lucide icon) for the "Sud hujjatlari" template selector — distinct from the spec's data-driven `DocumentTemplate` model.
 - `src/shared/constants/permissions.ts` · `PERMISSION_ACTION`, `PermissionAction`, `PERMISSIONS` · typed role×action matrix (admin/editor/viewer example) consumed by `usePermission`/`Can`.
-- `src/shared/types/enums.ts` · `USER_ROLE`, `SORT_DIRECTION`, `COURT_ROLE`, `COURT_TYPE`, `CASE_TYPE`, `CASE_STATUS`, `PARTICIPANT_ROLE`, `HEARING_STATUS`, `SEGMENT_STATUS`, `PROCEDURAL_EVENT_TYPE`, `EVENT_REVIEW_STATUS`, `CRITICAL_FIELD_TYPE`, `DOCUMENT_TYPE`, `DOCUMENT_STATUS`, `TEMPLATE_STATUS`, `JOB_STATUS`, `EXPORT_FORMAT` · core enum IDs (LexKotib court domain keeps the spec's exact UPPER_SNAKE values); labels live in i18n messages under `enums.*` (see `docs/i18n.md`).
+- `src/shared/types/enums.ts` · `USER_ROLE`, `SORT_DIRECTION`, `COURT_ROLE`, `COURT_TYPE`, `CASE_TYPE`, `CASE_STATUS`, `CASE_STAGE`, `PARTICIPANT_ROLE`, `HEARING_STATUS`, `SEGMENT_STATUS`, `PROCEDURAL_EVENT_TYPE`, `EVENT_REVIEW_STATUS`, `CRITICAL_FIELD_TYPE`, `DOCUMENT_TYPE`, `DOCUMENT_STATUS`, `TEMPLATE_STATUS`, `JOB_STATUS`, `EXPORT_FORMAT` · core enum IDs (LexKotib court domain keeps the spec's exact UPPER_SNAKE values); labels live in i18n messages under `enums.*` (see `docs/i18n.md`). `CASE_STAGE` is the mockup dashboard's procedural stage (intake/preparation/hearing/decision/appeal/execution), distinct from `CASE_STATUS`. `CASE_TYPE.CIVIL`/`SPECIAL` were added additively for the new-case wizard's kind cards (mockup-03; see `features/case-create/categories.ts`).
 - `src/shared/lib/i18n/locale.ts` · `LOCALES`, `Locale`, `DEFAULT_LOCALE`, `LOCALE_LABELS`, `LOCALE_STORAGE_KEY`, `isLocale` · locale model.
 - `src/shared/lib/i18n/format.ts` · `formatMoney`, `formatDate`, `formatNumber` · `Intl`-based, locale-aware formatting.
 - `src/shared/lib/i18n/locale-context.tsx` · `LocaleProvider`, `useTranslation`, `LocaleContextValue` · derives locale from the `:lang` route param; provides `t()` + formatters.
@@ -147,6 +185,7 @@ One line per source file: `path · exports · purpose`. The third-tier lookup (a
 - `src/shared/lib/i18n/messages/ru.ts` · `ru` · RU messages, typed against `Messages`.
 - `src/shared/lib/i18n/messages/index.ts` · `MESSAGES`, `MessageKey`, `Messages` · aggregated messages + the typed dot-path key union for `t()`.
 - `src/shared/styles/tag-styles.css` · — · non-token global styles.
+- `src/shared/styles/print.css` · — · `@media print` scoping (mockup-06 "Chop etish") — hides app chrome, prints only `#document-editor-print-area`; imported from `src/index.css`.
 - `src/index.css` · — · Tailwind v4 entry + design tokens (`:root` / `.dark`, mapped via `@theme inline`).
 
 ## Shared — mock API / data layer (`src/shared/lib/mock-api/`)
@@ -155,12 +194,13 @@ See `docs/architecture.md` → "Mock API / data layer" for the swap-to-real-API 
 
 - `src/shared/lib/mock-api/delay.ts` · `delay` · simulated latency helper (timer-based `Promise`) every mock service awaits.
 - `src/shared/lib/mock-api/user.service.ts` · `listUsers`, `getUser` · server-shaped user directory service — list + single lookup by id.
-- `src/shared/lib/mock-api/court-case.service.ts` · `listCases`, `getCase`, `createCase`, `updateCase`, `archiveCase`, `CaseFilters`, `CaseSortField`, `CreateCaseInput` · server-shaped case service (spec §14.2/FR-02) with search/filter/sort/paging over a session-mutable store.
+- `src/shared/lib/mock-api/court-case.service.ts` · `listCases`, `getCase`, `createCase`, `updateCase`, `archiveCase`, `CaseFilters`, `CaseSortField`, `CreateCaseInput` · server-shaped case service (spec §14.2/FR-02) with search/filter/sort/paging over a session-mutable store; `CaseFilters.stage` filters by `CaseStage`, search also matches subject/parties.
 - `src/shared/lib/mock-api/participant.service.ts` · `listParticipants`, `createParticipant`, `updateParticipant`, `deleteParticipant`, `CreateParticipantInput` · server-shaped participant service (spec §14.3) that keeps the owning case's `participantCount` in sync.
 - `src/shared/lib/mock-api/hearing.service.ts` · `listHearings`, `getHearing`, `createHearing`, `transitionHearing` · hearing service enforcing the §17.3 session state machine (illegal transitions throw).
 - `src/shared/lib/mock-api/transcript.service.ts` · `listSegments`, `editSegmentText`, `verifySegment`, `mapSpeaker` · transcript service (spec §14.6); edits preserve raw ASR text, speaker mapping is one bulk mutation (AC-03).
 - `src/shared/lib/mock-api/event.service.ts` · `listEvents`, `updateEvent`, `verifyEvent`, `rejectEvent` · procedural-event service (spec §14.7, FR-08).
 - `src/shared/lib/mock-api/document.service.ts` · `listTemplates`, `listDocuments`, `getDocument`, `listVersions`, `transitionDocument`, `saveDocumentVersion` · documents/templates/versions + FR-11 approval workflow (illegal transitions throw).
+- `src/shared/lib/mock-api/copilot.service.ts` · `listDefects`, `listLawArticles`, `listDeadlines`, `listSuggestions` · read-only mockup-07 judge-copilot fixtures per `caseId`; no mutations — "Hujjatga qo'shish" writes via `document-append-bus`, not this service.
 - `src/shared/lib/mock-api/job.service.ts` · `startJob`, `getJob` · simulated background jobs that progress to SUCCEEDED over wall-clock time.
 - `src/shared/lib/mock-api/data/hearings.ts` · `HEARINGS` · hearing fixtures (hearing-1 = case-1's processed 34-min hearing).
 - `src/shared/lib/mock-api/data/transcript-segments.ts` · `TRANSCRIPT_SEGMENTS` · 60 deterministic scripted segments for hearing-1 with low-confidence/critical/verified variety.
@@ -171,4 +211,5 @@ See `docs/architecture.md` → "Mock API / data layer" for the swap-to-real-API 
 - `src/shared/lib/mock-api/data/court-users.ts` · `COURT_USERS` · mock app users, one per court role (spec §4); the accounts auth authenticates and `judgeId` points at.
 - `src/shared/lib/mock-api/data/court-cases.ts` · `COURT_CASES` · mock court cases (spec §14.2); `case-1` is the fully-populated economic-court demo fixture, the rest give the list volume/filters.
 - `src/shared/lib/mock-api/data/participants.ts` · `PARTICIPANTS` · mock participants (spec §14.3); `case-1` has the four-party dispute, others a claimant/defendant pair.
-- `src/shared/lib/mock-api/data/index.ts` · re-exports `ORGANIZATION`, `USERS`, `COURT_USERS`, `COURT_CASES`, `PARTICIPANTS` · single import surface for the services — add new seed exports here as you add entities.
+- `src/shared/lib/mock-api/data/copilot.ts` · `COPILOT_DEFECTS`, `COPILOT_LAW_ARTICLES`, `COPILOT_DEADLINES`, `COPILOT_SUGGESTIONS` · mockup-07 judge-copilot fixtures — demo defect/law-article/deadline/AI-suggestion content per `caseId`, `case-1` fully populated.
+- `src/shared/lib/mock-api/data/index.ts` · re-exports `ORGANIZATION`, `USERS`, `COURT_USERS`, `COURT_CASES`, `PARTICIPANTS`, `HEARINGS`, `TRANSCRIPT_SEGMENTS`, `PROCEDURAL_EVENTS`, `DOCUMENT_TEMPLATES`, `GENERATED_DOCUMENTS`, `DOCUMENT_VERSIONS`, `AUDIT_LOGS`, `COPILOT_DEFECTS`, `COPILOT_LAW_ARTICLES`, `COPILOT_DEADLINES`, `COPILOT_SUGGESTIONS` · single import surface for the services — add new seed exports here as you add entities.
