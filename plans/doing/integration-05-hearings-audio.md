@@ -1,6 +1,6 @@
 # Integration 05 — Hearings, audio upload & transcription
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §9 (hearing/audio/transcribe/transcript), §17 (gaps)
@@ -67,13 +67,13 @@ upload, queue transcription, poll the job, and load the transcript — replacing
 
 ## Steps
 
-1. [ ] Align `Hearing`/`AudioTrack`/`TranscriptSegment`/`Job` types to guide — `refactor: align hearing/transcript/job types to api`
-2. [ ] Add `hearing.service.ts` (create/start/stop/transcript) — `feat: hearing lifecycle service`
-3. [ ] Add `use-hearing-session.ts` carrying `hearingId`+`version` in router state — `feat: hearing session state carry`
-4. [ ] Add audio upload (FormData, client validation, no manual Content-Type) — `feat: hearing audio upload`
-5. [ ] Wire `transcribe` + `useJobPolling` + retry-on-failed in hearing-detail — `feat: transcription queue and job polling`
-6. [ ] Load transcript after job success into the transcript panel (read-only) — `feat: load transcript from api`
-7. [ ] docs: sync `docs/codemap.md` — `docs: sync hearing/audio services`
+1. [x] Align `Hearing`/`AudioTrack`/`TranscriptSegment`/`Job` types to guide — `refactor: align hearing/transcript/job types to api`
+2. [x] Add `hearing.service.ts` (create/start/stop/transcript) — `feat: hearing lifecycle service`
+3. [x] Add `use-hearing-session.ts` carrying `hearingId`+`version` in router state — `feat: hearing session state carry`
+4. [x] Add audio upload (FormData, client validation, no manual Content-Type) — `feat: hearing audio upload`
+5. [x] Wire `transcribe` + `useJobPolling` + retry-on-failed in hearing-detail — `feat: transcription queue and job polling`
+6. [x] Load transcript after job success into the transcript panel (read-only) — `feat: load transcript from api`
+7. [x] docs: sync `docs/codemap.md` — `docs: sync hearing/audio services`
 
 ## Risks / ripple / escalation
 
