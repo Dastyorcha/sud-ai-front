@@ -124,11 +124,18 @@ export interface Participant {
   updatedAt: string;
 }
 
-/** A single sitting of a case; owns audio and transcript (spec §14.4). */
+/**
+ * A single sitting of a case; owns audio and transcript (spec §14.4).
+ * `scheduledAt` is nullable and `version` is present (integration guide §9,
+ * §16 optimistic concurrency) to match the real `HearingResponse` returned by
+ * `features/hearings/hearing.service.ts`; `version` is `undefined` for the
+ * mock layer's hearings (`shared/lib/mock-api/hearing.service.ts`), which
+ * doesn't model concurrency tokens.
+ */
 export interface Hearing {
   id: string;
   caseId: string;
-  scheduledAt: string;
+  scheduledAt: string | null;
   startedAt: string | null;
   endedAt: string | null;
   status: HearingStatus;
@@ -138,9 +145,11 @@ export interface Hearing {
   finalSttModel: string | null;
   audioDurationMs: number;
   createdBy: string;
+  /** Optimistic-concurrency token (guide §16) — real hearings only. */
+  version?: number;
 }
 
-/** A recorded audio channel for a hearing (spec §14.5). */
+/** A recorded audio channel for a hearing (spec §14.5, guide §9 `AudioTrackResponse`). */
 export interface AudioTrack {
   id: string;
   hearingId: string;
@@ -155,8 +164,12 @@ export interface AudioTrack {
 }
 
 /**
- * One utterance segment of the transcript (spec §14.6). Layers are preserved,
- * never overwritten (spec §10.1): raw ASR → normalized → human edit → canonical.
+ * One utterance segment of the transcript (spec §14.6, guide §9
+ * `GET /hearings/{id}/transcript`). Layers are preserved, never overwritten
+ * (spec §10.1): raw ASR → normalized → human edit → canonical. Field names
+ * already match the live response 1:1; `version` (per-segment optimistic
+ * concurrency) is added in integration-06 (transcript editor), not here —
+ * this plan only reads segments (read-only load).
  */
 export interface TranscriptSegment {
   id: string;

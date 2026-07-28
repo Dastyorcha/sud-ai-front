@@ -24,6 +24,11 @@ export type ErrorCode =
   | "case_archive_endpoint_required"
   | "archived_case_immutable"
   | "invalid_credentials"
+  | "invalid_hearing_transition"
+  | "invalid_audio_size"
+  | "unsupported_audio_format"
+  | "audio_signature_mismatch"
+  | "hearing_audio_missing"
   | "unknown";
 
 const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
@@ -42,6 +47,11 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   case_archive_endpoint_required: "errors.codes.case_archive_endpoint_required",
   archived_case_immutable: "errors.codes.archived_case_immutable",
   invalid_credentials: "errors.codes.invalid_credentials",
+  invalid_hearing_transition: "errors.codes.invalid_hearing_transition",
+  invalid_audio_size: "errors.codes.invalid_audio_size",
+  unsupported_audio_format: "errors.codes.unsupported_audio_format",
+  audio_signature_mismatch: "errors.codes.audio_signature_mismatch",
+  hearing_audio_missing: "errors.codes.hearing_audio_missing",
   unknown: "errors.codes.unknown",
 };
 

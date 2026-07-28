@@ -10,7 +10,12 @@ import type { HearingStatus } from "@/shared/types/enums";
 
 let hearings: Hearing[] = HEARINGS.map((h) => ({ ...h }));
 
-/** Allowed transitions (spec §17.3). */
+/**
+ * Allowed transitions (spec §17.3). Only the mock's UPPER_SNAKE values are
+ * ever produced/consumed here — the PascalCase entries exist purely so this
+ * `Record<HearingStatus, …>` stays exhaustive against the real-API values
+ * additively appended to `HEARING_STATUS` (`shared/types/enums.ts`).
+ */
 const TRANSITIONS: Record<HearingStatus, HearingStatus[]> = {
   CREATED: ["DEVICE_CHECK", "RECORDING"],
   DEVICE_CHECK: ["RECORDING", "CREATED"],
@@ -21,6 +26,12 @@ const TRANSITIONS: Record<HearingStatus, HearingStatus[]> = {
   READY_FOR_REVIEW: ["APPROVED"],
   APPROVED: [],
   FAILED: ["PROCESSING"],
+  Created: [],
+  DeviceCheck: [],
+  Recording: [],
+  Paused: [],
+  Finalizing: [],
+  Failed: [],
 };
 
 export async function listHearings(caseId: string): Promise<Hearing[]> {

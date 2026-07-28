@@ -38,6 +38,13 @@ const HEARING_TONES: Record<HearingStatus, Tone> = {
   READY_FOR_REVIEW: "primary",
   APPROVED: "success",
   FAILED: "destructive",
+  // Real API values (guide §9) — additive, see `shared/types/enums.ts`.
+  Created: "neutral",
+  DeviceCheck: "info",
+  Recording: "destructive",
+  Paused: "warning",
+  Finalizing: "info",
+  Failed: "destructive",
 };
 
 const JOB_TONES: Record<JobStatus, Tone> = {

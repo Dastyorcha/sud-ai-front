@@ -338,7 +338,8 @@ export default function CaseDetailView() {
                   >
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-foreground">
-                        {t("hearing.scheduled")}: <DateText value={h.scheduledAt} />
+                        {t("hearing.scheduled")}:{" "}
+                        {h.scheduledAt ? <DateText value={h.scheduledAt} /> : "—"}
                       </span>
                       {h.audioDurationMs > 0 && (
                         <span className="font-mono text-xs text-muted-foreground">
