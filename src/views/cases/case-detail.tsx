@@ -37,8 +37,8 @@ import {
 import { useDocuments } from "@/features/documents/use-documents";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
 import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
-import { useHearings } from "@/features/hearings/use-hearings";
-import { createHearing } from "@/shared/lib/mock-api/hearing.service";
+import { useCreateHearing } from "@/features/hearings/use-hearings";
+import { useCaseHearingSessions } from "@/features/hearings/use-hearing-session";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { buildRoute } from "@/shared/constants/route-paths";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
@@ -67,12 +67,18 @@ export default function CaseDetailView() {
   const { data: courtCase, isLoading, error } = useCase(caseId);
   const { data: participants, refetch: refetchParticipants } = useParticipants(caseId);
   const { data: documents } = useDocuments(caseId);
-  const { data: hearings, refetch: refetchHearings } = useHearings(caseId);
+  const { hearings, refresh: refreshHearingSessions } = useCaseHearingSessions(caseId);
+  const createHearingMutation = useCreateHearing();
 
   async function addHearing() {
-    const inWeek = new Date(Date.now() + 7 * 86_400_000).toISOString();
-    await createHearing(caseId, inWeek);
-    refetchHearings();
+    try {
+      const hearing = await createHearingMutation.mutateAsync({ caseId });
+      refreshHearingSessions();
+      return hearing;
+    } catch {
+      // Errors are already toasted by useApiMutation.
+      return undefined;
+    }
   }
 
   const { can } = useCourtAuth();
@@ -323,12 +329,18 @@ export default function CaseDetailView() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-foreground">{t("hearing.listTitle")}</h2>
-            <Button size="sm" variant="outline" onClick={addHearing}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={addHearing}
+              disabled={createHearingMutation.isPending}
+            >
               <Plus className="size-4" />
               {t("hearing.newHearing")}
             </Button>
           </div>
-          {hearings && hearings.length > 0 ? (
+          <p className="text-xs text-muted-foreground">{t("hearing.sessionOnlyNotice")}</p>
+          {hearings.length > 0 ? (
             <ul className="divide-y divide-border rounded-lg border border-border">
               {hearings.map((h) => (
                 <li key={h.id}>
