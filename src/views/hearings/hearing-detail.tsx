@@ -1,81 +1,96 @@
+import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Tabs from "@/shared/components/ui/tabs";
 import { Button } from "@/shared/components/ui/button";
-import { LoadingState } from "@/shared/custom/loading-state";
-import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
-import { useHearing } from "@/features/hearings/use-hearings";
+import { useHearingSession } from "@/features/hearings/use-hearing-session";
+import { HearingLifecyclePanel } from "@/features/hearings/hearing-lifecycle-panel";
+import { RealTranscriptPanel } from "@/features/transcript/real-transcript-panel";
 import { useCase } from "@/features/cases/use-case";
-import { LiveHearingPanel } from "@/features/live-session/live-hearing-panel";
-import { TranscriptPanel } from "@/features/transcript/transcript-panel";
 import { EventsPanel } from "@/features/events/events-panel";
 import { ProtocolPanel } from "@/features/protocol/protocol-panel";
-import { transitionHearing } from "@/shared/lib/mock-api/hearing.service";
-import { buildRoute, withLocale } from "@/shared/constants/route-paths";
+import { buildRoute, ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
-import { notify } from "@/shared/lib/toast";
 
 /**
- * Hearing workspace (spec §16.1 #6–9): live session, transcript review,
- * procedural events and protocol in one tabbed screen scoped to a hearing.
+ * Hearing workspace (spec §16.1 #6–9, integration guide §9): live session
+ * (real start/stop/upload/transcribe), transcript review, procedural events
+ * and protocol in one tabbed screen. Reads `:hearingId` from the route, but
+ * — since there's no `GET /hearings/{id}` yet (guide §17) — the hearing
+ * itself comes from `use-hearing-session`'s sessionStorage carry, populated
+ * by the create/start/stop calls that got the user here. A hearing this tab
+ * never saw (fresh tab, cleared session, another device) can't be recovered:
+ * the empty state below sends the user back to the case to reopen it.
  */
 export default function HearingDetailView() {
   const { t, locale } = useTranslation();
   const { hearingId = "" } = useParams<{ hearingId: string }>();
-  const { data: hearing, isLoading, error, refetch } = useHearing(hearingId);
+  const { hearing, setHearing } = useHearingSession(hearingId);
   const { data: courtCase } = useCase(hearing?.caseId ?? "");
+  const [transcriptReloadKey, setTranscriptReloadKey] = useState(0);
 
-  if (isLoading) return <LoadingState rows={6} />;
-  if (error) return <ErrorState />;
-  if (!hearing) return <EmptyState title={t("errors.notFoundTitle")} />;
+  const backLink = (
+    <Button variant="ghost" size="sm" asChild className="self-start">
+      <Link
+        to={
+          hearing
+            ? withLocale(locale, buildRoute.caseDetail(hearing.caseId))
+            : withLocale(locale, ROUTE_PATHS.CASES)
+        }
+      >
+        <ChevronLeft className="size-4" />
+        {t("common.back")}
+      </Link>
+    </Button>
+  );
 
-  async function approveCanonical() {
-    if (!hearing) return;
-    try {
-      await transitionHearing(hearing.id, "APPROVED");
-      notify.success(t("transcript.approveCanonical"));
-      refetch();
-    } catch {
-      notify.error(t("errors.genericTitle"));
-    }
+  if (!hearing) {
+    return (
+      <div className="flex flex-col gap-4">
+        {backLink}
+        <EmptyState
+          title={t("errors.notFoundTitle")}
+          description={t("hearing.sessionLostNotice")}
+        />
+      </div>
+    );
   }
 
   const tabs = [
     {
       id: "live",
       label: t("hearing.liveTab"),
-      content: <LiveHearingPanel hearing={hearing} onStatusChange={refetch} />,
+      content: (
+        <HearingLifecyclePanel
+          hearing={hearing}
+          onHearingChanged={setHearing}
+          onTranscribed={() => setTranscriptReloadKey((k) => k + 1)}
+        />
+      ),
     },
     {
       id: "transcript",
       label: t("hearing.transcriptTab"),
-      content: <TranscriptPanel hearing={hearing} onApproved={approveCanonical} />,
+      content: <RealTranscriptPanel hearingId={hearing.id} reloadKey={transcriptReloadKey} />,
     },
     {
       id: "events",
       label: t("hearing.eventsTab"),
-      content: <EventsPanel hearing={hearing} />,
+      content: <EventsPanel hearing={{ id: hearing.id, caseId: hearing.caseId }} />,
     },
     {
       id: "protocol",
       label: t("hearing.protocolTab"),
-      content: <ProtocolPanel hearing={hearing} />,
+      content: <ProtocolPanel hearing={{ id: hearing.id, caseId: hearing.caseId }} />,
     },
   ];
-
-  const isProcessed = hearing.status === "READY_FOR_REVIEW" || hearing.status === "APPROVED";
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Button variant="ghost" size="sm" asChild className="self-start">
-          <Link to={withLocale(locale, buildRoute.caseDetail(hearing.caseId))}>
-            <ChevronLeft className="size-4" />
-            {t("common.back")}
-          </Link>
-        </Button>
+        {backLink}
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
             {t("pages.hearing")}
@@ -87,7 +102,7 @@ export default function HearingDetailView() {
         </div>
       </div>
 
-      <Tabs tabs={tabs} variant="underline" defaultTab={isProcessed ? "transcript" : "live"} />
+      <Tabs tabs={tabs} variant="underline" defaultTab="live" />
     </div>
   );
 }

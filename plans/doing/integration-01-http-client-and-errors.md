@@ -1,6 +1,6 @@
 # Integration 01 — Axios client, dev proxy & error contract
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §1 (env/base/CORS), §3 (error format), §16 (concurrency)

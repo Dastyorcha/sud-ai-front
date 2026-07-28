@@ -82,9 +82,9 @@ export async function listCases(
     rows = [...rows].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }
 
-  const total = rows.length;
+  const totalCount = rows.length;
   const start = (page - 1) * pageSize;
-  return { items: rows.slice(start, start + pageSize), total, page, pageSize };
+  return { items: rows.slice(start, start + pageSize), totalCount, page, pageSize };
 }
 
 /** A single case by id. Swap to `GET /api/v1/cases/:id` later. */
@@ -108,6 +108,8 @@ export async function createCase(
     caseType: input.caseType,
     judgeId: input.judgeId,
     status: "ACTIVE",
+    description: input.subject ?? null,
+    isDemo: false,
     stage: "INTAKE",
     subject: input.subject ?? "",
     claimantName: input.claimantName ?? null,

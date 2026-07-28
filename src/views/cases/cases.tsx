@@ -15,7 +15,7 @@ import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { CaseCard } from "@/widgets/case-card/case-card";
 import { useCases } from "@/features/cases/use-cases";
-import { CASE_STAGE, CASE_TYPE, type CaseStage, type CaseType } from "@/shared/types/enums";
+import { CASE_STATUS, type CaseStatus } from "@/shared/types/enums";
 import { buildRoute, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
@@ -24,18 +24,18 @@ import { notify } from "@/shared/lib/toast";
 const NewCaseWizard = lazy(() => import("@/widgets/new-case-wizard/new-case-wizard"));
 
 /**
- * Case dashboard grid (mockup-02): search + type/stage filters over
- * `useCases()`, live result count, gold "Yangi ish ochish" CTA, and a
- * responsive grid of `CaseCard`s. Client-side over the mock service, mirrors
- * `views/dashboard` for the CTA/link pattern.
+ * Case dashboard grid (mockup-02, wired to the live API — guide §8): search
+ * (→ `caseNumber` contains) + status filter over `useCases()`, live result
+ * count, gold "Yangi ish ochish" CTA, and a responsive grid of `CaseCard`s.
+ * `caseType`/`stage` filters were dropped — `GET /cases` only supports
+ * `caseNumber`/`courtName`/`status` server-side (integration-04 design note).
  */
 export default function CasesView() {
   const { t, locale } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [caseType, setCaseType] = useState<"ALL" | CaseType>("ALL");
-  const [stage, setStage] = useState<"ALL" | CaseStage>("ALL");
+  const [status, setStatus] = useState<"ALL" | CaseStatus>("ALL");
   const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
@@ -45,11 +45,10 @@ export default function CasesView() {
 
   const filters = useMemo(
     () => ({
-      search: debouncedSearch,
-      ...(caseType !== "ALL" ? { caseType } : {}),
-      ...(stage !== "ALL" ? { stage } : {}),
+      caseNumber: debouncedSearch,
+      ...(status !== "ALL" ? { status } : {}),
     }),
-    [debouncedSearch, caseType, stage]
+    [debouncedSearch, status]
   );
   const { data, isLoading, error } = useCases({ filters, pageSize: 100 });
   const cases = data?.items ?? [];
@@ -76,28 +75,15 @@ export default function CasesView() {
           placeholder={t("common.search")}
           className="max-w-sm"
         />
-        <Select value={caseType} onValueChange={(v) => setCaseType(v as "ALL" | CaseType)}>
+        <Select value={status} onValueChange={(v) => setStatus(v as "ALL" | CaseStatus)}>
           <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">{t("cases.allTypes")}</SelectItem>
-            {(Object.values(CASE_TYPE) as CaseType[]).map((type) => (
-              <SelectItem key={type} value={type}>
-                {t(`enums.caseType.${type}` as MessageKey)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={stage} onValueChange={(v) => setStage(v as "ALL" | CaseStage)}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">{t("cases.allStages")}</SelectItem>
-            {(Object.values(CASE_STAGE) as CaseStage[]).map((s) => (
+            <SelectItem value="ALL">{t("cases.allStatuses")}</SelectItem>
+            {(Object.values(CASE_STATUS) as CaseStatus[]).map((s) => (
               <SelectItem key={s} value={s}>
-                {t(`enums.caseStage.${s}` as MessageKey)}
+                {t(`enums.caseStatus.${s}` as MessageKey)}
               </SelectItem>
             ))}
           </SelectContent>

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { ChevronLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, ChevronLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import {
   Table,
@@ -25,24 +25,28 @@ import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { StageBadge } from "@/shared/custom/stage-badge";
+import { StatusBadge } from "@/shared/custom/status-badge";
 import { CaseTypeTag } from "@/shared/custom/case-type-tag";
 import { CaseStats } from "@/widgets/case-stats/case-stats";
 import { useCase } from "@/features/cases/use-case";
-import { useParticipants } from "@/features/participants/use-participants";
+import { useArchiveCase } from "@/features/cases/use-cases";
+import {
+  useDeactivateParticipant,
+  useParticipants,
+} from "@/features/participants/use-participants";
 import { useDocuments } from "@/features/documents/use-documents";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
 import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
-import { useHearings } from "@/features/hearings/use-hearings";
-import { createHearing } from "@/shared/lib/mock-api/hearing.service";
+import { useCreateHearing } from "@/features/hearings/use-hearings";
+import { useCaseHearingSessions } from "@/features/hearings/use-hearing-session";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { buildRoute } from "@/shared/constants/route-paths";
-import { deleteParticipant } from "@/shared/lib/mock-api/participant.service";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
+import { useCourtAuth } from "@/features/auth/use-court-auth";
 import type { Participant } from "@/shared/types/models";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
-import { notify } from "@/shared/lib/toast";
 
 // Sub-tab modules (mockup-05/06/07) — lazy so the shell stays light until a
 // tab is opened.
@@ -63,18 +67,36 @@ export default function CaseDetailView() {
   const { data: courtCase, isLoading, error } = useCase(caseId);
   const { data: participants, refetch: refetchParticipants } = useParticipants(caseId);
   const { data: documents } = useDocuments(caseId);
-  const { data: hearings, refetch: refetchHearings } = useHearings(caseId);
+  const { hearings, refresh: refreshHearingSessions } = useCaseHearingSessions(caseId);
+  const createHearingMutation = useCreateHearing();
 
   async function addHearing() {
-    const inWeek = new Date(Date.now() + 7 * 86_400_000).toISOString();
-    await createHearing(caseId, inWeek);
-    refetchHearings();
+    try {
+      const hearing = await createHearingMutation.mutateAsync({ caseId });
+      refreshHearingSessions();
+      return hearing;
+    } catch {
+      // Errors are already toasted by useApiMutation.
+      return undefined;
+    }
   }
 
+  const { can } = useCourtAuth();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Participant | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+  const deactivateMutation = useDeactivateParticipant(caseId);
+  const archiveMutation = useArchiveCase(caseId);
+
+  async function confirmArchive() {
+    try {
+      await archiveMutation.mutateAsync();
+      setArchiveConfirmOpen(false);
+    } catch {
+      // Errors are already toasted by useApiMutation.
+    }
+  }
 
   function openAdd() {
     setEditing(null);
@@ -88,15 +110,11 @@ export default function CaseDetailView() {
 
   async function confirmDelete() {
     if (!deleteTarget) return;
-    setDeleting(true);
     try {
-      await deleteParticipant(deleteTarget.id);
+      await deactivateMutation.mutateAsync(deleteTarget.id);
       setDeleteTarget(null);
-      refetchParticipants();
     } catch {
-      notify.error(t("errors.genericTitle"));
-    } finally {
-      setDeleting(false);
+      // Errors are already toasted by useApiMutation.
     }
   }
 
@@ -144,28 +162,48 @@ export default function CaseDetailView() {
     courtCase.claimantName && courtCase.defendantName
       ? `${courtCase.claimantName} ${t("cases.vs")} ${courtCase.defendantName}`
       : null;
+  const isArchived = courtCase.status === "ARCHIVED";
+  const canManageParticipants = can("participant.edit") && !isArchived;
+  const canArchive = can("case.archive") && !isArchived;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         {backLink}
         <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
-              {courtCase.caseNumber}
-            </h1>
-            <StageBadge stage={courtCase.stage} />
-            <CaseTypeTag caseType={courtCase.caseType} />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
+                {courtCase.caseNumber}
+              </h1>
+              <StatusBadge
+                label={t(`enums.caseStatus.${courtCase.status}` as MessageKey)}
+                tone={isArchived ? "neutral" : "success"}
+              />
+              {courtCase.stage && <StageBadge stage={courtCase.stage} />}
+              <CaseTypeTag caseType={courtCase.caseType} />
+            </div>
+            {canArchive && (
+              <Button variant="outline" size="sm" onClick={() => setArchiveConfirmOpen(true)}>
+                <Archive className="size-4" />
+                {t("caseDetail.archive")}
+              </Button>
+            )}
           </div>
           {parties && <p className="text-lg font-semibold text-foreground">{parties}</p>}
-          <p className="text-sm text-muted-foreground">{courtCase.subject}</p>
+          <p className="text-sm text-muted-foreground">
+            {courtCase.subject ?? courtCase.description}
+          </p>
+          {isArchived && (
+            <p className="text-sm text-muted-foreground">{t("caseDetail.archivedNotice")}</p>
+          )}
         </div>
       </div>
 
       <CaseStats
         courtCase={courtCase}
         documentsCount={documents?.length ?? 0}
-        participantsCount={participants?.length ?? courtCase.participantCount}
+        participantsCount={participants?.length ?? courtCase.participantCount ?? 0}
       />
 
       <Tabs
@@ -232,10 +270,12 @@ export default function CaseDetailView() {
             <h2 className="text-lg font-semibold text-foreground">
               {t("cases.columns.participants")}
             </h2>
-            <Button size="sm" onClick={openAdd}>
-              <Plus className="size-4" />
-              {t("participants.add")}
-            </Button>
+            {canManageParticipants && (
+              <Button size="sm" onClick={openAdd}>
+                <Plus className="size-4" />
+                {t("participants.add")}
+              </Button>
+            )}
           </div>
           {participants && participants.length > 0 ? (
             <div className="rounded-lg border border-border">
@@ -245,7 +285,7 @@ export default function CaseDetailView() {
                     <TableHead>{t("users.columns.name")}</TableHead>
                     <TableHead>{t("users.columns.role")}</TableHead>
                     <TableHead>{t("cases.columns.organization")}</TableHead>
-                    <TableHead className="w-24 text-right" />
+                    {canManageParticipants && <TableHead className="w-24 text-right" />}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -254,26 +294,28 @@ export default function CaseDetailView() {
                       <TableCell className="font-medium text-foreground">{p.displayName}</TableCell>
                       <TableCell>{t(`enums.participantRole.${p.role}` as MessageKey)}</TableCell>
                       <TableCell>{p.organizationName ?? "—"}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t("participants.edit")}
-                            onClick={() => openEdit(p)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t("participants.delete")}
-                            onClick={() => setDeleteTarget(p)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      {canManageParticipants && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={t("participants.edit")}
+                              onClick={() => openEdit(p)}
+                            >
+                              <Pencil className="size-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={t("participants.delete")}
+                              onClick={() => setDeleteTarget(p)}
+                            >
+                              <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -287,12 +329,18 @@ export default function CaseDetailView() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-foreground">{t("hearing.listTitle")}</h2>
-            <Button size="sm" variant="outline" onClick={addHearing}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={addHearing}
+              disabled={createHearingMutation.isPending}
+            >
               <Plus className="size-4" />
               {t("hearing.newHearing")}
             </Button>
           </div>
-          {hearings && hearings.length > 0 ? (
+          <p className="text-xs text-muted-foreground">{t("hearing.sessionOnlyNotice")}</p>
+          {hearings.length > 0 ? (
             <ul className="divide-y divide-border rounded-lg border border-border">
               {hearings.map((h) => (
                 <li key={h.id}>
@@ -302,7 +350,8 @@ export default function CaseDetailView() {
                   >
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-foreground">
-                        {t("hearing.scheduled")}: <DateText value={h.scheduledAt} />
+                        {t("hearing.scheduled")}:{" "}
+                        {h.scheduledAt ? <DateText value={h.scheduledAt} /> : "—"}
                       </span>
                       {h.audioDurationMs > 0 && (
                         <span className="font-mono text-xs text-muted-foreground">
@@ -343,8 +392,33 @@ export default function CaseDetailView() {
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
               {t("common.cancel")}
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deactivateMutation.isPending}
+            >
               {t("participants.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("caseDetail.archiveConfirmTitle")}</DialogTitle>
+            <DialogDescription>{t("caseDetail.archiveConfirmDescription")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setArchiveConfirmOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmArchive}
+              disabled={archiveMutation.isPending}
+            >
+              {t("caseDetail.archive")}
             </Button>
           </DialogFooter>
         </DialogContent>

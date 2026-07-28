@@ -7,18 +7,10 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { DateText } from "@/shared/custom/date-text";
 import { Stat } from "@/shared/custom/stat";
 import { AUDIT_LOGS, COURT_USERS } from "@/shared/lib/mock-api/data";
-import { setCourtRole, useCourtAuth } from "@/features/auth/use-court-auth";
-import { COURT_ROLE, type CourtRole } from "@/shared/types/enums";
+import { useCourtAuth } from "@/features/auth/use-court-auth";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 
@@ -46,18 +38,9 @@ export default function AdminView() {
         <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="col-span-2 flex flex-col gap-1 sm:col-span-4">
             <span className="text-xs text-muted-foreground">{t("admin.activeRole")}</span>
-            <Select value={role} onValueChange={(v) => setCourtRole(v as CourtRole)}>
-              <SelectTrigger className="w-56">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(COURT_ROLE).map((r) => (
-                  <SelectItem key={r} value={r}>
-                    {t(`enums.courtRoles.${r}` as MessageKey)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <p className="text-sm font-medium text-foreground">
+              {role ? t(`enums.apiRoles.${role}` as MessageKey) : "—"}
+            </p>
           </div>
           <Stat label={t("admin.liveProvider")}>mock-live</Stat>
           <Stat label={t("admin.finalProvider")}>mock-batch</Stat>

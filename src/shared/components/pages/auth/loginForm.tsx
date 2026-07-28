@@ -13,7 +13,13 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { Mail, Eye, EyeOff, LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -21,6 +27,7 @@ import ReuseableModal from "@/shared/components/reusable-modal";
 import ConfirmCode from "./confirmCode";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
+import { useLogin } from "@/features/auth/use-login";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -64,12 +71,10 @@ export default function LoginForm() {
     }
   }, [isCodeCorrect]);
 
+  const { mutate: submitLogin, isPending: isLoggingIn } = useLogin();
+
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log("login form values:", values);
-    toast.success("Login successful!");
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
+    submitLogin(values);
   };
 
   const onForgotPasswordSubmit = (values: z.infer<typeof forgotPasswordSchema>) => {
@@ -180,7 +185,11 @@ export default function LoginForm() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <Button onClick={loginForm.handleSubmit(onLoginSubmit)} className="w-full">
+                  <Button
+                    onClick={loginForm.handleSubmit(onLoginSubmit)}
+                    disabled={isLoggingIn}
+                    className="w-full"
+                  >
                     Login
                   </Button>
                   <div className="flex items-center justify-between">

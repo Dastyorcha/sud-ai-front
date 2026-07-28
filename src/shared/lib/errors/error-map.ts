@@ -1,12 +1,13 @@
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 
 /**
- * Central error → localized-message mapping (TZ §18.3/§18.4). A real backend
- * returns a stable `code`; the UI never shows a raw code or a server string.
- * Resolve the returned key with `t()` and surface via `notify.error`.
+ * Central error → localized-message mapping (TZ §18.3/§18.4, integration guide
+ * §3). The real backend returns a stable `code` — often `UPPER_SNAKE`
+ * (`CONCURRENCY_CONFLICT`) — the UI never shows a raw code or a server
+ * string; it's normalized to `lower_snake` and resolved with `t()`.
  */
 
-/** Known backend/domain error codes. Extend as the real API defines more. */
+/** Known backend/domain error codes (lower_snake — see `normalizeCode`). Extend as the API defines more. */
 export type ErrorCode =
   | "validation_error"
   | "not_found"
@@ -14,6 +15,25 @@ export type ErrorCode =
   | "conflict"
   | "network_error"
   | "server_error"
+  | "unauthorized"
+  | "timeout"
+  | "concurrency_conflict"
+  | "transcript_locked"
+  | "case_number_exists"
+  | "invalid_judge"
+  | "case_archive_endpoint_required"
+  | "archived_case_immutable"
+  | "invalid_credentials"
+  | "invalid_hearing_transition"
+  | "invalid_audio_size"
+  | "unsupported_audio_format"
+  | "audio_signature_mismatch"
+  | "hearing_audio_missing"
+  | "transcript_text_required"
+  | "speaker_label_required"
+  | "participant_not_in_case"
+  | "speaker_not_found"
+  | "transcript_validation_failed"
   | "unknown";
 
 const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
@@ -23,6 +43,25 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   conflict: "errors.codes.conflict",
   network_error: "errors.codes.network_error",
   server_error: "errors.codes.server_error",
+  unauthorized: "errors.codes.unauthorized",
+  timeout: "errors.codes.timeout",
+  concurrency_conflict: "errors.codes.concurrency_conflict",
+  transcript_locked: "errors.codes.transcript_locked",
+  case_number_exists: "errors.codes.case_number_exists",
+  invalid_judge: "errors.codes.invalid_judge",
+  case_archive_endpoint_required: "errors.codes.case_archive_endpoint_required",
+  archived_case_immutable: "errors.codes.archived_case_immutable",
+  invalid_credentials: "errors.codes.invalid_credentials",
+  invalid_hearing_transition: "errors.codes.invalid_hearing_transition",
+  invalid_audio_size: "errors.codes.invalid_audio_size",
+  unsupported_audio_format: "errors.codes.unsupported_audio_format",
+  audio_signature_mismatch: "errors.codes.audio_signature_mismatch",
+  hearing_audio_missing: "errors.codes.hearing_audio_missing",
+  transcript_text_required: "errors.codes.transcript_text_required",
+  speaker_label_required: "errors.codes.speaker_label_required",
+  participant_not_in_case: "errors.codes.participant_not_in_case",
+  speaker_not_found: "errors.codes.speaker_not_found",
+  transcript_validation_failed: "errors.codes.transcript_validation_failed",
   unknown: "errors.codes.unknown",
 };
 
@@ -31,20 +70,25 @@ interface CodedError {
   code?: string;
 }
 
-function isErrorCode(value: unknown): value is ErrorCode {
-  return typeof value === "string" && value in CODE_MESSAGE_KEY;
+/** Backend codes may arrive `UPPER_SNAKE` (guide) or already `lower_snake` (mocks/fallbacks). */
+function normalizeCode(code: string): string {
+  return code.toLowerCase();
+}
+
+function isErrorCode(value: string): value is ErrorCode {
+  return value in CODE_MESSAGE_KEY;
 }
 
 /**
  * Resolves any thrown value to a localized-message key. Accepts an `ErrorCode`
- * string, a `{ code }` object, or anything else (→ `unknown`). Pass the result
- * to `t()`.
+ * string, a `{ code }` object (e.g. `ApiError`), or anything else (→
+ * `unknown`). Pass the result to `t()`.
  */
 export function errorMessageKey(error: unknown): MessageKey {
-  if (isErrorCode(error)) return CODE_MESSAGE_KEY[error];
-  if (error && typeof error === "object") {
-    const code = (error as CodedError).code;
-    if (isErrorCode(code)) return CODE_MESSAGE_KEY[code];
+  const code = typeof error === "string" ? error : (error as CodedError | null)?.code;
+  if (typeof code === "string") {
+    const normalized = normalizeCode(code);
+    if (isErrorCode(normalized)) return CODE_MESSAGE_KEY[normalized];
   }
   return CODE_MESSAGE_KEY.unknown;
 }

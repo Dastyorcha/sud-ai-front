@@ -1,6 +1,6 @@
 # Integration 04 — Cases & participants
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §8 (cases & participants), §17 (judge-list gap)
@@ -70,13 +70,13 @@ identifier, language, isActive, createdAt, updatedAt }`. Update
 
 ## Steps
 
-1. [ ] Align `CourtCase`/`Participant` types to guide responses — `refactor: align case and participant types to api`
-2. [ ] Add `case.service.ts` (list/get/create/update/archive) — `feat: real case service`
-3. [ ] Rewrite `use-cases`/`use-case` over TanStack Query — `feat: cases hooks over live api`
-4. [ ] Add `participant.service.ts`; rewrite `use-participants` (CRUD + invalidation) — `feat: real participant service and hook`
-5. [ ] Wire wizard `use-create-case` → `POST /cases`; add judgeId UUID field + map caseType — `feat: case wizard submits to api`
-6. [ ] Enforce archived-case read-only in detail/participant UI — `feat: gate mutations on archived case`
-7. [ ] docs: sync `docs/codemap.md` — `docs: sync case/participant services`
+1. [x] Align `CourtCase`/`Participant` types to guide responses — `refactor: align case and participant types to api`
+2. [x] Add `case.service.ts` (list/get/create/update/archive) — `feat: real case service`
+3. [x] Rewrite `use-cases`/`use-case` over TanStack Query — `feat: cases hooks over live api`
+4. [x] Add `participant.service.ts`; rewrite `use-participants` (CRUD + invalidation) — `feat: real participant service and hook`
+5. [x] Wire wizard `use-create-case` → `POST /cases`; add judgeId UUID field + map caseType — `feat: case wizard submits to api`
+6. [x] Enforce archived-case read-only in detail/participant UI — `feat: gate mutations on archived case`
+7. [x] docs: sync `docs/codemap.md` — `docs: sync case/participant services`
 
 ## Risks / ripple / escalation
 

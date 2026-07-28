@@ -60,7 +60,16 @@ export interface CourtUser {
   lastLoginAt: string | null;
 }
 
-/** A court case — the root aggregate everything else hangs off (spec §14.2). */
+/**
+ * A court case — the root aggregate everything else hangs off (spec §14.2).
+ * Fields through `archivedAt` mirror the real `CourtCaseResponse` (integration
+ * guide §8) exactly — that's what `features/cases/case.service.ts` returns.
+ * The fields below `archivedAt` are mockup-only additions (dashboard card
+ * parties/claim/stage) with no live-API equivalent yet; the real service
+ * leaves them `undefined`, while `shared/lib/mock-api/court-case.service.ts`
+ * (kept for `views/cases/case-new.tsx` until integration-11) still populates
+ * them. Consumers must treat them as optional.
+ */
 export interface CourtCase {
   id: string;
   caseNumber: string;
@@ -69,44 +78,64 @@ export interface CourtCase {
   caseType: CaseType;
   judgeId: string | null;
   status: CaseStatus;
-  /** Procedural stage for the dashboard card/filter (mockup — see `CASE_STAGE`). */
-  stage: CaseStage;
-  /** Short description of the dispute, shown on the dashboard card. */
-  subject: string;
-  /** Claimant display name for the "X vs Y" card heading; `null` if not yet set. */
-  claimantName: string | null;
-  /** Defendant display name for the "X vs Y" card heading; `null` if not yet set. */
-  defendantName: string | null;
-  /** Integer UZS claim amount shown on the card (`Money`); `null` when not applicable. */
-  claimAmount: number | null;
-  /** Free-form structured extras (spec §14.2 `metadata JSONB`). */
-  metadata: Record<string, unknown>;
-  participantCount: number;
+  /** Free-text case description (guide §8, ≤4000 chars server-side). */
+  description: string | null;
+  /** Demo/seed flag (guide §8) — distinct from the mock's `isDemo`-less fixtures. */
+  isDemo: boolean;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;
+
+  /** Procedural stage for the dashboard card/filter (mockup — see `CASE_STAGE`). Not in the live API response. */
+  stage?: CaseStage;
+  /** Short description of the dispute, shown on the dashboard card (mockup — prefer `description` for real data). */
+  subject?: string;
+  /** Claimant display name for the "X vs Y" card heading (mockup); `null`/`undefined` if not yet set. */
+  claimantName?: string | null;
+  /** Defendant display name for the "X vs Y" card heading (mockup); `null`/`undefined` if not yet set. */
+  defendantName?: string | null;
+  /** Integer UZS claim amount shown on the card (mockup `Money`); `null`/`undefined` when not applicable. */
+  claimAmount?: number | null;
+  /** Free-form structured extras (mockup `metadata JSONB`). Not in the live API response. */
+  metadata?: Record<string, unknown>;
+  participantCount?: number;
 }
 
-/** A party or actor attached to a case with a procedural role (spec §14.3). */
+/**
+ * A party or actor attached to a case with a procedural role (spec §14.3).
+ * Mirrors the real `ParticipantResponse` (integration guide §8):
+ * `courtCaseId`/`language`/`isActive`/`updatedAt` replace the mock's former
+ * `caseId`/`languagePreferences`/`voiceReferenceUri`.
+ */
 export interface Participant {
   id: string;
-  caseId: string;
+  courtCaseId: string;
   displayName: string;
   organizationName: string | null;
   role: ParticipantRole;
   /** Identity payload (passport, TIN, etc.) — kept opaque (spec §14.3 `identifier JSONB`). */
   identifier: Record<string, unknown>;
-  languagePreferences: string[];
-  voiceReferenceUri: string | null;
+  /** Primary spoken language for STT (guide §8) — a single code, e.g. `"uz"`. */
+  language: string;
+  /** `false` once soft-deleted via `DELETE /participants/{id}` (guide §8, §17). */
+  isActive: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
-/** A single sitting of a case; owns audio and transcript (spec §14.4). */
+/**
+ * A single sitting of a case; owns audio and transcript (spec §14.4).
+ * `scheduledAt` is nullable and `version` is present (integration guide §9,
+ * §16 optimistic concurrency) to match the real `HearingResponse` returned by
+ * `features/hearings/hearing.service.ts`; `version` is `undefined` for the
+ * mock layer's hearings (`shared/lib/mock-api/hearing.service.ts`), which
+ * doesn't model concurrency tokens.
+ */
 export interface Hearing {
   id: string;
   caseId: string;
-  scheduledAt: string;
+  scheduledAt: string | null;
   startedAt: string | null;
   endedAt: string | null;
   status: HearingStatus;
@@ -116,9 +145,11 @@ export interface Hearing {
   finalSttModel: string | null;
   audioDurationMs: number;
   createdBy: string;
+  /** Optimistic-concurrency token (guide §16) — real hearings only. */
+  version?: number;
 }
 
-/** A recorded audio channel for a hearing (spec §14.5). */
+/** A recorded audio channel for a hearing (spec §14.5, guide §9 `AudioTrackResponse`). */
 export interface AudioTrack {
   id: string;
   hearingId: string;
@@ -133,8 +164,13 @@ export interface AudioTrack {
 }
 
 /**
- * One utterance segment of the transcript (spec §14.6). Layers are preserved,
- * never overwritten (spec §10.1): raw ASR → normalized → human edit → canonical.
+ * One utterance segment of the transcript (spec §14.6, guide §9/§10
+ * `GET /hearings/{id}/transcript`, `transcript-segments` PATCH/verify).
+ * Layers are preserved, never overwritten (spec §10.1): raw ASR →
+ * normalized → human edit → canonical. `version` is the per-segment
+ * optimistic-concurrency token (guide §16) — `undefined` for the mock
+ * layer's segments (`shared/lib/mock-api/transcript.service.ts`), which
+ * doesn't model it.
  */
 export interface TranscriptSegment {
   id: string;
@@ -155,6 +191,8 @@ export interface TranscriptSegment {
   isCriticalReviewed: boolean;
   createdAt: string;
   updatedAt: string;
+  /** Optimistic-concurrency token (guide §16) — real segments only. */
+  version?: number;
 }
 
 /**

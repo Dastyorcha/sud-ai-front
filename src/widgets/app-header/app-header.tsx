@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { useCourtAuth } from "@/features/auth/use-court-auth";
+import { useLogout } from "@/features/auth/use-logout";
 import { APP_FULL_NAME, APP_NAME } from "@/shared/constants/app";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useCase } from "@/features/cases/use-case";
@@ -39,6 +40,7 @@ function initials(name: string): string {
 export function AppHeader({ onOpenNav }: AppHeaderProps) {
   const { t, locale } = useTranslation();
   const { user, role } = useCourtAuth();
+  const { logout } = useLogout();
   const { pathname } = useLocation();
 
   const caseMatch = matchPath(withLocale(locale, ROUTE_PATHS.CASE_DETAIL), pathname);
@@ -114,26 +116,31 @@ export function AppHeader({ onOpenNav }: AppHeaderProps) {
             >
               <Avatar className="size-8">
                 <AvatarFallback className="bg-gold-soft text-xs font-semibold text-gold">
-                  {initials(user.fullName)}
+                  {initials(user?.fullName ?? "")}
                 </AvatarFallback>
               </Avatar>
               <span className="hidden flex-col items-start leading-tight sm:flex">
-                <span className="text-sm font-medium text-foreground">{user.fullName}</span>
+                <span className="text-sm font-medium text-foreground">{user?.fullName}</span>
                 <span className="text-xs text-muted-foreground">
-                  {t(`enums.courtRoles.${role}` as MessageKey)}
+                  {role ? t(`enums.apiRoles.${role}` as MessageKey) : null}
                 </span>
               </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-64">
             <DropdownMenuLabel className="flex flex-col gap-0.5 font-normal">
-              <span className="text-sm font-semibold text-foreground">{user.fullName}</span>
+              <span className="text-sm font-semibold text-foreground">{user?.fullName}</span>
               <span className="text-xs text-muted-foreground">
-                {t(`enums.courtRoles.${role}` as MessageKey)}
+                {role ? t(`enums.apiRoles.${role}` as MessageKey) : null}
               </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              className="cursor-pointer text-destructive focus:text-destructive"
+              onClick={() => {
+                void logout();
+              }}
+            >
               <LogOut className="size-4" aria-hidden="true" />
               {t("common.logout")}
             </DropdownMenuItem>

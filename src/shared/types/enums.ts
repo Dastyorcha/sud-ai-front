@@ -104,7 +104,14 @@ export const PARTICIPANT_ROLE = {
 } as const;
 export type ParticipantRole = (typeof PARTICIPANT_ROLE)[keyof typeof PARTICIPANT_ROLE];
 
-/** Hearing / session state machine (spec §17.3, FR-03). */
+/**
+ * Hearing / session state machine (spec §17.3, FR-03). `CREATED`…`FAILED`
+ * (UPPER_SNAKE) are the mock layer's values, still used by the demo-only
+ * live/protocol/events flows. `Created`…`Failed` (PascalCase) are the real
+ * API's values (integration guide §9) driven by `features/hearings/hearing.service.ts`
+ * — additive, not a rename, so both layers type-check side by side until
+ * integration-11 reconciles casing and deletes the mock layer.
+ */
 export const HEARING_STATUS = {
   CREATED: "CREATED",
   DEVICE_CHECK: "DEVICE_CHECK",
@@ -115,15 +122,41 @@ export const HEARING_STATUS = {
   READY_FOR_REVIEW: "READY_FOR_REVIEW",
   APPROVED: "APPROVED",
   FAILED: "FAILED",
+  // Real API values (guide §9) — no DeviceCheck/Paused transition endpoints
+  // yet (guide §17), so the real hearing flow never programmatically sets
+  // those two, but they're listed for completeness/exhaustiveness.
+  Created: "Created",
+  DeviceCheck: "DeviceCheck",
+  Recording: "Recording",
+  Paused: "Paused",
+  Finalizing: "Finalizing",
+  RealFailed: "Failed",
+  // Real API values reached only once transcript review/approve exist
+  // (integration-06, guide §10) — `ReadyForReview` is the state the
+  // `HEARING_NOT_READY_FOR_REVIEW` validate issue refers to, `Approved` is
+  // set by `POST /hearings/{id}/transcript/approve`.
+  ReadyForReview: "ReadyForReview",
+  Approved: "Approved",
 } as const;
 export type HearingStatus = (typeof HEARING_STATUS)[keyof typeof HEARING_STATUS];
 
-/** Review state of a transcript segment across the layered pipeline (spec §10.1). */
+/**
+ * Review state of a transcript segment across the layered pipeline (spec
+ * §10.1). `INTERIM`…`VERIFIED` (UPPER_SNAKE) are the mock layer's values.
+ * `Raw`…`Canonical` (PascalCase) are the real API's values (guide §10,
+ * integration-06) — additive, not a rename, so both layers type-check side
+ * by side until integration-11 reconciles casing and deletes the mock layer.
+ */
 export const SEGMENT_STATUS = {
   INTERIM: "INTERIM",
   FINAL: "FINAL",
   EDITED: "EDITED",
   VERIFIED: "VERIFIED",
+  // Real API values (guide §10).
+  Raw: "Raw",
+  Normalized: "Normalized",
+  HumanEdited: "HumanEdited",
+  Canonical: "Canonical",
 } as const;
 export type SegmentStatus = (typeof SEGMENT_STATUS)[keyof typeof SEGMENT_STATUS];
 

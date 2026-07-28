@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createCase } from "@/shared/lib/mock-api/court-case.service";
-import { createParticipant } from "@/shared/lib/mock-api/participant.service";
+import { createCase } from "@/features/cases/case.service";
+import { createParticipant } from "@/features/participants/participant.service";
 import type { CourtCase } from "@/shared/types/models";
 import type { CourtType } from "@/shared/types/enums";
 import type { CaseWizardValues } from "@/features/case-create/schema";
@@ -31,9 +31,15 @@ export interface UseCreateCaseResult {
 }
 
 /**
- * New-case wizard submit hook (`case-create` feature): creates the case then
- * its claimant/defendant/optional-representative participants via the
- * existing mock services, mirroring `views/cases/case-new.tsx`'s sequencing.
+ * New-case wizard submit hook (`case-create` feature): `POST /cases` (guide
+ * §8) then its claimant/defendant/optional-representative participants via
+ * `POST /cases/{id}/participants`. The wizard's `caseType` (case kind:
+ * Civil/Economic/Special) maps to the request's `courtType`; the finer-grained
+ * `category` (e.g. "debtRecovery") maps to the request's `caseType`, since the
+ * live API's `caseType` is a free ≤100-char string, not this app's enum.
+ * `judgeId` is the wizard's manual UUID field (guide §17 — no judge-list
+ * endpoint). Callers should catch and toast `errorMessageKey(error)` — e.g.
+ * `400 INVALID_JUDGE`, `409 CASE_NUMBER_EXISTS`.
  */
 export function useCreateCase(): UseCreateCaseResult {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,13 +51,9 @@ export function useCreateCase(): UseCreateCaseResult {
         caseNumber: generateCaseNumber(),
         courtName: DEFAULT_COURT_NAME,
         courtType: COURT_TYPE_BY_KIND[values.caseType as CaseKind],
-        caseType: values.caseType,
-        judgeId: null,
-        subject: values.claimText,
-        claimantName: values.claimant.displayName,
-        defendantName: values.defendant.displayName,
-        claimAmount: values.claimAmount,
-        metadata: { category: values.category, legalBasis: values.legalBasis },
+        caseType: values.category,
+        judgeId: values.judgeId,
+        description: values.claimText,
       });
 
       await createParticipant({

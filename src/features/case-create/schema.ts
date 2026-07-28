@@ -23,6 +23,12 @@ export const caseWizardSchema = z
   .object({
     caseType: z.enum(CASE_KIND_VALUES, { message: "requiredKind" }),
     category: z.string().min(1, "requiredCategory"),
+    /**
+     * Assigned judge's account UUID (integration guide §17 — no judge-list
+     * endpoint yet, so this is a manual UUID field rather than a picker).
+     * TODO: replace with a real judge picker once a judge-list endpoint exists.
+     */
+    judgeId: z.string().trim().min(1, "requiredJudgeId").uuid("invalidJudgeId"),
     claimant: partySchema,
     defendant: partySchema,
     hasRepresentative: z.boolean(),
@@ -47,6 +53,7 @@ export type CaseWizardValues = z.infer<typeof caseWizardSchema>;
 export const CASE_WIZARD_DEFAULTS: CaseWizardValues = {
   caseType: "ECONOMIC_DISPUTE",
   category: "",
+  judgeId: "",
   claimant: { displayName: "", organizationName: "" },
   defendant: { displayName: "", organizationName: "" },
   hasRepresentative: false,
@@ -62,7 +69,7 @@ export const WIZARD_STEP_COUNT = 5;
 
 /** Field paths validated (via `form.trigger`) before advancing from each step. */
 export const WIZARD_STEP_FIELDS: Record<number, string[]> = {
-  1: ["caseType", "category"],
+  1: ["caseType", "category", "judgeId"],
   2: ["claimant.displayName", "defendant.displayName", "representativeName"],
   3: ["claimText", "claimAmount", "legalBasis"],
   4: [],

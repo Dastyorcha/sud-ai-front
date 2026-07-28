@@ -23,14 +23,15 @@ Dependencies point **downward only**. A layer may import from layers below it, n
 - `components/ui/` — shadcn/ui primitives (new-york style, lucide icons). Keep them here; do not hand-edit beyond additive fixes.
 - `custom/` — cross-cutting components built on primitives: `status-badge`, `money`, `date-text`, `detail-grid`, `theme-toggle`, `lang-switcher`, `coming-soon`, data-state blocks (`loading-state`, `empty-state`, `error-state`, `permission-denied`), `can`, etc.
 - `hooks/` — generic hooks (`use-debounce`, `use-mock-query`, `use-unsaved-guard`).
-- `lib/` — `utils.ts` (`cn`), `mock-api/` (the mock service layer — see below), `i18n/` (custom locale/message/formatting layer — see below), `errors/` (central error-code → message-key map), `toast.ts`.
+- `lib/` — `utils.ts` (`cn`), `mock-api/` (the mock service layer — see below), `http/` (the real-backend axios client — see below), `query/` (TanStack Query key factory, job polling, mutation wrapper — see below), `i18n/` (custom locale/message/formatting layer — see below), `errors/` (central error-code → message-key map), `toast.ts`.
+- `config/` — typed environment config (`env.ts`).
 - `constants/` — static config as `UPPER_SNAKE_CASE`: `nav-items.ts`, `route-paths.ts`, `page-names.ts`, `permissions.ts`, `app.ts`.
 - `types/` — shared TypeScript types/interfaces (`models.ts`, `enums.ts`, `query-types.ts`).
 - `styles/` — non-token global CSS (e.g. `tag-styles.css`). Design tokens live in `src/index.css` only.
 
 ## Routing (React Router v7)
 
-- The router lives at `src/app/app.tsx`, wrapped by `src/app/providers.tsx` (`next-themes` `ThemeProvider` + `sonner` `Toaster`) in `src/main.tsx`. Pages are **lazy-loaded** (`lazy(() => import(...))`) for code-splitting.
+- The router lives at `src/app/app.tsx`, wrapped by `src/app/providers.tsx` (TanStack Query `QueryProvider` + `next-themes` `ThemeProvider` + `sonner` `Toaster`) in `src/main.tsx`. Pages are **lazy-loaded** (`lazy(() => import(...))`) for code-splitting.
 - Every route is mounted under a `/:lang` locale prefix (`/uz/...`, `/en/...`, `/ru/...`) — `/` redirects to the preferred locale, an unsupported `:lang` renders the 404. See **Internationalization (i18n)** below and `docs/i18n.md`.
 - Route strings come from `src/shared/constants/route-paths.ts` (`ROUTE_PATHS`; parametrised/detail routes via `buildRoute.*`) — these are **locale-less**; never hardcode a path in a `<Route>` or `<Link>`. Build a concrete, navigable URL with `withLocale(locale, ROUTE_PATHS.X)`.
 - Page/route display names come from `src/shared/constants/page-names.ts` (`PAGE_NAMES`, keyed by `ROUTE_PATHS` key) as **i18n message keys** — resolve with `t(PAGE_NAMES.KEY)`.
@@ -98,6 +99,79 @@ Until a real backend exists, every screen reads from an **in-memory mock service
 - **`user.service.ts`** reads from `data/` and exposes server-shaped async functions (`listUsers`, `getUser`). Add one `*.service.ts` per entity, following the same pattern.
 - **Swap-to-real-API note:** every service function's signature and return shape is deliberately API-shaped. Replacing the mock layer later means rewriting each service function's body to call `fetch`/an HTTP client instead of reading the in-memory arrays — call sites (feature hooks, widgets) do not change.
 - **Consumer hooks** (`src/features/users/use-users.ts`, `src/shared/hooks/use-mock-query.ts`) wrap the services with plain `useState`/`useEffect` (`{ data, isLoading, error }` or `{ data, isLoading, error, refetch }`) — no `react-query`, by design (no extra dependency for a mock-only layer). `use-mock-query.ts` is the generic loader — pass it any `() => Promise<T>` and a dependency array.
+
+## HTTP client / real-backend layer (`src/shared/lib/http/`)
+
+The LexKotib backend integration (see `plans/idea/integration-*.md`) is landing
+service-by-service alongside the mock layer; `shared/lib/http/` is the shared
+foundation every real service imports:
+
+- `api-client.ts` — the single axios instance (`apiClient`). `baseURL` stays
+  `""` (relative); every call passes a same-origin path prefixed with
+  `src/shared/config/env.ts`'s `API_PREFIX` (`/api/v1/...`) so the Vite dev
+  proxy and a same-origin prod reverse proxy both work unchanged (no
+  `Access-Control-Allow-Origin: *`). The request interceptor sets `Accept`, a
+  fresh `X-Request-ID` (`request-id.ts`), and `Authorization: Bearer <token>`
+  from an **injectable** token getter (`setAccessTokenGetter`) — the real auth
+  store wires this once at app init; until then it's a no-op so this layer
+  builds/tests standalone. The response interceptor captures the response's
+  `X-Request-ID` and rejects with a parsed `ApiError`.
+- `api-error.ts` — `ApiError` (`status`, `code`, `title`, `detail`,
+  `requestId`, `fieldErrors?`) + `parseApiError()`, which normalizes an axios
+  rejection into one shape: RFC ProblemDetails with a `code`, ASP.NET
+  `ValidationProblemDetails` (`errors` map → `code: "validation_error"` +
+  `fieldErrors`), an empty-body error (status → fallback code), or a
+  network/timeout failure (`network_error/timeout`, `status: 0`).
+- `request-id.ts` — `createRequestId()` (UUID per outgoing request) +
+  `setLastRequestId`/`getLastRequestId` (last captured response id, for
+  logs/support correlation).
+- Errors are never shown raw: `ApiError.code` (backend `UPPER_SNAKE` or a
+  derived fallback) resolves through `src/shared/lib/errors/error-map.ts`'s
+  `errorMessageKey()` (case-insensitive) to an `errors.codes.*` i18n key.
+- Dev proxy: `vite.config.ts` forwards `/api` and `/hubs` to
+  `env.apiBaseUrl` (`VITE_API_BASE_URL`, see `.env.example`) — the backend has
+  no CORS yet, so this is the sanctioned same-origin workaround (never set
+  CORS headers client-side).
+
+## Query layer (`src/shared/lib/query/`, `src/app/providers/query-provider.tsx`)
+
+Real-service feature hooks (integration-04 onward) use **TanStack Query**
+instead of `use-mock-query` — both coexist until integration-11 deletes the
+mock layer.
+
+- `src/app/providers/query-provider.tsx` — the single `QueryClient` (mounted
+  in `AppProviders`). Defaults: `staleTime: 30_000`, `retry` only on a
+  network/timeout or 5xx `ApiError` (never a 4xx, capped at 2 attempts),
+  `refetchOnWindowFocus: false`. Mutations never auto-retry — error handling
+  (including the 409 concurrency path) is `useApiMutation`'s job, not a
+  global `onError`. Dev-only `ReactQueryDevtools` is lazy-imported.
+- `query-keys.ts` — the `queryKeys` factory (cases, participants, hearings,
+  transcript, events, documents, audit, jobs, users). Every feature hook's
+  `queryKey` and every `useApiMutation`'s `invalidateKeys` read from here so
+  keys always agree.
+- `use-job-polling.ts` — `useJobPolling(jobId)` polls `GET /jobs/{id}` (guide
+  §9/§12) every 1.5s via `refetchInterval` until `status` is
+  `Succeeded`/`Failed`, then stops. Returns `{ job, isTerminal, isSucceeded,
+isFailed }`; on `Failed`, read `job.errorCode`/`job.errorMessageSafe`.
+  `JobStatus ∈ Queued | Processing | Succeeded | Failed` and
+  `JobType ∈ FinalTranscription | DocumentGeneration | DocumentPdfExport` are
+  the real API's PascalCase values — distinct from the mock `enums.ts`
+  `JobStatus` (`QUEUED`/`RUNNING`/...) until integration-11 reconciles them.
+- `use-api-mutation.ts` — `useApiMutation` wraps `useMutation`: on success it
+  invalidates the caller's `invalidateKeys`; on an `ApiError` with
+  `code === "CONCURRENCY_CONFLICT"` it also invalidates `invalidateKeys` (the
+  resource changed under the caller — guide §16.4) and toasts the localized
+  message; any other `ApiError` just toasts `errorMessageKey(error)`. Exposes
+  `fieldErrors` from a 400 validation error for inline form binding. Never
+  auto-retries.
+- **Paging envelope** — `src/shared/types/query-types.ts`'s `Paginated<T>` is
+  `{ items, page, pageSize, totalCount }` (guide §5); `totalPages()` derives
+  the page count. The audit endpoint (§13) returns `total` instead — adapted
+  at that service's boundary (integration-09), not modeled in this type.
+- **Concurrency convention** (guide §16) — a resource hook stores `version`
+  from its `GET`; a mutation sends `expectedVersion`; on success the cache is
+  updated with the response's new `version`. Each feature plan states which
+  mutations carry `expectedVersion`.
 
 ## Admin-panel patterns
 

@@ -29,7 +29,8 @@ interface Section {
 }
 
 export interface ProtocolPanelProps {
-  hearing: Hearing;
+  /** Only `id`/`caseId` are read — accepts either a full `Hearing` or the session-carried real one. */
+  hearing: Pick<Hearing, "id" | "caseId">;
 }
 
 /**
@@ -41,14 +42,15 @@ export interface ProtocolPanelProps {
 export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const { t } = useTranslation();
   const { can } = useCourtAuth();
-  const { data: documents, isLoading, refetch } = useMockQuery(
-    () => listDocuments(hearing.caseId),
-    [hearing.caseId],
-  );
+  const {
+    data: documents,
+    isLoading,
+    refetch,
+  } = useMockQuery(() => listDocuments(hearing.caseId), [hearing.caseId]);
   const doc = documents?.find((d) => d.hearingId === hearing.id) ?? null;
   const { data: versions } = useMockQuery(
     () => (doc ? listVersions(doc.id) : Promise.resolve([])),
-    [doc?.id],
+    [doc?.id]
   );
   const [exportJobId, setExportJobId] = useState<string | null>(null);
   const exportJob = useJob(exportJobId);
@@ -85,13 +87,15 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
           {doc.templateCode} v{doc.templateVersion}
         </span>
         <div className="ml-auto flex flex-wrap gap-2">
-          {(doc.status === "AI_GENERATED" || doc.status === "DRAFT" || doc.status === "CHANGES_REQUESTED") &&
+          {(doc.status === "AI_GENERATED" ||
+            doc.status === "DRAFT" ||
+            doc.status === "CHANGES_REQUESTED") &&
             can("document.submit") && (
-            <Button size="sm" onClick={() => act("UNDER_REVIEW")}>
-              <Send className="size-4" />
-              {t("protocol.submitReview")}
-            </Button>
-          )}
+              <Button size="sm" onClick={() => act("UNDER_REVIEW")}>
+                <Send className="size-4" />
+                {t("protocol.submitReview")}
+              </Button>
+            )}
           {doc.status === "UNDER_REVIEW" && can("document.approve") && (
             <>
               <Button size="sm" onClick={() => act("APPROVED")}>
