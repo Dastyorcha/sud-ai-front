@@ -1,6 +1,6 @@
 # Integration 03 — Auth, session & roles
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §2 (auth/session), §7 (auth endpoints), roles table
