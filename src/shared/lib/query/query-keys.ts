@@ -6,6 +6,9 @@
  * filter/sort/paging type; this factory only fixes the key *shape*.
  */
 export const queryKeys = {
+  auth: {
+    me: () => ["auth", "me"] as const,
+  },
   cases: {
     all: () => ["cases"] as const,
     list: (params?: unknown) => ["cases", "list", params] as const,
