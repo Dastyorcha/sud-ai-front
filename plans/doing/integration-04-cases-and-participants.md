@@ -1,6 +1,6 @@
 # Integration 04 — Cases & participants
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §8 (cases & participants), §17 (judge-list gap)
