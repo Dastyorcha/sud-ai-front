@@ -1,9 +1,10 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { listCases, type CaseListFilters } from "@/features/cases/case.service";
+import { archiveCase, listCases, type CaseListFilters } from "@/features/cases/case.service";
 import type { CourtCase } from "@/shared/types/models";
 import type { Paginated } from "@/shared/types/query-types";
 import { queryKeys } from "@/shared/lib/query/query-keys";
 import { ApiError } from "@/shared/lib/http/api-error";
+import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/use-api-mutation";
 
 export interface UseCasesParams {
   filters?: CaseListFilters;
@@ -40,4 +41,16 @@ export function useCases({
     error: query.error,
     query,
   };
+}
+
+/**
+ * Archives a case (guide §8 `POST /cases/{id}/archive`, idempotent `204`) —
+ * invalidates both the case's detail and every cached list so the UI
+ * immediately reflects the read-only `ARCHIVED` state.
+ */
+export function useArchiveCase(caseId: string): UseApiMutationResult<void, void> {
+  return useApiMutation({
+    mutationFn: () => archiveCase(caseId),
+    invalidateKeys: [queryKeys.cases.detail(caseId), queryKeys.cases.all()],
+  });
 }

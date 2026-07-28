@@ -224,6 +224,11 @@ export const uz = {
   },
   caseDetail: {
     backToList: "Ishlar ro'yxati",
+    archive: "Ishni arxivlash",
+    archiveConfirmTitle: "Bu ish arxivlansinmi?",
+    archiveConfirmDescription:
+      "Ish va uning ishtirokchilari faqat o'qish uchun bo'lib qoladi. Buni bu yerdan qaytarib bo'lmaydi.",
+    archivedNotice: "Bu ish arxivlangan va faqat o'qish uchun.",
     stats: {
       documents: "Hujjatlar",
       duration: "Davomiylik",

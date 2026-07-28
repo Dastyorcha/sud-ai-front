@@ -219,6 +219,11 @@ export const en: Messages = {
   },
   caseDetail: {
     backToList: "Case list",
+    archive: "Archive case",
+    archiveConfirmTitle: "Archive this case?",
+    archiveConfirmDescription:
+      "The case and its participants become read-only. This can't be undone from here.",
+    archivedNotice: "This case is archived and read-only.",
     stats: {
       documents: "Documents",
       duration: "Duration",

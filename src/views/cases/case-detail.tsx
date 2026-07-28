@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { ChevronLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, ChevronLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import {
   Table,
@@ -25,9 +25,11 @@ import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { StageBadge } from "@/shared/custom/stage-badge";
+import { StatusBadge } from "@/shared/custom/status-badge";
 import { CaseTypeTag } from "@/shared/custom/case-type-tag";
 import { CaseStats } from "@/widgets/case-stats/case-stats";
 import { useCase } from "@/features/cases/use-case";
+import { useArchiveCase } from "@/features/cases/use-cases";
 import {
   useDeactivateParticipant,
   useParticipants,
@@ -40,6 +42,7 @@ import { createHearing } from "@/shared/lib/mock-api/hearing.service";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { buildRoute } from "@/shared/constants/route-paths";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
+import { useCourtAuth } from "@/features/auth/use-court-auth";
 import type { Participant } from "@/shared/types/models";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
@@ -72,10 +75,22 @@ export default function CaseDetailView() {
     refetchHearings();
   }
 
+  const { can } = useCourtAuth();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Participant | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const deactivateMutation = useDeactivateParticipant(caseId);
+  const archiveMutation = useArchiveCase(caseId);
+
+  async function confirmArchive() {
+    try {
+      await archiveMutation.mutateAsync();
+      setArchiveConfirmOpen(false);
+    } catch {
+      // Errors are already toasted by useApiMutation.
+    }
+  }
 
   function openAdd() {
     setEditing(null);
@@ -141,23 +156,41 @@ export default function CaseDetailView() {
     courtCase.claimantName && courtCase.defendantName
       ? `${courtCase.claimantName} ${t("cases.vs")} ${courtCase.defendantName}`
       : null;
+  const isArchived = courtCase.status === "ARCHIVED";
+  const canManageParticipants = can("participant.edit") && !isArchived;
+  const canArchive = can("case.archive") && !isArchived;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
         {backLink}
         <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
-              {courtCase.caseNumber}
-            </h1>
-            {courtCase.stage && <StageBadge stage={courtCase.stage} />}
-            <CaseTypeTag caseType={courtCase.caseType} />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-mono text-2xl font-semibold tracking-tight text-foreground">
+                {courtCase.caseNumber}
+              </h1>
+              <StatusBadge
+                label={t(`enums.caseStatus.${courtCase.status}` as MessageKey)}
+                tone={isArchived ? "neutral" : "success"}
+              />
+              {courtCase.stage && <StageBadge stage={courtCase.stage} />}
+              <CaseTypeTag caseType={courtCase.caseType} />
+            </div>
+            {canArchive && (
+              <Button variant="outline" size="sm" onClick={() => setArchiveConfirmOpen(true)}>
+                <Archive className="size-4" />
+                {t("caseDetail.archive")}
+              </Button>
+            )}
           </div>
           {parties && <p className="text-lg font-semibold text-foreground">{parties}</p>}
           <p className="text-sm text-muted-foreground">
             {courtCase.subject ?? courtCase.description}
           </p>
+          {isArchived && (
+            <p className="text-sm text-muted-foreground">{t("caseDetail.archivedNotice")}</p>
+          )}
         </div>
       </div>
 
@@ -231,10 +264,12 @@ export default function CaseDetailView() {
             <h2 className="text-lg font-semibold text-foreground">
               {t("cases.columns.participants")}
             </h2>
-            <Button size="sm" onClick={openAdd}>
-              <Plus className="size-4" />
-              {t("participants.add")}
-            </Button>
+            {canManageParticipants && (
+              <Button size="sm" onClick={openAdd}>
+                <Plus className="size-4" />
+                {t("participants.add")}
+              </Button>
+            )}
           </div>
           {participants && participants.length > 0 ? (
             <div className="rounded-lg border border-border">
@@ -244,7 +279,7 @@ export default function CaseDetailView() {
                     <TableHead>{t("users.columns.name")}</TableHead>
                     <TableHead>{t("users.columns.role")}</TableHead>
                     <TableHead>{t("cases.columns.organization")}</TableHead>
-                    <TableHead className="w-24 text-right" />
+                    {canManageParticipants && <TableHead className="w-24 text-right" />}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -253,26 +288,28 @@ export default function CaseDetailView() {
                       <TableCell className="font-medium text-foreground">{p.displayName}</TableCell>
                       <TableCell>{t(`enums.participantRole.${p.role}` as MessageKey)}</TableCell>
                       <TableCell>{p.organizationName ?? "—"}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t("participants.edit")}
-                            onClick={() => openEdit(p)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t("participants.delete")}
-                            onClick={() => setDeleteTarget(p)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      {canManageParticipants && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={t("participants.edit")}
+                              onClick={() => openEdit(p)}
+                            >
+                              <Pencil className="size-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={t("participants.delete")}
+                              onClick={() => setDeleteTarget(p)}
+                            >
+                              <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -348,6 +385,27 @@ export default function CaseDetailView() {
               disabled={deactivateMutation.isPending}
             >
               {t("participants.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("caseDetail.archiveConfirmTitle")}</DialogTitle>
+            <DialogDescription>{t("caseDetail.archiveConfirmDescription")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setArchiveConfirmOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmArchive}
+              disabled={archiveMutation.isPending}
+            >
+              {t("caseDetail.archive")}
             </Button>
           </DialogFooter>
         </DialogContent>

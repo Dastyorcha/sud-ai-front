@@ -220,6 +220,11 @@ export const ru: Messages = {
   },
   caseDetail: {
     backToList: "Список дел",
+    archive: "Архивировать дело",
+    archiveConfirmTitle: "Архивировать это дело?",
+    archiveConfirmDescription:
+      "Дело и его участники станут доступны только для чтения. Отменить это здесь нельзя.",
+    archivedNotice: "Это дело архивировано и доступно только для чтения.",
     stats: {
       documents: "Документы",
       duration: "Длительность",
