@@ -23,7 +23,8 @@ Dependencies point **downward only**. A layer may import from layers below it, n
 - `components/ui/` — shadcn/ui primitives (new-york style, lucide icons). Keep them here; do not hand-edit beyond additive fixes.
 - `custom/` — cross-cutting components built on primitives: `status-badge`, `money`, `date-text`, `detail-grid`, `theme-toggle`, `lang-switcher`, `coming-soon`, data-state blocks (`loading-state`, `empty-state`, `error-state`, `permission-denied`), `can`, etc.
 - `hooks/` — generic hooks (`use-debounce`, `use-mock-query`, `use-unsaved-guard`).
-- `lib/` — `utils.ts` (`cn`), `mock-api/` (the mock service layer — see below), `i18n/` (custom locale/message/formatting layer — see below), `errors/` (central error-code → message-key map), `toast.ts`.
+- `lib/` — `utils.ts` (`cn`), `mock-api/` (the mock service layer — see below), `http/` (the real-backend axios client — see below), `i18n/` (custom locale/message/formatting layer — see below), `errors/` (central error-code → message-key map), `toast.ts`.
+- `config/` — typed environment config (`env.ts`).
 - `constants/` — static config as `UPPER_SNAKE_CASE`: `nav-items.ts`, `route-paths.ts`, `page-names.ts`, `permissions.ts`, `app.ts`.
 - `types/` — shared TypeScript types/interfaces (`models.ts`, `enums.ts`, `query-types.ts`).
 - `styles/` — non-token global CSS (e.g. `tag-styles.css`). Design tokens live in `src/index.css` only.
@@ -98,6 +99,39 @@ Until a real backend exists, every screen reads from an **in-memory mock service
 - **`user.service.ts`** reads from `data/` and exposes server-shaped async functions (`listUsers`, `getUser`). Add one `*.service.ts` per entity, following the same pattern.
 - **Swap-to-real-API note:** every service function's signature and return shape is deliberately API-shaped. Replacing the mock layer later means rewriting each service function's body to call `fetch`/an HTTP client instead of reading the in-memory arrays — call sites (feature hooks, widgets) do not change.
 - **Consumer hooks** (`src/features/users/use-users.ts`, `src/shared/hooks/use-mock-query.ts`) wrap the services with plain `useState`/`useEffect` (`{ data, isLoading, error }` or `{ data, isLoading, error, refetch }`) — no `react-query`, by design (no extra dependency for a mock-only layer). `use-mock-query.ts` is the generic loader — pass it any `() => Promise<T>` and a dependency array.
+
+## HTTP client / real-backend layer (`src/shared/lib/http/`)
+
+The LexKotib backend integration (see `plans/idea/integration-*.md`) is landing
+service-by-service alongside the mock layer; `shared/lib/http/` is the shared
+foundation every real service imports:
+
+- `api-client.ts` — the single axios instance (`apiClient`). `baseURL` stays
+  `""` (relative); every call passes a same-origin path prefixed with
+  `src/shared/config/env.ts`'s `API_PREFIX` (`/api/v1/...`) so the Vite dev
+  proxy and a same-origin prod reverse proxy both work unchanged (no
+  `Access-Control-Allow-Origin: *`). The request interceptor sets `Accept`, a
+  fresh `X-Request-ID` (`request-id.ts`), and `Authorization: Bearer <token>`
+  from an **injectable** token getter (`setAccessTokenGetter`) — the real auth
+  store wires this once at app init; until then it's a no-op so this layer
+  builds/tests standalone. The response interceptor captures the response's
+  `X-Request-ID` and rejects with a parsed `ApiError`.
+- `api-error.ts` — `ApiError` (`status`, `code`, `title`, `detail`,
+  `requestId`, `fieldErrors?`) + `parseApiError()`, which normalizes an axios
+  rejection into one shape: RFC ProblemDetails with a `code`, ASP.NET
+  `ValidationProblemDetails` (`errors` map → `code: "validation_error"` +
+  `fieldErrors`), an empty-body error (status → fallback code), or a
+  network/timeout failure (`network_error/timeout`, `status: 0`).
+- `request-id.ts` — `createRequestId()` (UUID per outgoing request) +
+  `setLastRequestId`/`getLastRequestId` (last captured response id, for
+  logs/support correlation).
+- Errors are never shown raw: `ApiError.code` (backend `UPPER_SNAKE` or a
+  derived fallback) resolves through `src/shared/lib/errors/error-map.ts`'s
+  `errorMessageKey()` (case-insensitive) to an `errors.codes.*` i18n key.
+- Dev proxy: `vite.config.ts` forwards `/api` and `/hubs` to
+  `env.apiBaseUrl` (`VITE_API_BASE_URL`, see `.env.example`) — the backend has
+  no CORS yet, so this is the sanctioned same-origin workaround (never set
+  CORS headers client-side).
 
 ## Admin-panel patterns
 
