@@ -165,6 +165,13 @@ export const uz = {
       conflict: "Ma’lumot boshqa o‘zgarish bilan to‘qnashdi. Sahifani yangilang.",
       network_error: "Tarmoq xatosi. Ulanishni tekshiring.",
       server_error: "Server xatosi. Birozdan so‘ng qayta urinib ko‘ring.",
+      unauthorized: "Sessiya muddati tugadi. Iltimos, qayta tizimga kiring.",
+      timeout: "So‘rov vaqti tugadi. Qaytadan urinib ko‘ring.",
+      concurrency_conflict:
+        "Bu yozuv boshqa joyda o‘zgartirildi. Sahifani yangilab, qayta urinib ko‘ring.",
+      transcript_locked: "Hozir stenogramma boshqa foydalanuvchi tomonidan bloklangan.",
+      case_number_exists: "Bu raqamli ish allaqachon mavjud.",
+      invalid_credentials: "Login yoki parol noto‘g‘ri.",
       unknown: "Noma’lum xatolik yuz berdi.",
     },
   },
