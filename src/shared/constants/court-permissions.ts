@@ -19,6 +19,21 @@ export const COURT_ACTION = {
 } as const;
 export type CourtAction = (typeof COURT_ACTION)[keyof typeof COURT_ACTION];
 
+/**
+ * The five API roles `/auth/me` returns (guide §2/§7.4) — reconciled from
+ * the repo's earlier mock `CourtRole` enum (`ADMIN|CLERK|JUDGE|LEGAL_EXPERT|
+ * DEMO_OPERATOR`, `src/shared/types/enums.ts`, still used by the mock domain
+ * fixtures until integration-04+ swaps them) to the real session's values.
+ */
+export const API_ROLE = {
+  ADMINISTRATOR: "Administrator",
+  SECRETARY: "Secretary",
+  JUDGE: "Judge",
+  LEGAL_EXPERT: "LegalExpert",
+  DEMO_OPERATOR: "DemoOperator",
+} as const;
+export type ApiRole = (typeof API_ROLE)[keyof typeof API_ROLE];
+
 const ALL: CourtAction[] = Object.values(COURT_ACTION);
 
 /** Role × action matrix (spec §4.1–4.5). */
