@@ -23,6 +23,7 @@ export const queryKeys = {
   },
   transcript: {
     segments: (hearingId: string) => ["hearings", hearingId, "segments"] as const,
+    speakers: (hearingId: string) => ["hearings", hearingId, "speakers"] as const,
   },
   events: {
     list: (hearingId: string) => ["hearings", hearingId, "events"] as const,

@@ -131,15 +131,32 @@ export const HEARING_STATUS = {
   Paused: "Paused",
   Finalizing: "Finalizing",
   RealFailed: "Failed",
+  // Real API values reached only once transcript review/approve exist
+  // (integration-06, guide §10) — `ReadyForReview` is the state the
+  // `HEARING_NOT_READY_FOR_REVIEW` validate issue refers to, `Approved` is
+  // set by `POST /hearings/{id}/transcript/approve`.
+  ReadyForReview: "ReadyForReview",
+  Approved: "Approved",
 } as const;
 export type HearingStatus = (typeof HEARING_STATUS)[keyof typeof HEARING_STATUS];
 
-/** Review state of a transcript segment across the layered pipeline (spec §10.1). */
+/**
+ * Review state of a transcript segment across the layered pipeline (spec
+ * §10.1). `INTERIM`…`VERIFIED` (UPPER_SNAKE) are the mock layer's values.
+ * `Raw`…`Canonical` (PascalCase) are the real API's values (guide §10,
+ * integration-06) — additive, not a rename, so both layers type-check side
+ * by side until integration-11 reconciles casing and deletes the mock layer.
+ */
 export const SEGMENT_STATUS = {
   INTERIM: "INTERIM",
   FINAL: "FINAL",
   EDITED: "EDITED",
   VERIFIED: "VERIFIED",
+  // Real API values (guide §10).
+  Raw: "Raw",
+  Normalized: "Normalized",
+  HumanEdited: "HumanEdited",
+  Canonical: "Canonical",
 } as const;
 export type SegmentStatus = (typeof SEGMENT_STATUS)[keyof typeof SEGMENT_STATUS];
 

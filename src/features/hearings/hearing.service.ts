@@ -167,8 +167,12 @@ export async function transcribeHearing(hearingId: string): Promise<TranscribeAc
   return data;
 }
 
-/** `TranscriptSegmentResponse` (guide §9) — the exact live shape. */
-interface TranscriptSegmentResponse {
+/**
+ * `TranscriptSegmentResponse` (guide §9/§10) — the exact live shape. Exported
+ * for `features/transcript/transcript.service.ts`, whose PATCH/verify
+ * endpoints return the same shape.
+ */
+export interface TranscriptSegmentResponse {
   id: string;
   hearingId: string;
   audioTrackId: string | null;
@@ -187,9 +191,11 @@ interface TranscriptSegmentResponse {
   isCriticalReviewed?: boolean;
   createdAt: string;
   updatedAt?: string;
+  version: number;
 }
 
-function toSegment(response: TranscriptSegmentResponse): TranscriptSegment {
+/** Maps a `TranscriptSegmentResponse` to the domain `TranscriptSegment` — shared with `transcript.service.ts`. */
+export function toSegment(response: TranscriptSegmentResponse): TranscriptSegment {
   return {
     id: response.id,
     hearingId: response.hearingId,
@@ -205,12 +211,11 @@ function toSegment(response: TranscriptSegmentResponse): TranscriptSegment {
     humanText: response.humanText,
     canonicalText: response.canonicalText,
     confidence: response.confidence,
-    // Real segment-status casing is reconciled in integration-06 (transcript
-    // editor) — read-only display here doesn't depend on the exact value.
     status: response.status as SegmentStatus,
     isCriticalReviewed: response.isCriticalReviewed ?? false,
     createdAt: response.createdAt,
     updatedAt: response.updatedAt ?? response.createdAt,
+    version: response.version,
   };
 }
 

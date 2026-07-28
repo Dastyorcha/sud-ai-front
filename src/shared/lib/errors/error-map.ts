@@ -29,6 +29,11 @@ export type ErrorCode =
   | "unsupported_audio_format"
   | "audio_signature_mismatch"
   | "hearing_audio_missing"
+  | "transcript_text_required"
+  | "speaker_label_required"
+  | "participant_not_in_case"
+  | "speaker_not_found"
+  | "transcript_validation_failed"
   | "unknown";
 
 const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
@@ -52,6 +57,11 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   unsupported_audio_format: "errors.codes.unsupported_audio_format",
   audio_signature_mismatch: "errors.codes.audio_signature_mismatch",
   hearing_audio_missing: "errors.codes.hearing_audio_missing",
+  transcript_text_required: "errors.codes.transcript_text_required",
+  speaker_label_required: "errors.codes.speaker_label_required",
+  participant_not_in_case: "errors.codes.participant_not_in_case",
+  speaker_not_found: "errors.codes.speaker_not_found",
+  transcript_validation_failed: "errors.codes.transcript_validation_failed",
   unknown: "errors.codes.unknown",
 };
 

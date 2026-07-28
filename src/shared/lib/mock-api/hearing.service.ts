@@ -32,6 +32,8 @@ const TRANSITIONS: Record<HearingStatus, HearingStatus[]> = {
   Paused: [],
   Finalizing: [],
   Failed: [],
+  ReadyForReview: [],
+  Approved: [],
 };
 
 export async function listHearings(caseId: string): Promise<Hearing[]> {

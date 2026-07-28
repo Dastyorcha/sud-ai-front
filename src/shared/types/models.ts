@@ -164,12 +164,13 @@ export interface AudioTrack {
 }
 
 /**
- * One utterance segment of the transcript (spec §14.6, guide §9
- * `GET /hearings/{id}/transcript`). Layers are preserved, never overwritten
- * (spec §10.1): raw ASR → normalized → human edit → canonical. Field names
- * already match the live response 1:1; `version` (per-segment optimistic
- * concurrency) is added in integration-06 (transcript editor), not here —
- * this plan only reads segments (read-only load).
+ * One utterance segment of the transcript (spec §14.6, guide §9/§10
+ * `GET /hearings/{id}/transcript`, `transcript-segments` PATCH/verify).
+ * Layers are preserved, never overwritten (spec §10.1): raw ASR →
+ * normalized → human edit → canonical. `version` is the per-segment
+ * optimistic-concurrency token (guide §16) — `undefined` for the mock
+ * layer's segments (`shared/lib/mock-api/transcript.service.ts`), which
+ * doesn't model it.
  */
 export interface TranscriptSegment {
   id: string;
@@ -190,6 +191,8 @@ export interface TranscriptSegment {
   isCriticalReviewed: boolean;
   createdAt: string;
   updatedAt: string;
+  /** Optimistic-concurrency token (guide §16) — real segments only. */
+  version?: number;
 }
 
 /**
