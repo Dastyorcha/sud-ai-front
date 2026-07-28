@@ -174,6 +174,10 @@ export const ru: Messages = {
       concurrency_conflict: "Эта запись была изменена в другом месте. Обновите и попробуйте снова.",
       transcript_locked: "Стенограмма сейчас заблокирована другим пользователем.",
       case_number_exists: "Дело с таким номером уже существует.",
+      invalid_judge: "Указанный ID судьи не соответствует активному судье.",
+      case_archive_endpoint_required:
+        "Чтобы закрыть дело, используйте архивирование, а не изменение статуса.",
+      archived_case_immutable: "Это дело архивировано и больше не может быть изменено.",
       invalid_credentials: "Неверный логин или пароль.",
       unknown: "Произошла неизвестная ошибка.",
     },
@@ -508,6 +512,10 @@ export const ru: Messages = {
     },
     categoryLabel: "Категория",
     selectCategory: "Выберите категорию",
+    judgeId: "ID судьи (UUID)",
+    judgeIdPlaceholder: "например, 3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    judgeIdHint:
+      "Временный ручной ввод — справочника судей пока нет. Вставьте UUID учётной записи назначенного судьи.",
     categories: {
       civil: {
         family: "Семейные споры",
@@ -568,6 +576,8 @@ export const ru: Messages = {
       requiredClaimText: "Введите исковое требование",
       requiredLegalBasis: "Введите правовое основание",
       requiredRepresentativeName: "Введите имя представителя",
+      requiredJudgeId: "Введите UUID судьи",
+      invalidJudgeId: "Введите корректный UUID",
     },
   },
 };

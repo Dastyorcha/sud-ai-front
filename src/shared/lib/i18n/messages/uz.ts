@@ -178,6 +178,10 @@ export const uz = {
         "Bu yozuv boshqa joyda o‘zgartirildi. Sahifani yangilab, qayta urinib ko‘ring.",
       transcript_locked: "Hozir stenogramma boshqa foydalanuvchi tomonidan bloklangan.",
       case_number_exists: "Bu raqamli ish allaqachon mavjud.",
+      invalid_judge: "Kiritilgan sudya ID faol sudyaga mos kelmadi.",
+      case_archive_endpoint_required:
+        "Ishni yopish uchun statusni tahrirlash emas, arxivlash amalidan foydalaning.",
+      archived_case_immutable: "Bu ish arxivlangan va endi tahrirlab bo‘lmaydi.",
       invalid_credentials: "Login yoki parol noto‘g‘ri.",
       unknown: "Noma’lum xatolik yuz berdi.",
     },
@@ -514,6 +518,10 @@ export const uz = {
     },
     categoryLabel: "Kategoriya",
     selectCategory: "Kategoriyani tanlang",
+    judgeId: "Sudya ID (UUID)",
+    judgeIdPlaceholder: "masalan, 3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    judgeIdHint:
+      "Vaqtincha qo'lda kiritish — hozircha sudyalar ro'yxati mavjud emas. Tayinlangan sudyaning UUID'sini kiriting.",
     categories: {
       civil: {
         family: "Oila nizolari",
@@ -574,6 +582,8 @@ export const uz = {
       requiredClaimText: "Da'vo talabini kiriting",
       requiredLegalBasis: "Huquqiy asosni kiriting",
       requiredRepresentativeName: "Vakil nomini kiriting",
+      requiredJudgeId: "Sudya UUID'sini kiriting",
+      invalidJudgeId: "To'g'ri UUID kiriting",
     },
   },
 };

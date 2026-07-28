@@ -174,6 +174,9 @@ export const en: Messages = {
       concurrency_conflict: "This record was changed elsewhere. Refresh and try again.",
       transcript_locked: "The transcript is locked by another user right now.",
       case_number_exists: "A case with this number already exists.",
+      invalid_judge: "The selected judge ID isn't a valid active judge.",
+      case_archive_endpoint_required: "Use the archive action to close a case, not a status edit.",
+      archived_case_immutable: "This case is archived and can no longer be edited.",
       invalid_credentials: "Incorrect username or password.",
       unknown: "An unknown error occurred.",
     },
@@ -508,6 +511,10 @@ export const en: Messages = {
     },
     categoryLabel: "Category",
     selectCategory: "Select a category",
+    judgeId: "Judge ID (UUID)",
+    judgeIdPlaceholder: "e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    judgeIdHint:
+      "Temporary manual entry — there is no judge directory yet. Paste the assigned judge's account UUID.",
     categories: {
       civil: {
         family: "Family disputes",
@@ -568,6 +575,8 @@ export const en: Messages = {
       requiredClaimText: "Enter the claim",
       requiredLegalBasis: "Enter the legal basis",
       requiredRepresentativeName: "Enter the representative's name",
+      requiredJudgeId: "Enter the judge's UUID",
+      invalidJudgeId: "Enter a valid UUID",
     },
   },
 };

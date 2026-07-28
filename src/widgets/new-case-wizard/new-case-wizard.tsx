@@ -23,6 +23,7 @@ import {
   type RequiredDocumentKey,
 } from "@/features/case-create/categories";
 import { useCreateCase } from "@/features/case-create/use-create-case";
+import { errorMessageKey } from "@/shared/lib/errors/error-map";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 import { notify } from "@/shared/lib/toast";
@@ -92,8 +93,8 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
       const created = await submit(form.getValues());
       resetWizard();
       onCreated(created.id);
-    } catch {
-      notify.error(t("errors.genericTitle"));
+    } catch (error) {
+      notify.error(t(errorMessageKey(error)));
     }
   }
 

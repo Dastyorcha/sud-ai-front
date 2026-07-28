@@ -20,6 +20,9 @@ export type ErrorCode =
   | "concurrency_conflict"
   | "transcript_locked"
   | "case_number_exists"
+  | "invalid_judge"
+  | "case_archive_endpoint_required"
+  | "archived_case_immutable"
   | "invalid_credentials"
   | "unknown";
 
@@ -35,6 +38,9 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   concurrency_conflict: "errors.codes.concurrency_conflict",
   transcript_locked: "errors.codes.transcript_locked",
   case_number_exists: "errors.codes.case_number_exists",
+  invalid_judge: "errors.codes.invalid_judge",
+  case_archive_endpoint_required: "errors.codes.case_archive_endpoint_required",
+  archived_case_immutable: "errors.codes.archived_case_immutable",
   invalid_credentials: "errors.codes.invalid_credentials",
   unknown: "errors.codes.unknown",
 };
