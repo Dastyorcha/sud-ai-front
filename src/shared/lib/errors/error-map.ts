@@ -34,6 +34,13 @@ export type ErrorCode =
   | "participant_not_in_case"
   | "speaker_not_found"
   | "transcript_validation_failed"
+  | "transcript_not_approved"
+  | "canonical_transcript_required"
+  | "invalid_event_type"
+  | "event_outside_source_range"
+  | "ruling_source_not_explicit"
+  | "event_source_required"
+  | "event_source_invalid"
   | "unknown";
 
 const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
@@ -62,6 +69,13 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   participant_not_in_case: "errors.codes.participant_not_in_case",
   speaker_not_found: "errors.codes.speaker_not_found",
   transcript_validation_failed: "errors.codes.transcript_validation_failed",
+  transcript_not_approved: "errors.codes.transcript_not_approved",
+  canonical_transcript_required: "errors.codes.canonical_transcript_required",
+  invalid_event_type: "errors.codes.invalid_event_type",
+  event_outside_source_range: "errors.codes.event_outside_source_range",
+  ruling_source_not_explicit: "errors.codes.ruling_source_not_explicit",
+  event_source_required: "errors.codes.event_source_required",
+  event_source_invalid: "errors.codes.event_source_invalid",
   unknown: "errors.codes.unknown",
 };
 
