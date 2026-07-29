@@ -92,12 +92,19 @@ Full spec: `docs/i18n.md`. A lightweight **custom** layer — no library:
 
 ## Mock API / data layer (`src/shared/lib/mock-api/`)
 
-Until a real backend exists, every screen reads from an **in-memory mock service layer** that behaves like a server: every call is `async` with a simulated ~250ms latency (`delay.ts`) so loading states are always exercised.
+The LexKotib backend integration (integration-01…11) replaced most mock
+services with the real API (see "HTTP client / real-backend layer" and
+`docs/api-integration.md`), but `shared/lib/mock-api/` was **not** deleted
+wholesale — every file still there has a genuine, deliberate consumer with no
+live endpoint to migrate to (documented per-file in `docs/codemap.md` and in
+`docs/api-integration.md`'s gap register: no hearing list/GET, no case-level
+document list, the reference users CRUD page, the judge-copilot feature).
+Each mock call is still `async` with a simulated ~250ms latency (`delay.ts`)
+so loading states are always exercised.
 
-- **Domain models** (`src/shared/types/models.ts`) hold `Organization` and `User` — the example entities. Add your real entities here, backend-shaped (ISO date strings, enum IDs from `enums.ts`) so a real API is a drop-in swap later. `src/shared/types/query-types.ts` holds the generic `ListParams<TFilters, TField>` / `Paginated<T>` request/response shapes for server-style list endpoints.
-- **`data/`** holds the seed dataset: `organization.ts`, `users.ts`. `data/index.ts` is the single import surface — add new seed files there as you add entities.
-- **`user.service.ts`** reads from `data/` and exposes server-shaped async functions (`listUsers`, `getUser`). Add one `*.service.ts` per entity, following the same pattern.
-- **Swap-to-real-API note:** every service function's signature and return shape is deliberately API-shaped. Replacing the mock layer later means rewriting each service function's body to call `fetch`/an HTTP client instead of reading the in-memory arrays — call sites (feature hooks, widgets) do not change.
+- **Domain models** (`src/shared/types/models.ts`) are shared between the mock and real layers — backend-shaped (ISO date strings, enum IDs from `enums.ts`), with mock-only fields marked `undefined` on real records. `src/shared/types/query-types.ts` holds the generic `ListParams<TFilters, TField>` / `Paginated<T>` request/response shapes for server-style list endpoints.
+- **`data/`** holds the seed dataset (one file per entity — `organization.ts`, `users.ts`, `court-cases.ts`, `hearings.ts`, `transcript-segments.ts`, `documents.ts`, `copilot.ts`, …). `data/index.ts` is the single import surface — add new seed files there as you add entities.
+- **`*.service.ts`** (one per still-mock entity) reads from `data/` and exposes server-shaped async functions (`listUsers`/`getUser`, `createCase`/`transitionHearing`, …), following the same pattern.
 - **Consumer hooks** (`src/features/users/use-users.ts`, `src/shared/hooks/use-mock-query.ts`) wrap the services with plain `useState`/`useEffect` (`{ data, isLoading, error }` or `{ data, isLoading, error, refetch }`) — no `react-query`, by design (no extra dependency for a mock-only layer). `use-mock-query.ts` is the generic loader — pass it any `() => Promise<T>` and a dependency array.
 
 ## HTTP client / real-backend layer (`src/shared/lib/http/`)
@@ -165,8 +172,8 @@ SignalR hub instead of a scripted local feed:
 ## Query layer (`src/shared/lib/query/`, `src/app/providers/query-provider.tsx`)
 
 Real-service feature hooks (integration-04 onward) use **TanStack Query**
-instead of `use-mock-query` — both coexist until integration-11 deletes the
-mock layer.
+instead of `use-mock-query`. Both genuinely coexist post integration-11 —
+see "Mock API / data layer" above for why the mock layer wasn't deleted.
 
 - `src/app/providers/query-provider.tsx` — the single `QueryClient` (mounted
   in `AppProviders`). Defaults: `staleTime: 30_000`, `retry` only on a
@@ -184,8 +191,9 @@ mock layer.
 isFailed }`; on `Failed`, read `job.errorCode`/`job.errorMessageSafe`.
   `JobStatus ∈ Queued | Processing | Succeeded | Failed` and
   `JobType ∈ FinalTranscription | DocumentGeneration | DocumentPdfExport` are
-  the real API's PascalCase values — distinct from the mock `enums.ts`
-  `JobStatus` (`QUEUED`/`RUNNING`/...) until integration-11 reconciles them.
+  the real API's PascalCase values, defined locally in this file rather than
+  imported from `shared/types/enums.ts` — that module's `JOB_STATUS` stays
+  mock-only UPPER_SNAKE (`shared/hooks/use-job.ts`'s demo job poller).
 - `use-api-mutation.ts` — `useApiMutation` wraps `useMutation`: on success it
   invalidates the caller's `invalidateKeys`; on an `ApiError` with
   `code === "CONCURRENCY_CONFLICT"` it also invalidates `invalidateKeys` (the
