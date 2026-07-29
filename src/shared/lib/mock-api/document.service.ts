@@ -23,6 +23,14 @@ const TRANSITIONS: Record<DocumentStatus, DocumentStatus[]> = {
   APPROVED: ["EXPORTED", "ARCHIVED"],
   EXPORTED: ["ARCHIVED"],
   ARCHIVED: [],
+  // Real API values (`shared/types/enums.ts`) — unused by this mock's own
+  // transitions (it only ever sets its own UPPER_SNAKE statuses) but required
+  // for `Record<DocumentStatus, ...>` exhaustiveness.
+  Draft: [],
+  UnderReview: [],
+  ChangesRequested: [],
+  Approved: [],
+  Exported: [],
 };
 
 export async function listTemplates(): Promise<DocumentTemplate[]> {
@@ -50,7 +58,7 @@ export async function listVersions(documentId: string): Promise<DocumentVersion[
 /** Moves a document through the FR-11 approval workflow; throws when illegal. */
 export async function transitionDocument(
   id: string,
-  to: DocumentStatus,
+  to: DocumentStatus
 ): Promise<GeneratedDocument> {
   await delay();
   const current = documents.find((d) => d.id === id);
@@ -71,12 +79,12 @@ export async function transitionDocument(
 export async function saveDocumentVersion(
   documentId: string,
   contentJson: Record<string, unknown>,
-  changeSummary: string,
+  changeSummary: string
 ): Promise<DocumentVersion> {
   await delay();
   const doc = documents.find((d) => d.id === documentId);
   if (!doc) throw new Error(`Document ${documentId} not found`);
-  const versionNo = doc.currentVersionNo + 1;
+  const versionNo = (doc.currentVersionNo ?? 0) + 1;
   const created: DocumentVersion = {
     id: crypto.randomUUID(),
     documentId,
@@ -90,7 +98,7 @@ export async function saveDocumentVersion(
   };
   versions = [...versions, created];
   documents = documents.map((d) =>
-    d.id === documentId ? { ...d, currentVersionNo: versionNo } : d,
+    d.id === documentId ? { ...d, currentVersionNo: versionNo } : d
   );
   return created;
 }

@@ -19,6 +19,12 @@ const DOCUMENT_TONES: Record<DocumentStatus, Tone> = {
   APPROVED: "success",
   EXPORTED: "primary",
   ARCHIVED: "neutral",
+  // Real API values (guide §12) — additive, see `shared/types/enums.ts`.
+  Draft: "neutral",
+  UnderReview: "warning",
+  ChangesRequested: "destructive",
+  Approved: "success",
+  Exported: "primary",
 };
 
 const SEGMENT_TONES: Record<SegmentStatus, Tone> = {

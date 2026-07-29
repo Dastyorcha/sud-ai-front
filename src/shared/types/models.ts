@@ -232,7 +232,14 @@ export interface ProceduralEvent {
   modelMetadata?: Record<string, unknown>;
 }
 
-/** A legal-expert-approved document template in the catalogue (spec §13.2). */
+/**
+ * A legal-expert-approved document template in the catalogue (spec §13.2).
+ * Fields through `approvedAt` are the mock layer's shape. `isActive`/
+ * `storageKey` mirror the real `DocumentTemplateResponse` (integration guide
+ * §12 `POST`/`GET /document-templates`) — `undefined` for mock templates.
+ * `storageKey` is a private backend reference, **never** render it as a URL
+ * (guide §12).
+ */
 export interface DocumentTemplate {
   id: string;
   templateCode: string;
@@ -247,26 +254,98 @@ export interface DocumentTemplate {
   fileUri: string;
   approvedBy: string | null;
   approvedAt: string | null;
+  /** `true`/`false` (real API only, guide §12) — the generate form only lists `isActive: true` templates. */
+  isActive?: boolean;
+  /** Private backend storage reference (real API only, guide §12) — never a public URL. */
+  storageKey?: string;
+  createdAt?: string;
 }
 
-/** A document produced from a template + verified sources (spec §14.9). */
+/**
+ * A single traceability pointer from a generated field/paragraph back to its
+ * source record (integration guide §12 `contentJson.sources[]`). `type` is a
+ * backend-defined discriminator (e.g. `"TranscriptSegment"`/
+ * `"ProceduralEvent"`); `path` optionally narrows into that source (e.g. a
+ * JSON pointer). Every paragraph/field must carry ≥1 — an edit that drops
+ * `sources` breaks server-side approval (guide §12 design notes).
+ */
+export interface DocumentSource {
+  type: string;
+  id: string;
+  path?: string;
+}
+
+/** One key/value slot of `contentJson.fields[]` (guide §12) — e.g. case number, hearing date. */
+export interface DocumentField {
+  key: string;
+  value: string;
+  sources: DocumentSource[];
+}
+
+/** One paragraph of a `contentJson.sections[].paragraphs[]` entry (guide §12). `sources` must stay non-empty. */
+export interface DocumentParagraph {
+  paragraphId: string;
+  text: string;
+  sources: DocumentSource[];
+}
+
+/** One section of `contentJson.sections[]` (guide §12) — a named group of paragraphs. */
+export interface DocumentSection {
+  sectionKey: string;
+  paragraphs: DocumentParagraph[];
+}
+
+/**
+ * The exact `contentJson` schema a generated document's content is stored
+ * and edited as (integration guide §12 design notes). Preserve `fields`/
+ * `sections`/`sources` verbatim on every edit — `PATCH /documents/{id}` only
+ * accepts this shape, and every paragraph needs ≥1 source.
+ */
+export interface DocumentContent {
+  schemaVersion: string;
+  documentType: DocumentType;
+  fields: DocumentField[];
+  sections: DocumentSection[];
+}
+
+/**
+ * A document produced from a template + verified sources (spec §14.9).
+ * Fields through `approvedAt` mirror the mock layer's shape (`currentVersionNo`
+ * mock-only). `contentJson`/`docxStorageKey`/`pdfStorageKey`/`version`
+ * mirror the real `DocumentResponse` (integration guide §12
+ * `GET /documents/{id}`) — `undefined` for mock documents, which don't model
+ * concurrency or the structured content schema. `docxStorageKey` stays
+ * `null` until the generate/regeneration job finishes; `pdfStorageKey` is set
+ * only once `status === "Exported"`. Both are private backend references,
+ * never rendered as URLs (guide §12).
+ */
 export interface GeneratedDocument {
   id: string;
   caseId: string;
   hearingId: string | null;
   documentType: DocumentType;
   templateCode: string;
-  templateVersion: string;
+  templateVersion: string | null;
   status: DocumentStatus;
   /** Immutable snapshot of the inputs used at generation time (spec §14.9). */
   sourceSnapshot: Record<string, unknown>;
-  currentVersionNo: number;
+  currentVersionNo?: number;
   createdBy: string;
   createdAt: string;
+  updatedAt?: string;
   approvedAt: string | null;
+
+  /** Structured editable content (real API only, guide §12) — see `DocumentContent`. */
+  contentJson?: DocumentContent;
+  /** Private storage reference for the generated DOCX (real API only, guide §12); `null` until ready. */
+  docxStorageKey?: string | null;
+  /** Private storage reference for the exported PDF (real API only, guide §12); `null` until `status === "Exported"`. */
+  pdfStorageKey?: string | null;
+  /** Optimistic-concurrency token (guide §16) — real documents only. */
+  version?: number;
 }
 
-/** An immutable revision of a generated document (spec §14.10). */
+/** An immutable revision of a generated document (spec §14.10) — the mock layer's shape. */
 export interface DocumentVersion {
   id: string;
   documentId: string;
@@ -276,6 +355,24 @@ export interface DocumentVersion {
   docxUri: string | null;
   pdfUri: string | null;
   changeSummary: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+/**
+ * One entry of a document's real change history (integration guide §12
+ * `GET /documents/{id}/versions`) — newest-first. Distinct from the mock
+ * layer's `DocumentVersion` (no per-version `contentJson`/docx/pdf snapshot
+ * in the real response, just the change record).
+ */
+export interface DocumentVersionHistoryEntry {
+  id: string;
+  documentId: string;
+  versionNo: number;
+  status: DocumentStatus;
+  /** Backend-defined change kind, e.g. `"Generated"`/`"ContentEdited"`/`"StatusChanged"` (guide §12). */
+  changeType: string;
+  reason: string | null;
   createdBy: string;
   createdAt: string;
 }

@@ -235,16 +235,31 @@ export const CRITICAL_FIELD_TYPE = {
 } as const;
 export type CriticalFieldType = (typeof CRITICAL_FIELD_TYPE)[keyof typeof CRITICAL_FIELD_TYPE];
 
-/** Kinds of generated document (spec §13.1). Each sits behind a feature flag. */
+/**
+ * Kinds of generated document (spec §13.1). Each sits behind a feature flag.
+ * `HearingProtocol` (PascalCase) is the real API's only implemented value so
+ * far (integration guide §12 `POST /cases/{id}/documents/generate`) —
+ * additive alongside the mock layer's UPPER_SNAKE values.
+ */
 export const DOCUMENT_TYPE = {
   HEARING_PROTOCOL: "HEARING_PROTOCOL",
   RULING: "RULING",
   COURT_ORDER: "COURT_ORDER",
   EXECUTION_WRIT: "EXECUTION_WRIT",
+  // Real API value (guide §12).
+  HearingProtocol: "HearingProtocol",
 } as const;
 export type DocumentType = (typeof DOCUMENT_TYPE)[keyof typeof DOCUMENT_TYPE];
 
-/** Approval workflow statuses (spec FR-11). */
+/**
+ * Approval workflow statuses (spec FR-11). `DRAFT`…`ARCHIVED` (UPPER_SNAKE)
+ * are the mock layer's values. `Draft`…`Exported` (PascalCase) are the real
+ * API's values (integration guide §12) — additive, not a rename, so both
+ * layers type-check side by side until integration-11 reconciles casing and
+ * deletes the mock layer. The real workflow has no `AI_GENERATED`/`ARCHIVED`
+ * step — generation lands straight in `Draft`, and there's no archive
+ * transition yet (guide §17).
+ */
 export const DOCUMENT_STATUS = {
   DRAFT: "DRAFT",
   AI_GENERATED: "AI_GENERATED",
@@ -253,6 +268,12 @@ export const DOCUMENT_STATUS = {
   APPROVED: "APPROVED",
   EXPORTED: "EXPORTED",
   ARCHIVED: "ARCHIVED",
+  // Real API values (guide §12).
+  Draft: "Draft",
+  UnderReview: "UnderReview",
+  ChangesRequested: "ChangesRequested",
+  Approved: "Approved",
+  Exported: "Exported",
 } as const;
 export type DocumentStatus = (typeof DOCUMENT_STATUS)[keyof typeof DOCUMENT_STATUS];
 

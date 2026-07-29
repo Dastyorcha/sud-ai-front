@@ -41,6 +41,24 @@ export type ErrorCode =
   | "ruling_source_not_explicit"
   | "event_source_required"
   | "event_source_invalid"
+  | "canonical_transcript_not_approved"
+  | "judge_participant_required"
+  | "secretary_participant_required"
+  | "verified_events_required"
+  | "active_template_required"
+  | "hearing_time_required"
+  | "invalid_docx_template"
+  | "template_version_exists"
+  | "document_source_required"
+  | "document_not_editable"
+  | "approved_document_immutable"
+  | "docx_not_ready"
+  | "invalid_document_transition"
+  | "document_review_denied"
+  | "document_approval_denied"
+  | "change_reason_required"
+  | "document_not_approved"
+  | "pdf_export_already_queued"
   | "unknown";
 
 const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
@@ -76,6 +94,24 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   ruling_source_not_explicit: "errors.codes.ruling_source_not_explicit",
   event_source_required: "errors.codes.event_source_required",
   event_source_invalid: "errors.codes.event_source_invalid",
+  canonical_transcript_not_approved: "errors.codes.canonical_transcript_not_approved",
+  judge_participant_required: "errors.codes.judge_participant_required",
+  secretary_participant_required: "errors.codes.secretary_participant_required",
+  verified_events_required: "errors.codes.verified_events_required",
+  active_template_required: "errors.codes.active_template_required",
+  hearing_time_required: "errors.codes.hearing_time_required",
+  invalid_docx_template: "errors.codes.invalid_docx_template",
+  template_version_exists: "errors.codes.template_version_exists",
+  document_source_required: "errors.codes.document_source_required",
+  document_not_editable: "errors.codes.document_not_editable",
+  approved_document_immutable: "errors.codes.approved_document_immutable",
+  docx_not_ready: "errors.codes.docx_not_ready",
+  invalid_document_transition: "errors.codes.invalid_document_transition",
+  document_review_denied: "errors.codes.document_review_denied",
+  document_approval_denied: "errors.codes.document_approval_denied",
+  change_reason_required: "errors.codes.change_reason_required",
+  document_not_approved: "errors.codes.document_not_approved",
+  pdf_export_already_queued: "errors.codes.pdf_export_already_queued",
   unknown: "errors.codes.unknown",
 };
 
