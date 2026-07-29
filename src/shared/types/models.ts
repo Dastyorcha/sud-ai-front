@@ -377,16 +377,22 @@ export interface DocumentVersionHistoryEntry {
   createdAt: string;
 }
 
-/** An audit trail entry (spec §12, FR-12). */
+/**
+ * An audit trail entry (spec §12, FR-12; integration guide §13). `actorId`
+ * is `null` for system-initiated entries. `before`/`after` are nullable
+ * **JSON strings**, not parsed objects — the API never decodes them; parse
+ * with a guarded `try/catch` only when rendering a structured diff, and fall
+ * back to the raw string on parse failure (never assume they're objects).
+ */
 export interface AuditLog {
   id: string;
-  actorId: string;
+  actorId: string | null;
   action: string;
   entityType: string;
   entityId: string;
-  before: Record<string, unknown>;
-  after: Record<string, unknown>;
-  ipAddress: string;
+  before: string | null;
+  after: string | null;
+  requestId: string;
   createdAt: string;
 }
 
