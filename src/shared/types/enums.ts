@@ -160,7 +160,13 @@ export const SEGMENT_STATUS = {
 } as const;
 export type SegmentStatus = (typeof SEGMENT_STATUS)[keyof typeof SEGMENT_STATUS];
 
-/** The 17 procedural event types (spec FR-08). Order is the canonical taxonomy order. */
+/**
+ * The 17 procedural event types (spec FR-08), UPPER_SNAKE — the mock layer's
+ * values. `HearingOpened`…`Other` (PascalCase, 14) are the real API's
+ * canonical taxonomy (integration guide §11) — additive, not a rename, so
+ * both layers type-check side by side until integration-11 reconciles casing
+ * and deletes the mock layer. Order is the canonical taxonomy order.
+ */
 export const PROCEDURAL_EVENT_TYPE = {
   HEARING_OPENED: "HEARING_OPENED",
   IDENTITY_VERIFIED: "IDENTITY_VERIFIED",
@@ -179,15 +185,38 @@ export const PROCEDURAL_EVENT_TYPE = {
   RULING_ANNOUNCED: "RULING_ANNOUNCED",
   HEARING_CLOSED: "HEARING_CLOSED",
   OTHER: "OTHER",
+  // Real API values (guide §11) — the 14-value canonical taxonomy.
+  HearingOpened: "HearingOpened",
+  IdentityVerified: "IdentityVerified",
+  RightsExplained: "RightsExplained",
+  ClaimExplained: "ClaimExplained",
+  ResponseGiven: "ResponseGiven",
+  ObjectionRaised: "ObjectionRaised",
+  MotionSubmitted: "MotionSubmitted",
+  EvidenceSubmitted: "EvidenceSubmitted",
+  QuestionAsked: "QuestionAsked",
+  BreakAnnounced: "BreakAnnounced",
+  HearingPostponed: "HearingPostponed",
+  RulingAnnounced: "RulingAnnounced",
+  HearingClosed: "HearingClosed",
+  RealOther: "Other",
 } as const;
 export type ProceduralEventType =
   (typeof PROCEDURAL_EVENT_TYPE)[keyof typeof PROCEDURAL_EVENT_TYPE];
 
-/** Human review state of an extracted procedural event (spec §11, §14.7). */
+/**
+ * Human review state of an extracted procedural event (spec §11, §14.7).
+ * `PENDING_REVIEW`…`REJECTED` are the mock layer's values. `Draft`/`Verified`
+ * (real API, guide §11) are additive alongside them until integration-11
+ * reconciles casing and deletes the mock layer.
+ */
 export const EVENT_REVIEW_STATUS = {
   PENDING_REVIEW: "PENDING_REVIEW",
   VERIFIED: "VERIFIED",
   REJECTED: "REJECTED",
+  // Real API values (guide §11).
+  Draft: "Draft",
+  RealVerified: "Verified",
 } as const;
 export type EventReviewStatus = (typeof EVENT_REVIEW_STATUS)[keyof typeof EVENT_REVIEW_STATUS];
 

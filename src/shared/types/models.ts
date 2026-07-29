@@ -199,6 +199,13 @@ export interface TranscriptSegment {
  * A structured procedural event extracted from the transcript (spec §14.7, §11).
  * `sourceSegmentIds` is mandatory and non-empty — an event without a source is a
  * contract violation the UI must surface as an error, never render as data.
+ * Fields through `createdAt` mirror the real `ProceduralEventResponse`
+ * (integration guide §11) exactly — that's what
+ * `features/events/event.service.ts` returns. `version` is present (guide
+ * §16 optimistic concurrency) for real events; `undefined` for the mock
+ * layer's (`shared/lib/mock-api/event.service.ts`), which doesn't model it.
+ * The fields below `createdAt` are mock-layer-only additions with no live-API
+ * equivalent — `undefined` for real events.
  */
 export interface ProceduralEvent {
   id: string;
@@ -213,12 +220,16 @@ export interface ProceduralEvent {
   verbatimText: string;
   normalizedSummary: string;
   confidence: number;
-  requiresHumanReview: boolean;
   reviewStatus: EventReviewStatus;
-  verifiedBy: string | null;
-  /** STT/LLM model + prompt version metadata (spec §14.7 `model_metadata JSONB`). */
-  modelMetadata: Record<string, unknown>;
+  /** Optimistic-concurrency token (guide §16) — real events only. */
+  version?: number;
   createdAt: string;
+
+  /** Mock-layer-only (spec §14.7) — not in the real `ProceduralEventResponse`. */
+  requiresHumanReview?: boolean;
+  verifiedBy?: string | null;
+  /** STT/LLM model + prompt version metadata (spec §14.7 `model_metadata JSONB`) — mock-layer-only. */
+  modelMetadata?: Record<string, unknown>;
 }
 
 /** A legal-expert-approved document template in the catalogue (spec §13.2). */
