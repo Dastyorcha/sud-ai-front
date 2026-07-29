@@ -66,15 +66,16 @@ Full spec: `docs/agentic-workflow.md`. In short:
 
 The single index of `docs/*.md`. `/doc-writer` reads this to pick affected docs. Do not crawl `docs/` to explore.
 
-| Doc                        | Covers                                                                     | Sync triggers                                               |
-| -------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `docs/architecture.md`     | FSD layering, routing, naming, tokens, `/tools` playground, admin patterns | `src/{app,views,widgets,features,shared}/`, `src/index.css` |
-| `docs/agentic-workflow.md` | Task sizing, model routing, subagents, `plans/` lifecycle, escalation      | `.claude/agents/`, orchestration changes                    |
-| `docs/claude-hooks.md`     | Every shell hook in `.claude/hooks/`                                       | `.claude/hooks/`                                            |
-| `docs/claude-skills.md`    | Every skill + command in `.claude/`                                        | `.claude/skills/`, `.claude/commands/`                      |
-| `docs/codemap.md`          | One line per source file                                                   | Any add/remove/rename of an export, or file move            |
-| `docs/i18n.md`             | Locale model, message shape, `t()` API + typing, routing, formatting       | `src/shared/lib/i18n/`                                      |
-| `docs/qa-acceptance.md`    | TZ §27 acceptance checklist — feature coverage, a11y, known gaps           | End of a plan; acceptance/QA review                         |
+| Doc                        | Covers                                                                     | Sync triggers                                                   |
+| -------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `docs/architecture.md`     | FSD layering, routing, naming, tokens, `/tools` playground, admin patterns | `src/{app,views,widgets,features,shared}/`, `src/index.css`     |
+| `docs/agentic-workflow.md` | Task sizing, model routing, subagents, `plans/` lifecycle, escalation      | `.claude/agents/`, orchestration changes                        |
+| `docs/claude-hooks.md`     | Every shell hook in `.claude/hooks/`                                       | `.claude/hooks/`                                                |
+| `docs/claude-skills.md`    | Every skill + command in `.claude/`                                        | `.claude/skills/`, `.claude/commands/`                          |
+| `docs/codemap.md`          | One line per source file                                                   | Any add/remove/rename of an export, or file move                |
+| `docs/i18n.md`             | Locale model, message shape, `t()` API + typing, routing, formatting       | `src/shared/lib/i18n/`                                          |
+| `docs/api-integration.md`  | LexKotib API endpoint map, base URL/proxy, §17 gap register, concurrency   | `src/shared/lib/http/`, `src/shared/lib/query/`, `*.service.ts` |
+| `docs/qa-acceptance.md`    | TZ §27 + guide §18 acceptance checklist — feature coverage, a11y, gaps     | End of a plan; acceptance/QA review                             |
 
 ## Architecture summary (full: `docs/architecture.md`)
 
