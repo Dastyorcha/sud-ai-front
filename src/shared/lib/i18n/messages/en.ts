@@ -271,6 +271,8 @@ export const en: Messages = {
       change_reason_required: "A reason is required to request changes.",
       document_not_approved: "The document must be approved before exporting.",
       pdf_export_already_queued: "A PDF export is already in progress for this document.",
+      unsupported_template_format: "Unsupported template format. Upload a .docx file.",
+      invalid_template_size: "The template file must be between 1 byte and 10 MB.",
       unknown: "An unknown error occurred.",
     },
   },

@@ -59,6 +59,8 @@ export type ErrorCode =
   | "change_reason_required"
   | "document_not_approved"
   | "pdf_export_already_queued"
+  | "unsupported_template_format"
+  | "invalid_template_size"
   | "unknown";
 
 const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
@@ -112,6 +114,8 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   change_reason_required: "errors.codes.change_reason_required",
   document_not_approved: "errors.codes.document_not_approved",
   pdf_export_already_queued: "errors.codes.pdf_export_already_queued",
+  unsupported_template_format: "errors.codes.unsupported_template_format",
+  invalid_template_size: "errors.codes.invalid_template_size",
   unknown: "errors.codes.unknown",
 };
 

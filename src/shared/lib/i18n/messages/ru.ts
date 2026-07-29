@@ -275,6 +275,8 @@ export const ru: Messages = {
       change_reason_required: "Для запроса изменений необходимо указать причину.",
       document_not_approved: "Перед экспортом документ должен быть утверждён.",
       pdf_export_already_queued: "Экспорт PDF для этого документа уже выполняется.",
+      unsupported_template_format: "Неподдерживаемый формат шаблона. Загрузите файл .docx.",
+      invalid_template_size: "Файл шаблона должен быть от 1 байта до 10 МБ.",
       unknown: "Произошла неизвестная ошибка.",
     },
   },

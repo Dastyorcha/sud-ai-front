@@ -278,6 +278,8 @@ export const uz = {
       change_reason_required: "O‘zgartirish so‘rash uchun sabab kiritilishi shart.",
       document_not_approved: "Eksport qilishdan oldin hujjat tasdiqlangan bo‘lishi kerak.",
       pdf_export_already_queued: "Bu hujjat uchun PDF eksporti allaqachon navbatda turibdi.",
+      unsupported_template_format: "Shablon formati qo‘llab-quvvatlanmaydi. .docx fayl yuklang.",
+      invalid_template_size: "Shablon fayli 1 baytdan 10 MB gacha bo‘lishi kerak.",
       unknown: "Noma’lum xatolik yuz berdi.",
     },
   },
