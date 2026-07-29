@@ -1,38 +1,76 @@
+import { useState } from "react";
+import { CheckCheck, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/shared/components/ui/button";
 import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { Timestamp } from "@/shared/custom/record/timestamp";
 import { SpeakerChip } from "@/shared/custom/record/speaker-chip";
 import { ConfidenceBar } from "@/shared/custom/record/confidence-bar";
+import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { speakerColorClass } from "@/shared/custom/record/speaker-color";
 import { getTranscript } from "@/features/hearings/hearing.service";
+import {
+  validateTranscript,
+  type ValidateTranscriptResult,
+} from "@/features/transcript/transcript.service";
 import { queryKeys } from "@/shared/lib/query/query-keys";
+import { useApiMutation } from "@/shared/lib/query/use-api-mutation";
 import type { ApiError } from "@/shared/lib/http/api-error";
-import type { TranscriptSegment } from "@/shared/types/models";
+import type { Hearing, TranscriptSegment } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
+import type { MessageKey } from "@/shared/lib/i18n/messages";
 import { cn } from "@/shared/lib/utils";
 
 export interface RealTranscriptPanelProps {
-  hearingId: string;
+  hearing: Hearing;
+  /** Called after a successful approve (session-carry update) — wired in a later step. */
+  onHearingChanged: (hearing: Hearing) => void;
   /** Bump to force a refetch (e.g. once the transcribe job succeeds). */
   reloadKey?: number;
 }
 
+const KNOWN_ISSUE_CODES = [
+  "HEARING_NOT_READY_FOR_REVIEW",
+  "TRANSCRIPT_EMPTY",
+  "CANONICAL_TEXT_REQUIRED",
+  "INVALID_SEGMENT_TIMESTAMP",
+  "SPEAKER_MAPPING_REQUIRED",
+] as const;
+
+function issueMessageKey(code: string): MessageKey | undefined {
+  return (KNOWN_ISSUE_CODES as readonly string[]).includes(code)
+    ? (`transcript.issues.${code}` as MessageKey)
+    : undefined;
+}
+
 /**
- * Read-only transcript view over the live `GET /hearings/{id}/transcript`
- * (integration guide §9), loaded once transcription succeeds. Segments are
- * already sorted by `sequenceNo` by `hearing.service.getTranscript`. Editing/
- * verifying/speaker-mapping stay on the mock-backed `TranscriptPanel`
- * (`transcript-panel.tsx`) until integration-06 wires those to the real API.
+ * Real transcript editor over the live `/hearings/{id}/transcript` +
+ * `/transcript-segments` + `/hearings/{id}/transcript/{validate,approve}`
+ * endpoints (integration guide §10, §16 — highest-concurrency surface in the
+ * app). Currently: read-only segment list + pre-approval validation gate.
+ * Segment edit/verify and speaker mapping are wired in a later step; approve
+ * itself (using the hearing's `version` from `use-hearing-session`) in the
+ * step after that.
  */
-export function RealTranscriptPanel({ hearingId, reloadKey }: RealTranscriptPanelProps) {
+export function RealTranscriptPanel({ hearing, reloadKey }: RealTranscriptPanelProps) {
   const { t } = useTranslation();
+  const [validation, setValidation] = useState<ValidateTranscriptResult | null>(null);
+
   const query = useQuery<TranscriptSegment[], ApiError>({
-    queryKey: [...queryKeys.transcript.segments(hearingId), reloadKey],
-    queryFn: () => getTranscript(hearingId),
-    enabled: Boolean(hearingId),
+    queryKey: [...queryKeys.transcript.segments(hearing.id), reloadKey],
+    queryFn: () => getTranscript(hearing.id),
+    enabled: Boolean(hearing.id),
   });
+
+  const validateMutation = useApiMutation<ValidateTranscriptResult, void>({
+    mutationFn: () => validateTranscript(hearing.id),
+    onSuccess: (data) => setValidation(data),
+  });
+
+  const locked = hearing.status === "Approved";
+  const canApprove = !locked && validation?.isValid === true;
 
   if (query.isLoading) return <LoadingState rows={6} />;
   if (query.error) return <ErrorState />;
@@ -41,26 +79,86 @@ export function RealTranscriptPanel({ hearingId, reloadKey }: RealTranscriptPane
   }
 
   return (
-    <ul className="divide-y divide-border rounded-lg border border-border">
-      {query.data.map((s) => (
-        <li key={s.id} className="flex flex-col gap-2 px-4 py-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <Timestamp ms={s.startMs} />
-            <span
-              className={cn(
-                "size-2 shrink-0 rounded-full",
-                speakerColorClass(s.speakerLabel ?? "?")
-              )}
-              aria-hidden="true"
-            />
-            <SpeakerChip label={s.speakerLabel ?? "?"} />
-            <div className="w-24">
-              <ConfidenceBar value={s.confidence ?? 1} />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {locked && (
+          <span className="flex items-center gap-1.5 text-sm text-success">
+            <ShieldCheck className="size-4" />
+            {t("transcript.locked")}
+          </span>
+        )}
+        <div className="ml-auto flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => validateMutation.mutate()}
+            disabled={validateMutation.isPending || locked}
+          >
+            <CheckCheck className="size-4" />
+            {validateMutation.isPending ? t("transcript.validating") : t("transcript.validate")}
+          </Button>
+          <Button
+            size="sm"
+            disabled={!canApprove}
+            title={!canApprove ? t("transcript.approveDisabledInvalid") : undefined}
+          >
+            <CheckCheck className="size-4" />
+            {t("transcript.approveCanonical")}
+          </Button>
+        </div>
+      </div>
+
+      {validation && (
+        <div
+          className={cn(
+            "rounded-lg border px-4 py-3 text-sm",
+            validation.isValid
+              ? "border-success/40 bg-success/10 text-success"
+              : "border-destructive/40 bg-destructive/10 text-destructive"
+          )}
+        >
+          {validation.isValid ? (
+            t("transcript.valid")
+          ) : (
+            <div className="flex flex-col gap-1">
+              <p className="font-medium">{t("transcript.issuesTitle")}</p>
+              <ul className="list-inside list-disc">
+                {validation.issues.map((issue, i) => {
+                  const key = issueMessageKey(issue.code);
+                  return (
+                    <li key={`${issue.code}-${i}`}>
+                      {key ? t(key) : (issue.message ?? issue.code)}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-          </div>
-          <p className="text-sm text-foreground">{s.canonicalText}</p>
-        </li>
-      ))}
-    </ul>
+          )}
+        </div>
+      )}
+
+      <ul className="divide-y divide-border rounded-lg border border-border">
+        {query.data.map((s) => (
+          <li key={s.id} className="flex flex-col gap-2 px-4 py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Timestamp ms={s.startMs} />
+              <span
+                className={cn(
+                  "size-2 shrink-0 rounded-full",
+                  speakerColorClass(s.speakerLabel ?? "?")
+                )}
+                aria-hidden="true"
+              />
+              <SpeakerChip label={s.speakerLabel ?? "?"} />
+              <RecordStateBadge kind="segment" status={s.status} />
+              <div className="w-24">
+                <ConfidenceBar value={s.confidence ?? 1} />
+              </div>
+            </div>
+            <p className="text-sm text-foreground">{s.canonicalText}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
