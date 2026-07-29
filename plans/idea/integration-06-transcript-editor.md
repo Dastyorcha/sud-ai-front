@@ -74,7 +74,7 @@ TRANSCRIPT_LOCKED`). Handle `400 TRANSCRIPT_VALIDATION_FAILED`,
 4. [x] Wire validate + gate Approve on `isValid`; render issues — `feat: transcript validation gate`
 5. [x] Wire approve using hearing version from session — `feat: transcript approve with hearing version`
 6. [x] Wire panel UI to all of the above; concurrency + locked UX — `feat: transcript editor live wiring`
-7. [ ] docs: sync `docs/codemap.md` — `docs: sync transcript editor service`
+7. [x] docs: sync `docs/codemap.md` — `docs: sync transcript editor service`
 
 ## Risks / ripple / escalation
 
