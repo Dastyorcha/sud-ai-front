@@ -1,6 +1,6 @@
 # Integration 09 — Audit logs
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** small
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §13 (audit logs)
@@ -44,11 +44,11 @@ before, after, requestId, createdAt }`. **`before`/`after` are nullable JSON
 
 ## Steps
 
-1. [ ] Align `AuditLog` type to guide response — `refactor: align audit log type to api`
-2. [ ] Add `audit.service.ts` (filters + paging, `total` envelope) — `feat: audit log service`
-3. [ ] Add `use-audit-logs.ts` — `feat: audit logs hook`
-4. [ ] Wire admin audit table + filters + safe before/after parse — `feat: live audit log table`
-5. [ ] docs: sync `docs/codemap.md` — `docs: sync audit service`
+1. [x] Align `AuditLog` type to guide response — `refactor: align audit log type to api`
+2. [x] Add `audit.service.ts` (filters + paging, `total` envelope) — `feat: audit log service`
+3. [x] Add `use-audit-logs.ts` — `feat: audit logs hook`
+4. [x] Wire admin audit table + filters + safe before/after parse — `feat: live audit log table`
+5. [x] docs: sync `docs/codemap.md` — `docs: sync audit service`
 
 ## Risks / ripple / escalation
 
