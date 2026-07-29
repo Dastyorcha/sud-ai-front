@@ -22,13 +22,22 @@ export type SortDirection = (typeof SORT_DIRECTION)[keyof typeof SORT_DIRECTION]
 
 /* ────────────────────────────────────────────────────────────────────────
  * LexKotib AI — court-domain enums (spec §14, FR-08, FR-11, §4).
- * Enum VALUES keep the specification's exact UPPER_SNAKE casing and are never
- * translated in code — only at display time via `t(\`enums.*.${value}\`)`.
- * Some value sets (case/court type, statuses) are provisional until the legal
- * expert freezes them; treated as stable technical values regardless.
+ * Enum VALUES below either keep the mock layer's UPPER_SNAKE casing (where a
+ * genuinely mock-only consumer still needs them, documented per-enum) or
+ * store the real API's canonical PascalCase (integration guide §4) where the
+ * enum is on the real API path. Never translated in code — only at display
+ * time via `t(\`enums.*.${value}\`)`.
  * ──────────────────────────────────────────────────────────────────────── */
 
-/** Application roles (spec §4). Distinct from the template's example USER_ROLE. */
+/**
+ * Application roles (spec §4) — mock-only now. The real session's five API
+ * roles (guide §2/§7.4) live in `shared/constants/court-permissions.ts` as
+ * `API_ROLE`/`ApiRole` (a prior plan already reconciled auth to that
+ * PascalCase set independently of this enum). `COURT_ROLE` stays UPPER_SNAKE
+ * for the mock `CourtUser` fixtures (`shared/lib/mock-api/data/court-users.ts`)
+ * still read by `vocabulary-panel.tsx`/`case-detail.tsx`/`case-new.tsx`'s
+ * judge picker (no judge-list endpoint exists, guide §17).
+ */
 export const COURT_ROLE = {
   ADMIN: "ADMIN",
   CLERK: "CLERK",
@@ -64,10 +73,23 @@ export const CASE_TYPE = {
 } as const;
 export type CaseType = (typeof CASE_TYPE)[keyof typeof CASE_TYPE];
 
-/** Lifecycle of a court case (spec FR-02). */
+/**
+ * Lifecycle of a court case (integration guide §4/§8). `CourtCase.status`
+ * (`shared/types/models.ts`) is one shared field type used by both the real
+ * `features/cases/case.service.ts` (`Draft`…`Archived`, PascalCase) and the
+ * mock `shared/lib/mock-api/court-case.service.ts` (`ACTIVE`/`ARCHIVED`,
+ * UPPER_SNAKE — kept deliberately for `views/cases/case-new.tsx`, superseded
+ * by the real `widgets/new-case-wizard` but still reachable). Both sets are
+ * genuinely live side by side.
+ */
 export const CASE_STATUS = {
   ACTIVE: "ACTIVE",
   ARCHIVED: "ARCHIVED",
+  // Real API values (guide §8).
+  Draft: "Draft",
+  Active: "Active",
+  Completed: "Completed",
+  Archived: "Archived",
 } as const;
 export type CaseStatus = (typeof CASE_STATUS)[keyof typeof CASE_STATUS];
 
@@ -87,30 +109,36 @@ export const CASE_STAGE = {
 } as const;
 export type CaseStage = (typeof CASE_STAGE)[keyof typeof CASE_STAGE];
 
-/** Procedural role of a participant (spec §9.6, §11.2). */
+/**
+ * Procedural role of a participant (integration guide §4/§8). Real-API-only
+ * type — `features/participants/participant.service.ts` and the case-create
+ * wizard are the only producers/consumers — so this stores the canonical
+ * PascalCase values with no mock-only alternates.
+ */
 export const PARTICIPANT_ROLE = {
-  JUDGE: "JUDGE",
-  CLERK: "CLERK",
-  CLAIMANT: "CLAIMANT",
-  CLAIMANT_REPRESENTATIVE: "CLAIMANT_REPRESENTATIVE",
-  DEFENDANT: "DEFENDANT",
-  DEFENDANT_REPRESENTATIVE: "DEFENDANT_REPRESENTATIVE",
-  THIRD_PARTY: "THIRD_PARTY",
-  WITNESS: "WITNESS",
-  EXPERT: "EXPERT",
-  INTERPRETER: "INTERPRETER",
-  PROSECUTOR: "PROSECUTOR",
-  OTHER: "OTHER",
+  Judge: "Judge",
+  Secretary: "Secretary",
+  Claimant: "Claimant",
+  ClaimantRepresentative: "ClaimantRepresentative",
+  Defendant: "Defendant",
+  DefendantRepresentative: "DefendantRepresentative",
+  Witness: "Witness",
+  Expert: "Expert",
+  Interpreter: "Interpreter",
+  Other: "Other",
 } as const;
 export type ParticipantRole = (typeof PARTICIPANT_ROLE)[keyof typeof PARTICIPANT_ROLE];
 
 /**
  * Hearing / session state machine (spec §17.3, FR-03). `CREATED`…`FAILED`
- * (UPPER_SNAKE) are the mock layer's values, still used by the demo-only
- * live/protocol/events flows. `Created`…`Failed` (PascalCase) are the real
- * API's values (integration guide §9) driven by `features/hearings/hearing.service.ts`
- * — additive, not a rename, so both layers type-check side by side until
- * integration-11 reconciles casing and deletes the mock layer.
+ * (UPPER_SNAKE) are the mock layer's values — kept deliberately: there's no
+ * `GET /hearings` list/detail endpoint (guide §17), so
+ * `features/hearings/use-hearings.ts` and the `protocol-workspace`/
+ * `live-session` widgets stay on `shared/lib/mock-api/hearing.service.ts`.
+ * `Created`…`Failed` (PascalCase) are the real API's values (integration
+ * guide §9/§10) driven by `features/hearings/hearing.service.ts` and
+ * rendered on the real hearing-detail route. Both sets are genuinely live
+ * side by side — this isn't a temporary shim.
  */
 export const HEARING_STATUS = {
   CREATED: "CREATED",
@@ -122,14 +150,15 @@ export const HEARING_STATUS = {
   READY_FOR_REVIEW: "READY_FOR_REVIEW",
   APPROVED: "APPROVED",
   FAILED: "FAILED",
-  // Real API values (guide §9) — no DeviceCheck/Paused transition endpoints
-  // yet (guide §17), so the real hearing flow never programmatically sets
-  // those two, but they're listed for completeness/exhaustiveness.
+  // Real API values (guide §9/§10) — no DeviceCheck/Paused transition
+  // endpoints yet (guide §17), so the real hearing flow never
+  // programmatically sets those two, but they're listed for completeness.
   Created: "Created",
   DeviceCheck: "DeviceCheck",
   Recording: "Recording",
   Paused: "Paused",
   Finalizing: "Finalizing",
+  Processing: "Processing",
   RealFailed: "Failed",
   // Real API values reached only once transcript review/approve exist
   // (integration-06, guide §10) — `ReadyForReview` is the state the
@@ -144,8 +173,11 @@ export type HearingStatus = (typeof HEARING_STATUS)[keyof typeof HEARING_STATUS]
  * Review state of a transcript segment across the layered pipeline (spec
  * §10.1). `INTERIM`…`VERIFIED` (UPPER_SNAKE) are the mock layer's values.
  * `Raw`…`Canonical` (PascalCase) are the real API's values (guide §10,
- * integration-06) — additive, not a rename, so both layers type-check side
- * by side until integration-11 reconciles casing and deletes the mock layer.
+ * integration-06). Both sets are genuinely live side by side: mock fixture
+ * segments (`shared/lib/mock-api/data/transcript-segments.ts`, consumed by
+ * the demo `speakers-panel`/`transcript-panel`) use `INTERIM`…`VERIFIED`;
+ * `features/transcript/transcript.service.ts` (the real transcript editor)
+ * returns `Raw`…`Canonical`.
  */
 export const SEGMENT_STATUS = {
   INTERIM: "INTERIM",
@@ -161,31 +193,13 @@ export const SEGMENT_STATUS = {
 export type SegmentStatus = (typeof SEGMENT_STATUS)[keyof typeof SEGMENT_STATUS];
 
 /**
- * The 17 procedural event types (spec FR-08), UPPER_SNAKE — the mock layer's
- * values. `HearingOpened`…`Other` (PascalCase, 14) are the real API's
- * canonical taxonomy (integration guide §11) — additive, not a rename, so
- * both layers type-check side by side until integration-11 reconciles casing
- * and deletes the mock layer. Order is the canonical taxonomy order.
+ * The 14-value canonical procedural event taxonomy (integration guide §11).
+ * Real-API-only type — `features/events/event.service.ts` is the sole
+ * producer/consumer (the mock `shared/lib/mock-api/event.service.ts` and its
+ * fixture were deleted in integration-11 once nothing imported them), so
+ * this stores the canonical PascalCase values with no mock-only alternates.
  */
 export const PROCEDURAL_EVENT_TYPE = {
-  HEARING_OPENED: "HEARING_OPENED",
-  IDENTITY_VERIFIED: "IDENTITY_VERIFIED",
-  RIGHTS_EXPLAINED: "RIGHTS_EXPLAINED",
-  CLAIM_EXPLAINED: "CLAIM_EXPLAINED",
-  RESPONSE_GIVEN: "RESPONSE_GIVEN",
-  OBJECTION_RAISED: "OBJECTION_RAISED",
-  MOTION_SUBMITTED: "MOTION_SUBMITTED",
-  MOTION_DISCUSSION: "MOTION_DISCUSSION",
-  EVIDENCE_SUBMITTED: "EVIDENCE_SUBMITTED",
-  EVIDENCE_EXAMINED: "EVIDENCE_EXAMINED",
-  QUESTION_ASKED: "QUESTION_ASKED",
-  ANSWER_GIVEN: "ANSWER_GIVEN",
-  BREAK_ANNOUNCED: "BREAK_ANNOUNCED",
-  HEARING_POSTPONED: "HEARING_POSTPONED",
-  RULING_ANNOUNCED: "RULING_ANNOUNCED",
-  HEARING_CLOSED: "HEARING_CLOSED",
-  OTHER: "OTHER",
-  // Real API values (guide §11) — the 14-value canonical taxonomy.
   HearingOpened: "HearingOpened",
   IdentityVerified: "IdentityVerified",
   RightsExplained: "RightsExplained",
@@ -199,24 +213,21 @@ export const PROCEDURAL_EVENT_TYPE = {
   HearingPostponed: "HearingPostponed",
   RulingAnnounced: "RulingAnnounced",
   HearingClosed: "HearingClosed",
-  RealOther: "Other",
+  Other: "Other",
 } as const;
 export type ProceduralEventType =
   (typeof PROCEDURAL_EVENT_TYPE)[keyof typeof PROCEDURAL_EVENT_TYPE];
 
 /**
- * Human review state of an extracted procedural event (spec §11, §14.7).
- * `PENDING_REVIEW`…`REJECTED` are the mock layer's values. `Draft`/`Verified`
- * (real API, guide §11) are additive alongside them until integration-11
- * reconciles casing and deletes the mock layer.
+ * Human review state of an extracted procedural event (integration guide
+ * §11). Real-API-only type — `features/events/event.service.ts` is the sole
+ * producer/consumer — so this stores the canonical `Draft`/`Verified` values
+ * with no mock-only alternates (the mock layer's `PENDING_REVIEW`/`REJECTED`
+ * were dropped along with the deleted mock event service).
  */
 export const EVENT_REVIEW_STATUS = {
-  PENDING_REVIEW: "PENDING_REVIEW",
-  VERIFIED: "VERIFIED",
-  REJECTED: "REJECTED",
-  // Real API values (guide §11).
   Draft: "Draft",
-  RealVerified: "Verified",
+  Verified: "Verified",
 } as const;
 export type EventReviewStatus = (typeof EVENT_REVIEW_STATUS)[keyof typeof EVENT_REVIEW_STATUS];
 
@@ -239,7 +250,8 @@ export type CriticalFieldType = (typeof CRITICAL_FIELD_TYPE)[keyof typeof CRITIC
  * Kinds of generated document (spec §13.1). Each sits behind a feature flag.
  * `HearingProtocol` (PascalCase) is the real API's only implemented value so
  * far (integration guide §12 `POST /cases/{id}/documents/generate`) —
- * additive alongside the mock layer's UPPER_SNAKE values.
+ * genuinely additive alongside the mock layer's UPPER_SNAKE values (see
+ * `DOCUMENT_STATUS` above for why the mock layer stays).
  */
 export const DOCUMENT_TYPE = {
   HEARING_PROTOCOL: "HEARING_PROTOCOL",
@@ -253,12 +265,16 @@ export type DocumentType = (typeof DOCUMENT_TYPE)[keyof typeof DOCUMENT_TYPE];
 
 /**
  * Approval workflow statuses (spec FR-11). `DRAFT`…`ARCHIVED` (UPPER_SNAKE)
- * are the mock layer's values. `Draft`…`Exported` (PascalCase) are the real
- * API's values (integration guide §12) — additive, not a rename, so both
- * layers type-check side by side until integration-11 reconciles casing and
- * deletes the mock layer. The real workflow has no `AI_GENERATED`/`ARCHIVED`
- * step — generation lands straight in `Draft`, and there's no archive
- * transition yet (guide §17).
+ * are the mock layer's values — kept deliberately: `documents-workspace`/
+ * `document-editor`/`template-selector` have no case-level document-list
+ * endpoint to migrate to (guide §17), so they stay on
+ * `shared/lib/mock-api/document.service.ts`. `Draft`…`Exported` (PascalCase)
+ * are the real API's values (integration guide §12), returned by
+ * `features/documents/document.service.ts` (wired into the hearing-scoped
+ * `features/protocol/protocol-panel.tsx`). Both sets are genuinely live side
+ * by side. The real workflow has no `AI_GENERATED`/`ARCHIVED` step —
+ * generation lands straight in `Draft`, and there's no archive transition
+ * yet (guide §17).
  */
 export const DOCUMENT_STATUS = {
   DRAFT: "DRAFT",
@@ -285,7 +301,14 @@ export const TEMPLATE_STATUS = {
 } as const;
 export type TemplateStatus = (typeof TEMPLATE_STATUS)[keyof typeof TEMPLATE_STATUS];
 
-/** Background job lifecycle (spec §15 Jobs; exact values deferred to backend, D-09). */
+/**
+ * Background job lifecycle (spec §15 Jobs) — mock-only now
+ * (`shared/lib/mock-api/job.service.ts`, still driving the demo `live-session`/
+ * `protocol-workspace` finalize flow via `shared/hooks/use-job.ts`). The real
+ * job poller (`shared/lib/query/use-job-polling.ts`, guide §9/§12) defines
+ * its own local `Queued | Processing | Succeeded | Failed` `JobStatus` type
+ * instead of importing this one, so no reconciliation is needed here.
+ */
 export const JOB_STATUS = {
   QUEUED: "QUEUED",
   RUNNING: "RUNNING",

@@ -55,6 +55,7 @@ const HEARING_TONES: Record<HearingStatus, Tone> = {
   Recording: "destructive",
   Paused: "warning",
   Finalizing: "info",
+  Processing: "info",
   Failed: "destructive",
   ReadyForReview: "primary",
   Approved: "success",

@@ -694,10 +694,10 @@ export default function ToolsPage() {
               <h3 className="text-lg font-bold text-foreground mb-3">Speaker chip</h3>
               <div className="flex flex-wrap items-center gap-3">
                 <SpeakerChip label="SPEAKER_02" />
-                <SpeakerChip label="SPEAKER_01" roleLabel={t("enums.participantRole.JUDGE")} />
+                <SpeakerChip label="SPEAKER_01" roleLabel={t("enums.participantRole.Judge")} />
                 <SpeakerChip
                   label="SPEAKER_03"
-                  roleLabel={t("enums.participantRole.CLAIMANT_REPRESENTATIVE")}
+                  roleLabel={t("enums.participantRole.ClaimantRepresentative")}
                   conflicting
                 />
               </div>
@@ -738,11 +738,11 @@ export default function ToolsPage() {
                   playheadMs={862_000}
                   visibleRange={{ startMs: 700_000, endMs: 1_100_000 }}
                   events={[
-                    { id: "e1", atMs: 60_000, type: "HEARING_OPENED", verified: true },
-                    { id: "e2", atMs: 300_000, type: "RIGHTS_EXPLAINED", verified: true },
-                    { id: "e3", atMs: 862_000, type: "MOTION_SUBMITTED", verified: false },
-                    { id: "e4", atMs: 1_500_000, type: "EVIDENCE_EXAMINED", verified: false },
-                    { id: "e5", atMs: 1_980_000, type: "HEARING_CLOSED", verified: true },
+                    { id: "e1", atMs: 60_000, type: "HearingOpened", verified: true },
+                    { id: "e2", atMs: 300_000, type: "RightsExplained", verified: true },
+                    { id: "e3", atMs: 862_000, type: "MotionSubmitted", verified: false },
+                    { id: "e4", atMs: 1_500_000, type: "ObjectionRaised", verified: false },
+                    { id: "e5", atMs: 1_980_000, type: "HearingClosed", verified: true },
                   ]}
                   onSeek={() => undefined}
                 />

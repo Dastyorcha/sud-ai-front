@@ -162,7 +162,7 @@ export default function CaseDetailView() {
     courtCase.claimantName && courtCase.defendantName
       ? `${courtCase.claimantName} ${t("cases.vs")} ${courtCase.defendantName}`
       : null;
-  const isArchived = courtCase.status === "ARCHIVED";
+  const isArchived = courtCase.status === "Archived";
   const canManageParticipants = can("participant.edit") && !isArchived;
   const canArchive = can("case.archive") && !isArchived;
 

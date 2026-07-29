@@ -155,7 +155,7 @@ export function EventsPanel({ hearing }: EventsPanelProps) {
                 <div className="w-20">
                   <ConfidenceBar value={e.confidence} />
                 </div>
-                {e.reviewStatus === "Verified" || e.reviewStatus === "VERIFIED" ? (
+                {e.reviewStatus === "Verified" ? (
                   <StatusBadge label={t("transcript.verified")} tone="success" />
                 ) : (
                   <StatusBadge label={t("events.draft")} tone="warning" />
@@ -165,7 +165,7 @@ export function EventsPanel({ hearing }: EventsPanelProps) {
                     <Pencil className="size-4" />
                     {t("transcript.edit")}
                   </Button>
-                  {e.reviewStatus !== "Verified" && e.reviewStatus !== "VERIFIED" && (
+                  {e.reviewStatus !== "Verified" && (
                     <Button
                       size="sm"
                       variant="ghost"

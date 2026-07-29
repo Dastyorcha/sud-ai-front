@@ -31,6 +31,7 @@ const TRANSITIONS: Record<HearingStatus, HearingStatus[]> = {
   Recording: [],
   Paused: [],
   Finalizing: [],
+  Processing: [],
   Failed: [],
   ReadyForReview: [],
   Approved: [],

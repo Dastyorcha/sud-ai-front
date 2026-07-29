@@ -201,11 +201,11 @@ export interface TranscriptSegment {
  * contract violation the UI must surface as an error, never render as data.
  * Fields through `createdAt` mirror the real `ProceduralEventResponse`
  * (integration guide §11) exactly — that's what
- * `features/events/event.service.ts` returns. `version` is present (guide
- * §16 optimistic concurrency) for real events; `undefined` for the mock
- * layer's (`shared/lib/mock-api/event.service.ts`), which doesn't model it.
- * The fields below `createdAt` are mock-layer-only additions with no live-API
- * equivalent — `undefined` for real events.
+ * `features/events/event.service.ts` (the sole producer/consumer since
+ * integration-11 deleted the unused mock event service) returns. `version` is
+ * present (guide §16 optimistic concurrency) on every event.
+ * The fields below `createdAt` are legacy mockup-only additions with no
+ * live-API equivalent — always `undefined` now.
  */
 export interface ProceduralEvent {
   id: string;

@@ -51,7 +51,7 @@ export function ParticipantFormDialog({
   const { t } = useTranslation();
   const [displayName, setDisplayName] = useState("");
   const [organizationName, setOrganizationName] = useState("");
-  const [role, setRole] = useState<ParticipantRole>("CLAIMANT");
+  const [role, setRole] = useState<ParticipantRole>("Claimant");
   const createMutation = useCreateParticipant(caseId);
   const updateMutation = useUpdateParticipant(caseId);
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -60,7 +60,7 @@ export function ParticipantFormDialog({
   useEffect(() => {
     setDisplayName(participant?.displayName ?? "");
     setOrganizationName(participant?.organizationName ?? "");
-    setRole(participant?.role ?? "CLAIMANT");
+    setRole(participant?.role ?? "Claimant");
   }, [participant, open]);
 
   async function handleSave() {

@@ -22,8 +22,8 @@ import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 
 const REPRESENTATIVE_ROLE_VALUES = [
-  PARTICIPANT_ROLE.CLAIMANT_REPRESENTATIVE,
-  PARTICIPANT_ROLE.DEFENDANT_REPRESENTATIVE,
+  PARTICIPANT_ROLE.ClaimantRepresentative,
+  PARTICIPANT_ROLE.DefendantRepresentative,
 ] as const;
 
 /** Step 2: claimant, defendant and an optional representative (mockup-03). */
