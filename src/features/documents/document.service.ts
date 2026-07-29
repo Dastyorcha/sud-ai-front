@@ -9,6 +9,7 @@
  * dropping `sources` breaks server-side approval.
  */
 import { apiClient } from "@/shared/lib/http/api-client";
+import { ApiError } from "@/shared/lib/http/api-error";
 import { API_PREFIX } from "@/shared/config/env";
 import type { DocumentContent, GeneratedDocument } from "@/shared/types/models";
 import type { DocumentStatus, DocumentType } from "@/shared/types/enums";
@@ -132,4 +133,72 @@ export async function updateDocumentContent(
     input
   );
   return toDocument(data);
+}
+
+/**
+ * Reads a non-2xx blob response's body as a `ProblemDetails` and builds the
+ * matching `ApiError` (guide §12 design notes — a blob response never parses
+ * as JSON through the normal interceptor, since axios hands back a `Blob`,
+ * not the parsed body). Falls back to a status-derived code if the body isn't
+ * JSON (e.g. an empty 401/403).
+ */
+async function parseBlobError(
+  status: number,
+  requestId: string | undefined,
+  blob: Blob
+): Promise<ApiError> {
+  try {
+    const text = await blob.text();
+    const body = text
+      ? (JSON.parse(text) as { code?: string; title?: string; detail?: string })
+      : {};
+    if (typeof body.code === "string" && body.code.length > 0) {
+      return new ApiError({
+        status,
+        code: body.code,
+        title: body.title,
+        detail: body.detail,
+        requestId,
+      });
+    }
+  } catch {
+    // Not JSON — fall through to a status-derived fallback below.
+  }
+  const fallback =
+    status === 404
+      ? "not_found"
+      : status === 409
+        ? "conflict"
+        : status >= 500
+          ? "server_error"
+          : "unknown";
+  return new ApiError({ status, code: fallback, requestId });
+}
+
+/**
+ * Downloads the generated DOCX (guide §12 `GET /documents/{id}/download`) as
+ * a same-origin blob, then triggers a browser download and revokes the
+ * object URL. Uses `validateStatus: () => true` so a non-2xx response still
+ * resolves with its `Blob` body (rather than rejecting through the JSON-only
+ * error interceptor) — see `parseBlobError`. Handles `409 DOCX_NOT_READY`.
+ */
+export async function downloadDocument(documentId: string, fileName: string): Promise<void> {
+  const response = await apiClient.get<Blob>(`${API_PREFIX}/documents/${documentId}/download`, {
+    responseType: "blob",
+    validateStatus: () => true,
+  });
+
+  if (response.status < 200 || response.status >= 300) {
+    const requestId = response.headers["x-request-id"] as string | undefined;
+    throw await parseBlobError(response.status, requestId, response.data);
+  }
+
+  const url = URL.createObjectURL(response.data);
+  const anchor = window.document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  window.document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }

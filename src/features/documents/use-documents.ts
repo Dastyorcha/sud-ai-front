@@ -5,6 +5,7 @@ import { listDocuments } from "@/shared/lib/mock-api/document.service";
 import { queryKeys } from "@/shared/lib/query/query-keys";
 import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/use-api-mutation";
 import {
+  downloadDocument,
   generateDocument,
   getDocument,
   updateDocumentContent,
@@ -103,5 +104,14 @@ export function useUpdateDocumentContent(
   return useApiMutation({
     mutationFn: (input) => updateDocumentContent(documentId, input),
     invalidateKeys: [queryKeys.documents.detail(documentId)],
+  });
+}
+
+/** Downloads a document's generated DOCX (guide §12 `GET /documents/{id}/download`) — see `downloadDocument`. */
+export function useDownloadDocument(
+  documentId: string
+): UseApiMutationResult<void, { fileName: string }> {
+  return useApiMutation({
+    mutationFn: ({ fileName }) => downloadDocument(documentId, fileName),
   });
 }
