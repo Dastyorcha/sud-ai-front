@@ -12,7 +12,9 @@ import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { speakerColorClass } from "@/shared/custom/record/speaker-color";
 import { getTranscript } from "@/features/hearings/hearing.service";
 import {
+  approveTranscript,
   validateTranscript,
+  type ApproveTranscriptResult,
   type ValidateTranscriptResult,
 } from "@/features/transcript/transcript.service";
 import { queryKeys } from "@/shared/lib/query/query-keys";
@@ -25,7 +27,7 @@ import { cn } from "@/shared/lib/utils";
 
 export interface RealTranscriptPanelProps {
   hearing: Hearing;
-  /** Called after a successful approve (session-carry update) — wired in a later step. */
+  /** Called after a successful approve, so the session carry (and the tab header badge) picks up the new status/version. */
   onHearingChanged: (hearing: Hearing) => void;
   /** Bump to force a refetch (e.g. once the transcribe job succeeds). */
   reloadKey?: number;
@@ -49,12 +51,16 @@ function issueMessageKey(code: string): MessageKey | undefined {
  * Real transcript editor over the live `/hearings/{id}/transcript` +
  * `/transcript-segments` + `/hearings/{id}/transcript/{validate,approve}`
  * endpoints (integration guide §10, §16 — highest-concurrency surface in the
- * app). Currently: read-only segment list + pre-approval validation gate.
- * Segment edit/verify and speaker mapping are wired in a later step; approve
- * itself (using the hearing's `version` from `use-hearing-session`) in the
- * step after that.
+ * app). Currently: read-only segment list, pre-approval validation gate, and
+ * approve itself (using the **hearing's** `version` from `use-hearing-session`,
+ * not a segment version — guide §10). Segment edit/verify and speaker
+ * mapping are wired in a later step.
  */
-export function RealTranscriptPanel({ hearing, reloadKey }: RealTranscriptPanelProps) {
+export function RealTranscriptPanel({
+  hearing,
+  onHearingChanged,
+  reloadKey,
+}: RealTranscriptPanelProps) {
   const { t } = useTranslation();
   const [validation, setValidation] = useState<ValidateTranscriptResult | null>(null);
 
@@ -69,8 +75,23 @@ export function RealTranscriptPanel({ hearing, reloadKey }: RealTranscriptPanelP
     onSuccess: (data) => setValidation(data),
   });
 
+  const approveMutation = useApiMutation<ApproveTranscriptResult, void>({
+    mutationFn: () => approveTranscript(hearing.id, { expectedVersion: hearing.version ?? 0 }),
+    invalidateKeys: [queryKeys.transcript.segments(hearing.id)],
+    onSuccess: (data) =>
+      onHearingChanged({ ...hearing, status: data.status, version: data.version }),
+  });
+
   const locked = hearing.status === "Approved";
-  const canApprove = !locked && validation?.isValid === true;
+  const hasVersion = hearing.version !== undefined;
+  const canApprove = !locked && hasVersion && validation?.isValid === true;
+  const approveDisabledReason = locked
+    ? undefined
+    : !hasVersion
+      ? t("transcript.sessionVersionMissing")
+      : validation?.isValid !== true
+        ? t("transcript.approveDisabledInvalid")
+        : undefined;
 
   if (query.isLoading) return <LoadingState rows={6} />;
   if (query.error) return <ErrorState />;
@@ -99,14 +120,19 @@ export function RealTranscriptPanel({ hearing, reloadKey }: RealTranscriptPanelP
           </Button>
           <Button
             size="sm"
-            disabled={!canApprove}
-            title={!canApprove ? t("transcript.approveDisabledInvalid") : undefined}
+            disabled={!canApprove || approveMutation.isPending}
+            title={approveDisabledReason}
+            onClick={() => approveMutation.mutate()}
           >
             <CheckCheck className="size-4" />
             {t("transcript.approveCanonical")}
           </Button>
         </div>
       </div>
+
+      {!locked && !hasVersion && (
+        <p className="text-sm text-destructive">{t("transcript.sessionVersionMissing")}</p>
+      )}
 
       {validation && (
         <div
