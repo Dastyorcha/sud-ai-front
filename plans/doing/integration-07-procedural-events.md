@@ -1,6 +1,6 @@
 # Integration 07 — Procedural events
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §11 (procedural events), §16 (concurrency)
@@ -61,11 +61,11 @@ reason? }`. Editing resets `reviewStatus` to `Draft`. Unsent fields unchanged;
 
 ## Steps
 
-1. [ ] Align `ProceduralEvent` type to guide response — `refactor: align procedural event type to api`
-2. [ ] Add `event.service.ts` (extract/list/patch/verify) — `feat: procedural event service`
-3. [ ] Add `use-events.ts` (list + mutations + invalidation) — `feat: events hooks over live api`
-4. [ ] Wire `events-panel` extract/edit/verify; enforce source range + ruling rules in UI — `feat: events panel live wiring`
-5. [ ] docs: sync `docs/codemap.md` — `docs: sync procedural event service`
+1. [x] Align `ProceduralEvent` type to guide response — `refactor: align procedural event type to api`
+2. [x] Add `event.service.ts` (extract/list/patch/verify) — `feat: procedural event service`
+3. [x] Add `use-events.ts` (list + mutations + invalidation) — `feat: events hooks over live api`
+4. [x] Wire `events-panel` extract/edit/verify; enforce source range + ruling rules in UI — `feat: events panel live wiring`
+5. [x] docs: sync `docs/codemap.md` — `docs: sync procedural event service`
 
 ## Risks / ripple / escalation
 
