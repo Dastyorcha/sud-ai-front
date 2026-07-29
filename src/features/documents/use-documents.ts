@@ -7,18 +7,21 @@ import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/us
 import {
   approveDocument,
   downloadDocument,
+  exportDocument,
   generateDocument,
   getDocument,
+  listDocumentVersions,
   requestDocumentChanges,
   submitDocumentReview,
   updateDocumentContent,
   type DocumentVersionGate,
+  type ExportDocumentAccepted,
   type GenerateDocumentAccepted,
   type GenerateDocumentInput,
   type RequestDocumentChangesInput,
   type UpdateDocumentContentInput,
 } from "@/features/documents/document.service";
-import type { GeneratedDocument } from "@/shared/types/models";
+import type { DocumentVersionHistoryEntry, GeneratedDocument } from "@/shared/types/models";
 
 export type UseDocumentsResult = UseMockQueryResult<GeneratedDocument[]>;
 
@@ -191,5 +194,25 @@ export function useApproveDocument(
   return useApiMutation({
     mutationFn: (input) => approveDocument(documentId, input),
     invalidateKeys: [queryKeys.documents.detail(documentId)],
+  });
+}
+
+/** Queues the PDF export job (guide §12 `POST /documents/{id}/export`) — poll the returned `jobId` with `useJobPolling`. */
+export function useExportDocument(
+  documentId: string
+): UseApiMutationResult<ExportDocumentAccepted, DocumentVersionGate> {
+  return useApiMutation({
+    mutationFn: (input) => exportDocument(documentId, input),
+  });
+}
+
+/** A document's change history, newest-first (guide §12 `GET /documents/{id}/versions`). */
+export function useDocumentVersions(
+  documentId: string | null | undefined
+): UseQueryResult<DocumentVersionHistoryEntry[]> {
+  return useQuery({
+    queryKey: queryKeys.documents.versions(documentId ?? ""),
+    queryFn: () => listDocumentVersions(documentId as string),
+    enabled: Boolean(documentId),
   });
 }

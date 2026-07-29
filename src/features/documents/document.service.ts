@@ -11,7 +11,11 @@
 import { apiClient } from "@/shared/lib/http/api-client";
 import { ApiError } from "@/shared/lib/http/api-error";
 import { API_PREFIX } from "@/shared/config/env";
-import type { DocumentContent, GeneratedDocument } from "@/shared/types/models";
+import type {
+  DocumentContent,
+  DocumentVersionHistoryEntry,
+  GeneratedDocument,
+} from "@/shared/types/models";
 import type { DocumentStatus, DocumentType } from "@/shared/types/enums";
 
 /** `DocumentResponse` (guide §12) — the exact live shape returned by GET/PATCH/lifecycle endpoints. */
@@ -194,6 +198,43 @@ export async function approveDocument(
     input
   );
   return toDocument(data);
+}
+
+/** `202` response of `POST /documents/{id}/export` (guide §12). */
+export interface ExportDocumentAccepted {
+  jobId: string;
+}
+
+/**
+ * Queues the PDF export (guide §12 `POST /documents/{id}/export`, `202`) —
+ * only from `Approved`. Poll the returned `jobId` with `useJobPolling`, then
+ * re-`getDocument` — on success `status` becomes `Exported` and
+ * `pdfStorageKey` is set (no download endpoint for it, guide §17 — surface
+ * the exported state only). Handles `409 DOCUMENT_NOT_APPROVED`,
+ * `409 PDF_EXPORT_ALREADY_QUEUED`, concurrency.
+ */
+export async function exportDocument(
+  documentId: string,
+  input: DocumentVersionGate
+): Promise<ExportDocumentAccepted> {
+  const { data } = await apiClient.post<ExportDocumentAccepted>(
+    `${API_PREFIX}/documents/${documentId}/export`,
+    input
+  );
+  return data;
+}
+
+/**
+ * Reads a document's change history (guide §12 `GET /documents/{id}/versions`),
+ * newest-first — render `changeType`/`reason`/`status` per entry.
+ */
+export async function listDocumentVersions(
+  documentId: string
+): Promise<DocumentVersionHistoryEntry[]> {
+  const { data } = await apiClient.get<DocumentVersionHistoryEntry[]>(
+    `${API_PREFIX}/documents/${documentId}/versions`
+  );
+  return data;
 }
 
 /**

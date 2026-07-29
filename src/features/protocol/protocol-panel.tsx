@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, Download, FileText, Save, Send, Sparkles } from "lucide-react";
+import { Check, Download, FileText, Save, Send, Sparkles, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { Progress } from "@/shared/components/ui/progress";
@@ -23,12 +23,15 @@ import { LoadingState } from "@/shared/custom/loading-state";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
+import { DateText } from "@/shared/custom/date-text";
 import { useCourtAuth } from "@/features/auth/use-court-auth";
 import { useActiveTemplates } from "@/features/documents/use-templates";
 import {
   useApproveDocument,
   useDocument,
+  useDocumentVersions,
   useDownloadDocument,
+  useExportDocument,
   useGenerateDocument,
   useHearingDocumentId,
   useRequestDocumentChanges,
@@ -69,6 +72,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const [content, setContent] = useState<DocumentContent | null>(null);
   const [reasonOpen, setReasonOpen] = useState(false);
   const [reason, setReason] = useState("");
+  const [exportJobId, setExportJobId] = useState<string | null>(null);
 
   const generateMutation = useGenerateDocument(hearing.caseId);
   const {
@@ -83,6 +87,9 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const submitMutation = useSubmitDocumentReview(documentId ?? "");
   const requestChangesMutation = useRequestDocumentChanges(documentId ?? "");
   const approveMutation = useApproveDocument(documentId ?? "");
+  const exportMutation = useExportDocument(documentId ?? "");
+  const { isSucceeded: exportSucceeded, isFailed: exportFailed } = useJobPolling(exportJobId);
+  const versionsQuery = useDocumentVersions(documentId);
 
   useEffect(() => {
     setContent(doc?.contentJson ?? null);
@@ -93,6 +100,11 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
     // documentQuery is a fresh object every render — only re-run on the job's own terminal flag.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generateSucceeded]);
+
+  useEffect(() => {
+    if (exportSucceeded) void documentQuery.refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exportSucceeded]);
 
   const selectedTemplate =
     activeTemplates?.find((tpl) => tpl.templateCode === templateCode) ?? activeTemplates?.[0];
@@ -168,6 +180,14 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
     approveMutation.mutate({ expectedVersion: doc.version ?? 0 });
   }
 
+  function handleExport() {
+    if (!doc) return;
+    exportMutation.mutate(
+      { expectedVersion: doc.version ?? 0 },
+      { onSuccess: (accepted) => setExportJobId(accepted.jobId) }
+    );
+  }
+
   function handleRequestChanges() {
     if (!doc || !reason.trim()) return;
     requestChangesMutation.mutate(
@@ -186,6 +206,9 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const canSubmit = isEditable && can("document.submit") && Boolean(doc?.docxStorageKey);
   const canReview = doc?.status === "UnderReview" && can("document.approve");
   const canDownload = Boolean(doc?.docxStorageKey);
+  const canExport = doc?.status === "Approved" && can("document.export");
+  const exportInFlight =
+    exportMutation.isPending || (Boolean(exportJobId) && !exportSucceeded && !exportFailed);
 
   if (!documentId) {
     return (
@@ -268,8 +291,19 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
               </Button>
             </>
           )}
+          {canExport && doc.status !== "Exported" && (
+            <Button size="sm" variant="outline" onClick={handleExport} disabled={exportInFlight}>
+              <Upload className="size-4" />
+              {t("protocol.exportDoc")}
+            </Button>
+          )}
         </div>
       </div>
+
+      {doc.status === "Exported" && (
+        <p className="text-sm text-success">{t("protocol.exported")}</p>
+      )}
+      {exportInFlight && doc.status !== "Exported" && <Progress value={60} />}
 
       {documentQuery.isRegenerationTimedOut && (
         <p className="text-sm text-warning">{t("protocol.regenerationTimedOut")}</p>
@@ -347,6 +381,36 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
           </Button>
         </div>
       )}
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">{t("protocol.versionsTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!versionsQuery.data || versionsQuery.data.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("protocol.versionsEmpty")}</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {versionsQuery.data.map((entry) => (
+                <li
+                  key={entry.id}
+                  className="flex flex-wrap items-center gap-2 border-b border-border pb-2 text-sm last:border-b-0 last:pb-0"
+                >
+                  <span className="font-mono text-xs text-muted-foreground">
+                    v{entry.versionNo}
+                  </span>
+                  <RecordStateBadge kind="document" status={entry.status} />
+                  <span className="text-foreground">{entry.changeType}</span>
+                  {entry.reason && <span className="text-muted-foreground">— {entry.reason}</span>}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    <DateText value={entry.createdAt} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog open={reasonOpen} onOpenChange={setReasonOpen}>
         <DialogContent>
