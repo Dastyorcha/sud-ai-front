@@ -234,6 +234,13 @@ export const uz = {
       concurrency_conflict:
         "Bu yozuv boshqa joyda o‘zgartirildi. Sahifani yangilab, qayta urinib ko‘ring.",
       transcript_locked: "Hozir stenogramma boshqa foydalanuvchi tomonidan bloklangan.",
+      hearing_id_required: "Jonli stenogrammaga ulanish uchun majlis ID kerak.",
+      hearing_not_found: "Bu majlis topilmadi.",
+      case_access_denied: "Sizda bu ishga ruxsat yo‘q.",
+      duplicate_transcript_sequence: "Bu tartib raqamli segment allaqachon mavjud.",
+      audio_track_required: "Segment yuborishdan oldin bu majlisga audio yozuv kerak.",
+      invalid_segment_timing: "Segmentning boshlanish va tugash vaqti noto‘g‘ri.",
+      invalid_segment_confidence: "Ishonch darajasi 0 va 1 oralig‘ida bo‘lishi kerak.",
       case_number_exists: "Bu raqamli ish allaqachon mavjud.",
       invalid_judge: "Kiritilgan sudya ID faol sudyaga mos kelmadi.",
       case_archive_endpoint_required:

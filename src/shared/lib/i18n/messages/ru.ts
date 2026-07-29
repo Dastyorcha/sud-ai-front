@@ -230,6 +230,13 @@ export const ru: Messages = {
       timeout: "Время ожидания запроса истекло. Попробуйте снова.",
       concurrency_conflict: "Эта запись была изменена в другом месте. Обновите и попробуйте снова.",
       transcript_locked: "Стенограмма сейчас заблокирована другим пользователем.",
+      hearing_id_required: "Для подключения к прямой стенограмме нужен ID заседания.",
+      hearing_not_found: "Это заседание не найдено.",
+      case_access_denied: "У вас нет доступа к этому делу.",
+      duplicate_transcript_sequence: "Сегмент с таким порядковым номером уже существует.",
+      audio_track_required: "Прежде чем публиковать сегменты, добавьте аудиозапись к заседанию.",
+      invalid_segment_timing: "Время начала и окончания сегмента некорректно.",
+      invalid_segment_confidence: "Показатель уверенности должен быть от 0 до 1.",
       case_number_exists: "Дело с таким номером уже существует.",
       invalid_judge: "Указанный ID судьи не соответствует активному судье.",
       case_archive_endpoint_required:

@@ -19,6 +19,13 @@ export type ErrorCode =
   | "timeout"
   | "concurrency_conflict"
   | "transcript_locked"
+  | "hearing_id_required"
+  | "hearing_not_found"
+  | "case_access_denied"
+  | "duplicate_transcript_sequence"
+  | "audio_track_required"
+  | "invalid_segment_timing"
+  | "invalid_segment_confidence"
   | "case_number_exists"
   | "invalid_judge"
   | "case_archive_endpoint_required"
@@ -74,6 +81,13 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   timeout: "errors.codes.timeout",
   concurrency_conflict: "errors.codes.concurrency_conflict",
   transcript_locked: "errors.codes.transcript_locked",
+  hearing_id_required: "errors.codes.hearing_id_required",
+  hearing_not_found: "errors.codes.hearing_not_found",
+  case_access_denied: "errors.codes.case_access_denied",
+  duplicate_transcript_sequence: "errors.codes.duplicate_transcript_sequence",
+  audio_track_required: "errors.codes.audio_track_required",
+  invalid_segment_timing: "errors.codes.invalid_segment_timing",
+  invalid_segment_confidence: "errors.codes.invalid_segment_confidence",
   case_number_exists: "errors.codes.case_number_exists",
   invalid_judge: "errors.codes.invalid_judge",
   case_archive_endpoint_required: "errors.codes.case_archive_endpoint_required",
