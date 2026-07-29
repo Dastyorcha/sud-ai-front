@@ -133,6 +133,35 @@ foundation every real service imports:
   no CORS yet, so this is the sanctioned same-origin workaround (never set
   CORS headers client-side).
 
+## Realtime (SignalR demo transcript hub, `src/features/live-session/`)
+
+`LiveHearingPanel` (guide §14) connects to the demo `/hubs/demo-transcript`
+SignalR hub instead of a scripted local feed:
+
+- `demo-hub.ts` — `buildDemoHubConnection(hearingId)` builds (doesn't start) a
+  `HubConnection` via `HubConnectionBuilder` against
+  `${DEMO_TRANSCRIPT_HUB_PATH}?hearingId=<uuid>` (same-origin; the dev proxy's
+  `/hubs` entry has `ws: true`, but the transport itself is pinned regardless).
+  `accessTokenFactory` reads the live token from `token-store` on every
+  request so a token refresh mid-session keeps the connection authorized.
+  **Transport is hard-pinned to `HttpTransportType.LongPolling`** — the
+  backend's JWT handler doesn't read the WebSocket `access_token` query param
+  yet (§17); do not switch this to WebSockets until that lands.
+  `.withAutomaticReconnect()` is enabled. `hubErrorCode()` best-effort-extracts
+  an `UPPER_SNAKE` code from a thrown `HubException`'s `Error.message` so hub
+  errors route through the same `error-map.ts` as REST errors.
+- `use-demo-hub.ts` — `useDemoHub(hearingId)` owns the connection lifecycle
+  (start on mount when `hearingId` is set, stop on unmount/change), mirrors
+  `HubConnection.state` for the UI, accumulates `TranscriptSegmentReceived`
+  payloads, and exposes `publish()` (invokes `PublishMockSegment`, only when
+  `Connected`). Every failure surfaces via `notify.error` — never
+  `alert`/`confirm`/a blocking dialog.
+- `live-hearing-panel.tsx` renders a connection-status badge
+  (connecting/connected/reconnecting/disconnected) and, while recording,
+  publishes a canned demo script through the hub — the panel only ever
+  renders what comes back over `TranscriptSegmentReceived`, so every browser
+  tab connected to the same hearing sees the same feed.
+
 ## Query layer (`src/shared/lib/query/`, `src/app/providers/query-provider.tsx`)
 
 Real-service feature hooks (integration-04 onward) use **TanStack Query**
