@@ -135,6 +135,67 @@ export async function updateDocumentContent(
   return toDocument(data);
 }
 
+/** Body shared by every `expectedVersion`-gated lifecycle action (guide §12/§16). */
+export interface DocumentVersionGate {
+  expectedVersion: number;
+}
+
+/**
+ * Submits a document for review (guide §12 `POST /documents/{id}/submit-review`,
+ * `Draft`/`ChangesRequested` → `UnderReview`) — requires a regenerated DOCX
+ * and a valid source snapshot. Handles `409 DOCX_NOT_READY`,
+ * `409 INVALID_DOCUMENT_TRANSITION`, concurrency.
+ */
+export async function submitDocumentReview(
+  documentId: string,
+  input: DocumentVersionGate
+): Promise<GeneratedDocument> {
+  const { data } = await apiClient.post<DocumentResponse>(
+    `${API_PREFIX}/documents/${documentId}/submit-review`,
+    input
+  );
+  return toDocument(data);
+}
+
+/** Body of `POST /documents/{id}/request-changes` (guide §12) — `reason` must be non-empty. */
+export interface RequestDocumentChangesInput extends DocumentVersionGate {
+  reason: string;
+}
+
+/**
+ * Requests changes on a document (guide §12
+ * `POST /documents/{id}/request-changes`, Judge/Admin,
+ * `UnderReview` → `ChangesRequested`). Handles `400 CHANGE_REASON_REQUIRED`,
+ * `403 DOCUMENT_REVIEW_DENIED`, `409 INVALID_DOCUMENT_TRANSITION`, concurrency.
+ */
+export async function requestDocumentChanges(
+  documentId: string,
+  input: RequestDocumentChangesInput
+): Promise<GeneratedDocument> {
+  const { data } = await apiClient.post<DocumentResponse>(
+    `${API_PREFIX}/documents/${documentId}/request-changes`,
+    input
+  );
+  return toDocument(data);
+}
+
+/**
+ * Approves a document (guide §12 `POST /documents/{id}/approve`, Judge/Admin,
+ * `UnderReview` → `Approved`) — immutable afterwards. Handles
+ * `403 DOCUMENT_APPROVAL_DENIED`, `409 INVALID_DOCUMENT_TRANSITION`,
+ * concurrency.
+ */
+export async function approveDocument(
+  documentId: string,
+  input: DocumentVersionGate
+): Promise<GeneratedDocument> {
+  const { data } = await apiClient.post<DocumentResponse>(
+    `${API_PREFIX}/documents/${documentId}/approve`,
+    input
+  );
+  return toDocument(data);
+}
+
 /**
  * Reads a non-2xx blob response's body as a `ProblemDetails` and builds the
  * matching `ApiError` (guide §12 design notes — a blob response never parses

@@ -1,16 +1,21 @@
-import { useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useMockQuery, type UseMockQueryResult } from "@/shared/hooks/use-mock-query";
 import { listDocuments } from "@/shared/lib/mock-api/document.service";
 import { queryKeys } from "@/shared/lib/query/query-keys";
 import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/use-api-mutation";
 import {
+  approveDocument,
   downloadDocument,
   generateDocument,
   getDocument,
+  requestDocumentChanges,
+  submitDocumentReview,
   updateDocumentContent,
+  type DocumentVersionGate,
   type GenerateDocumentAccepted,
   type GenerateDocumentInput,
+  type RequestDocumentChangesInput,
   type UpdateDocumentContentInput,
 } from "@/features/documents/document.service";
 import type { GeneratedDocument } from "@/shared/types/models";
@@ -27,6 +32,49 @@ export type UseDocumentsResult = UseMockQueryResult<GeneratedDocument[]>;
  */
 export function useDocuments(caseId: string): UseDocumentsResult {
   return useMockQuery(() => listDocuments(caseId), [caseId]);
+}
+
+const HEARING_DOCUMENT_SESSION_KEY_PREFIX = "lexkotib:hearing-document:";
+
+function readHearingDocumentId(hearingId: string): string | undefined {
+  try {
+    return sessionStorage.getItem(HEARING_DOCUMENT_SESSION_KEY_PREFIX + hearingId) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Session-local carry for a hearing's generated protocol document id
+ * (mirrors `use-hearing-session.ts` — there's no `GET /hearings/{id}/documents`
+ * lookup, guide §17, so the id returned by `generateDocument`'s `202` is the
+ * only way to find it again). Resilient to a same-tab refresh; a fresh
+ * tab/session that never saw the generate call can't recover it.
+ */
+export function useHearingDocumentId(
+  hearingId: string
+): [string | undefined, (documentId: string) => void] {
+  const [documentId, setDocumentIdState] = useState<string | undefined>(() =>
+    readHearingDocumentId(hearingId)
+  );
+
+  useEffect(() => {
+    setDocumentIdState(readHearingDocumentId(hearingId));
+  }, [hearingId]);
+
+  const setDocumentId = useCallback(
+    (id: string) => {
+      try {
+        sessionStorage.setItem(HEARING_DOCUMENT_SESSION_KEY_PREFIX + hearingId, id);
+      } catch {
+        // sessionStorage unavailable — degrades to "current render only".
+      }
+      setDocumentIdState(id);
+    },
+    [hearingId]
+  );
+
+  return [documentId, setDocumentId];
 }
 
 /** How often `useDocument`'s regeneration poll re-`GET`s (guide §12/§17 — PATCH returns no `jobId`). */
@@ -113,5 +161,35 @@ export function useDownloadDocument(
 ): UseApiMutationResult<void, { fileName: string }> {
   return useApiMutation({
     mutationFn: ({ fileName }) => downloadDocument(documentId, fileName),
+  });
+}
+
+/** Submits a document for review (guide §12 `POST /documents/{id}/submit-review`). */
+export function useSubmitDocumentReview(
+  documentId: string
+): UseApiMutationResult<GeneratedDocument, DocumentVersionGate> {
+  return useApiMutation({
+    mutationFn: (input) => submitDocumentReview(documentId, input),
+    invalidateKeys: [queryKeys.documents.detail(documentId)],
+  });
+}
+
+/** Requests changes on a document (guide §12 `POST /documents/{id}/request-changes`, Judge/Admin). */
+export function useRequestDocumentChanges(
+  documentId: string
+): UseApiMutationResult<GeneratedDocument, RequestDocumentChangesInput> {
+  return useApiMutation({
+    mutationFn: (input) => requestDocumentChanges(documentId, input),
+    invalidateKeys: [queryKeys.documents.detail(documentId)],
+  });
+}
+
+/** Approves a document (guide §12 `POST /documents/{id}/approve`, Judge/Admin) — immutable afterwards. */
+export function useApproveDocument(
+  documentId: string
+): UseApiMutationResult<GeneratedDocument, DocumentVersionGate> {
+  return useApiMutation({
+    mutationFn: (input) => approveDocument(documentId, input),
+    invalidateKeys: [queryKeys.documents.detail(documentId)],
   });
 }
