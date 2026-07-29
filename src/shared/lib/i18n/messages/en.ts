@@ -347,6 +347,13 @@ export const en: Messages = {
     finalize: "Finalize and process",
     recording: "Recording",
     connected: "Connected",
+    hub: {
+      connecting: "Connecting…",
+      connected: "Live",
+      reconnecting: "Reconnecting…",
+      disconnecting: "Disconnecting…",
+      disconnected: "Disconnected",
+    },
     inputLevel: "Input level",
     liveTranscript: "Live transcript",
     stopConfirmTitle: "End hearing",

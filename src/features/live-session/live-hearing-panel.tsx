@@ -11,32 +11,67 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Progress } from "@/shared/components/ui/progress";
+import { StatusBadge } from "@/shared/custom/status-badge";
 import { Timestamp } from "@/shared/custom/record/timestamp";
 import { SpeakerChip } from "@/shared/custom/record/speaker-chip";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { transitionHearing } from "@/shared/lib/mock-api/hearing.service";
 import { startJob } from "@/shared/lib/mock-api/job.service";
 import { useJob } from "@/shared/hooks/use-job";
+import { HubConnectionState } from "@/features/live-session/demo-hub";
+import { useDemoHub } from "@/features/live-session/use-demo-hub";
 import type { Hearing } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
+import type { MessageKey } from "@/shared/lib/i18n/messages";
 import { notify } from "@/shared/lib/toast";
 
-/** Scripted live feed replayed while recording (frontend-only stand-in for the §9.4 WebSocket). */
-const LIVE_SCRIPT: Array<{ speaker: string; text: string }> = [
-  { speaker: "SPEAKER_01", text: "Sud majlisi ochiq deb e'lon qilinadi." },
-  { speaker: "SPEAKER_01", text: "Ishtirokchilarning shaxsi aniqlanadi." },
-  { speaker: "SPEAKER_02", text: "Da'vogar vakili — da'vo talablarini qo'llab-quvvatlaymiz." },
-  { speaker: "SPEAKER_03", text: "Javobgar vakili — qisman e'tiroz bildiramiz." },
-  { speaker: "SPEAKER_02", text: "Hisob-kitob dalolatnomasini talab qilib olishni so'raymiz." },
-  { speaker: "SPEAKER_01", text: "Iltimosnoma muhokamaga qo'yiladi." },
+/**
+ * Demo publish script (integration guide §14) — fed to the real
+ * `PublishMockSegment` hub method while recording, replacing the old
+ * client-only scripted feed. Every connection on the hearing (including this
+ * one) receives it back via `TranscriptSegmentReceived`.
+ */
+const MOCK_SEGMENT_SCRIPT: Array<{ speakerLabel: string; text: string; confidence: number }> = [
+  { speakerLabel: "SPEAKER_01", text: "Sud majlisi ochiq deb e'lon qilinadi.", confidence: 0.94 },
+  { speakerLabel: "SPEAKER_01", text: "Ishtirokchilarning shaxsi aniqlanadi.", confidence: 0.91 },
+  {
+    speakerLabel: "SPEAKER_02",
+    text: "Da'vogar vakili — da'vo talablarini qo'llab-quvvatlaymiz.",
+    confidence: 0.88,
+  },
+  {
+    speakerLabel: "SPEAKER_03",
+    text: "Javobgar vakili — qisman e'tiroz bildiramiz.",
+    confidence: 0.86,
+  },
+  {
+    speakerLabel: "SPEAKER_02",
+    text: "Hisob-kitob dalolatnomasini talab qilib olishni so'raymiz.",
+    confidence: 0.9,
+  },
+  { speakerLabel: "SPEAKER_01", text: "Iltimosnoma muhokamaga qo'yiladi.", confidence: 0.93 },
 ];
 
-interface LiveLine {
-  id: number;
-  speaker: string;
-  text: string;
-  atMs: number;
-  interim: boolean;
+/** Tone + message key per `HubConnection.state` (connecting/connected/reconnecting/disconnected). */
+const HUB_STATE_TONE: Record<HubConnectionState, "neutral" | "info" | "success" | "warning"> = {
+  [HubConnectionState.Disconnected]: "neutral",
+  [HubConnectionState.Connecting]: "info",
+  [HubConnectionState.Connected]: "success",
+  [HubConnectionState.Disconnecting]: "warning",
+  [HubConnectionState.Reconnecting]: "warning",
+};
+
+const HUB_STATE_KEY: Record<HubConnectionState, MessageKey> = {
+  [HubConnectionState.Disconnected]: "hearing.hub.disconnected",
+  [HubConnectionState.Connecting]: "hearing.hub.connecting",
+  [HubConnectionState.Connected]: "hearing.hub.connected",
+  [HubConnectionState.Disconnecting]: "hearing.hub.disconnecting",
+  [HubConnectionState.Reconnecting]: "hearing.hub.reconnecting",
+};
+
+/** Segments below this status count as still-settling ("interim" styling). */
+function isInterimSegment(status: string): boolean {
+  return status === "INTERIM" || status === "Raw";
 }
 
 export interface LiveHearingPanelProps {
@@ -45,14 +80,15 @@ export interface LiveHearingPanelProps {
 }
 
 /**
- * Live hearing screen (spec §16.2, FR-05, UC-02). Frontend-only build: the
- * live transcript is a scripted replay standing in for the realtime STT
- * WebSocket; controls drive the real §17.3 state machine. Interim lines
- * settle into final after a beat, and Stop runs the finalize job (UC-04).
+ * Live hearing screen (spec §16.2, FR-05, UC-02). The live transcript is the
+ * real demo SignalR hub (guide §14): while recording, a demo script is
+ * published via `PublishMockSegment` over LongPolling and every connection on
+ * the hearing (including this one) receives it back through
+ * `TranscriptSegmentReceived`. Controls drive the real §17.3 state machine;
+ * Stop runs the finalize job (UC-04).
  */
 export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelProps) {
   const { t } = useTranslation();
-  const [lines, setLines] = useState<LiveLine[]>([]);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [level, setLevel] = useState(0);
   const [stopOpen, setStopOpen] = useState(false);
@@ -60,28 +96,38 @@ export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelPr
   const job = useJob(finalizeJobId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recording = hearing.status === "RECORDING";
+  const { state: hubState, segments, publish } = useDemoHub(hearing.id);
+  const scriptIndexRef = useRef(0);
+  const sequenceRef = useRef(1);
 
-  // Simulated live feed + clock + level meter while recording.
+  // Clock while recording.
   useEffect(() => {
     if (!recording) return;
-    let i = 0;
-    const feed = setInterval(() => {
-      const line = LIVE_SCRIPT[i % LIVE_SCRIPT.length];
-      if (line) {
-        const id = i;
-        setLines((prev) => [
-          ...prev.map((l) => ({ ...l, interim: false })),
-          { id, speaker: line.speaker, text: line.text, atMs: (i + 1) * 4_000, interim: true },
-        ]);
-      }
-      i++;
-    }, 4_000);
     const clock = setInterval(() => setElapsedMs((ms) => ms + 1_000), 1_000);
-    return () => {
-      clearInterval(feed);
-      clearInterval(clock);
-    };
+    return () => clearInterval(clock);
   }, [recording]);
+
+  // Demo publish loop (guide §14): while recording and connected, feed the
+  // script through the real hub so it round-trips via `TranscriptSegmentReceived`.
+  useEffect(() => {
+    if (!recording || hubState !== HubConnectionState.Connected) return;
+    const feed = setInterval(() => {
+      const line = MOCK_SEGMENT_SCRIPT[scriptIndexRef.current % MOCK_SEGMENT_SCRIPT.length];
+      scriptIndexRef.current++;
+      if (!line) return;
+      const sequenceNo = sequenceRef.current++;
+      const startMs = (sequenceNo - 1) * 4_000;
+      void publish({
+        sequenceNo,
+        startMs,
+        endMs: startMs + 3_500,
+        speakerLabel: line.speakerLabel,
+        text: line.text,
+        confidence: line.confidence,
+      });
+    }, 4_000);
+    return () => clearInterval(feed);
+  }, [recording, hubState, publish]);
 
   // Real microphone level meter (FR-04): getUserMedia → AnalyserNode RMS.
   // Echo cancellation / noise suppression / AGC off — they damage courtroom
@@ -98,7 +144,12 @@ export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelPr
 
     navigator.mediaDevices
       .getUserMedia({
-        audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+        audio: {
+          channelCount: 1,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
       })
       .then((s) => {
         stream = s;
@@ -130,7 +181,7 @@ export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelPr
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [lines]);
+  }, [segments]);
 
   // Finalize job finished → hearing becomes reviewable.
   useEffect(() => {
@@ -164,6 +215,7 @@ export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelPr
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <RecordStateBadge kind="hearing" status={hearing.status} />
+        <StatusBadge tone={HUB_STATE_TONE[hubState]} label={t(HUB_STATE_KEY[hubState])} />
         <span className="font-mono text-sm tabular-nums text-muted-foreground">
           <Timestamp ms={elapsedMs} />
         </span>
@@ -223,19 +275,21 @@ export function LiveHearingPanel({ hearing, onStatusChange }: LiveHearingPanelPr
             {t("hearing.liveTranscript")}
           </h3>
           <div ref={scrollRef} className="flex max-h-96 flex-col gap-3 overflow-y-auto">
-            {lines.length === 0 && (
+            {segments.length === 0 && (
               <p className="text-sm text-muted-foreground">{t("hearing.waitingStart")}</p>
             )}
-            {lines.map((line) => (
-              <div key={line.id} className="flex items-start gap-3">
-                <Timestamp ms={line.atMs} />
-                <SpeakerChip label={line.speaker} />
+            {segments.map((segment) => (
+              <div key={segment.id} className="flex items-start gap-3">
+                <Timestamp ms={segment.startMs} />
+                <SpeakerChip label={segment.speakerLabel ?? t("record.unmappedSpeaker")} />
                 <p
                   className={
-                    line.interim ? "text-sm text-muted-foreground italic" : "text-sm text-foreground"
+                    isInterimSegment(segment.status)
+                      ? "text-sm text-muted-foreground italic"
+                      : "text-sm text-foreground"
                   }
                 >
-                  {line.text}
+                  {segment.normalizedText || segment.rawText}
                 </p>
               </div>
             ))}

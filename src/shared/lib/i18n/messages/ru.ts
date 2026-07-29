@@ -351,6 +351,13 @@ export const ru: Messages = {
     finalize: "Завершить и обработать",
     recording: "Идёт запись",
     connected: "Подключено",
+    hub: {
+      connecting: "Подключение…",
+      connected: "В эфире",
+      reconnecting: "Переподключение…",
+      disconnecting: "Отключение…",
+      disconnected: "Отключено",
+    },
     inputLevel: "Уровень входа",
     liveTranscript: "Живой транскрипт",
     stopConfirmTitle: "Завершить заседание",

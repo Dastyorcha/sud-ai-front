@@ -354,6 +354,13 @@ export const uz = {
     finalize: "Yakunlash va qayta ishlash",
     recording: "Yozilmoqda",
     connected: "Ulangan",
+    hub: {
+      connecting: "Ulanmoqda…",
+      connected: "Jonli",
+      reconnecting: "Qayta ulanmoqda…",
+      disconnecting: "Uzilmoqda…",
+      disconnected: "Uzilgan",
+    },
     inputLevel: "Kirish darajasi",
     liveTranscript: "Jonli transkript",
     stopConfirmTitle: "Majlisni tugatish",
