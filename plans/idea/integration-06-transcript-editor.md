@@ -73,7 +73,7 @@ TRANSCRIPT_LOCKED`). Handle `400 TRANSCRIPT_VALIDATION_FAILED`,
 3. [ ] Add `use-speakers.ts` (list + map/remap, encoded label) — `feat: speaker mapping hooks`
 4. [x] Wire validate + gate Approve on `isValid`; render issues — `feat: transcript validation gate`
 5. [x] Wire approve using hearing version from session — `feat: transcript approve with hearing version`
-6. [ ] Wire panel UI to all of the above; concurrency + locked UX — `feat: transcript editor live wiring`
+6. [x] Wire panel UI to all of the above; concurrency + locked UX — `feat: transcript editor live wiring`
 7. [ ] docs: sync `docs/codemap.md` — `docs: sync transcript editor service`
 
 ## Risks / ripple / escalation
