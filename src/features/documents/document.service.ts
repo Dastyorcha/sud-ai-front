@@ -101,3 +101,35 @@ export async function getDocument(documentId: string): Promise<GeneratedDocument
   const { data } = await apiClient.get<DocumentResponse>(`${API_PREFIX}/documents/${documentId}`);
   return toDocument(data);
 }
+
+/**
+ * Body of `PATCH /documents/{id}` (guide §12) — only allowed in `Draft`/
+ * `ChangesRequested`. `status` is always sent as `null`: the endpoint cannot
+ * change status, only content. Pass the *entire* `contentJson` back
+ * (`fields`/`sections`/every paragraph's `sources`) — this call never merges
+ * partial content server-side.
+ */
+export interface UpdateDocumentContentInput {
+  contentJson: DocumentContent;
+  status: null;
+  expectedVersion: number;
+}
+
+/**
+ * Edits a document's content (guide §12 `PATCH /documents/{id}`). Does
+ * **not** return a regeneration `jobId` (guide §17) — the response's
+ * `docxStorageKey` will still be the *old* one; callers must re-`getDocument`
+ * and poll until it changes (see `use-documents.ts`'s `useDocument`
+ * `pollForDocx` option). Handles `400 DOCUMENT_SOURCE_REQUIRED`,
+ * `409 DOCUMENT_NOT_EDITABLE`, `409 APPROVED_DOCUMENT_IMMUTABLE`, concurrency.
+ */
+export async function updateDocumentContent(
+  documentId: string,
+  input: UpdateDocumentContentInput
+): Promise<GeneratedDocument> {
+  const { data } = await apiClient.patch<DocumentResponse>(
+    `${API_PREFIX}/documents/${documentId}`,
+    input
+  );
+  return toDocument(data);
+}

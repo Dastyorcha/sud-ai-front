@@ -1,3 +1,4 @@
+import { useMemo, useRef } from "react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useMockQuery, type UseMockQueryResult } from "@/shared/hooks/use-mock-query";
 import { listDocuments } from "@/shared/lib/mock-api/document.service";
@@ -6,8 +7,10 @@ import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/us
 import {
   generateDocument,
   getDocument,
+  updateDocumentContent,
   type GenerateDocumentAccepted,
   type GenerateDocumentInput,
+  type UpdateDocumentContentInput,
 } from "@/features/documents/document.service";
 import type { GeneratedDocument } from "@/shared/types/models";
 
@@ -25,15 +28,63 @@ export function useDocuments(caseId: string): UseDocumentsResult {
   return useMockQuery(() => listDocuments(caseId), [caseId]);
 }
 
+/** How often `useDocument`'s regeneration poll re-`GET`s (guide §12/§17 — PATCH returns no `jobId`). */
+const REGEN_POLL_INTERVAL_MS = 2_000;
+/** How long to keep polling before surfacing `isRegenerationTimedOut` (guide §17 — must be robust against a never-ready DOCX). */
+const REGEN_POLL_TIMEOUT_MS = 60_000;
+
+export interface UseDocumentOptions {
+  /**
+   * Poll `GET /documents/{id}` every ~2s until `docxStorageKey` is set —
+   * needed after a content `PATCH`, which never returns a regeneration
+   * `jobId` (guide §12/§17). Stops after ~60s; check `isRegenerationTimedOut`
+   * to show a "still processing" message instead of polling forever.
+   */
+  pollForDocx?: boolean;
+}
+
+export type UseDocumentResult = UseQueryResult<GeneratedDocument> & {
+  isRegenerationTimedOut: boolean;
+};
+
 /** A document by id (guide §12 `GET /documents/{id}`) — `null`/`undefined` id keeps the query disabled. */
 export function useDocument(
-  documentId: string | null | undefined
-): UseQueryResult<GeneratedDocument> {
-  return useQuery({
+  documentId: string | null | undefined,
+  options: UseDocumentOptions = {}
+): UseDocumentResult {
+  const pollStartedAtRef = useRef<number | null>(null);
+
+  const query = useQuery({
     queryKey: queryKeys.documents.detail(documentId ?? ""),
     queryFn: () => getDocument(documentId as string),
     enabled: Boolean(documentId),
+    refetchInterval: (q) => {
+      if (!options.pollForDocx) {
+        pollStartedAtRef.current = null;
+        return false;
+      }
+      const docxReady = Boolean(q.state.data?.docxStorageKey);
+      if (docxReady) {
+        pollStartedAtRef.current = null;
+        return false;
+      }
+      if (pollStartedAtRef.current === null) pollStartedAtRef.current = Date.now();
+      if (Date.now() - pollStartedAtRef.current > REGEN_POLL_TIMEOUT_MS) return false;
+      return REGEN_POLL_INTERVAL_MS;
+    },
+    refetchOnWindowFocus: false,
   });
+
+  const isRegenerationTimedOut = useMemo(() => {
+    if (!options.pollForDocx || !query.data) return false;
+    if (query.data.docxStorageKey) return false;
+    return (
+      pollStartedAtRef.current !== null &&
+      Date.now() - pollStartedAtRef.current > REGEN_POLL_TIMEOUT_MS
+    );
+  }, [options.pollForDocx, query.data]);
+
+  return { ...query, isRegenerationTimedOut };
 }
 
 /** Queues protocol generation for a case (guide §12 `POST /cases/{id}/documents/generate`). */
@@ -42,5 +93,15 @@ export function useGenerateDocument(
 ): UseApiMutationResult<GenerateDocumentAccepted, GenerateDocumentInput> {
   return useApiMutation({
     mutationFn: (input) => generateDocument(caseId, input),
+  });
+}
+
+/** Edits a document's content (guide §12 `PATCH /documents/{id}`) — preserve `sources` on every paragraph/field. */
+export function useUpdateDocumentContent(
+  documentId: string
+): UseApiMutationResult<GeneratedDocument, UpdateDocumentContentInput> {
+  return useApiMutation({
+    mutationFn: (input) => updateDocumentContent(documentId, input),
+    invalidateKeys: [queryKeys.documents.detail(documentId)],
   });
 }
