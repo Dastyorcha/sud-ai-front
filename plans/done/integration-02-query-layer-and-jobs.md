@@ -1,6 +1,6 @@
 # Integration 02 — TanStack Query layer, job polling & concurrency
 
-- **Status:** doing
+- **Status:** done
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §5 (paging), §9/§12 (jobs), §16 (optimistic concurrency)

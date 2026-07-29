@@ -1,6 +1,15 @@
 # Integration 11 — Enums, mock removal & acceptance
 
-- **Status:** idea
+- **Status:** done
+- **Deviation from plan:** the plan's premise ("by this plan, 03–10 no longer
+  import mock-api") did not hold — several mock-api consumers were
+  deliberately kept by earlier plans because no live endpoint exists for
+  them (hearing list/GET, case-level document list, judge/user list, the
+  out-of-scope users CRUD example, the judge-copilot feature). Step 2 became
+  a grep-confirm + document-why pass instead of a full deletion; only the
+  genuinely dead files (`event.service.ts`, `data/procedural-events.ts`,
+  `data/audit-logs.ts`) were deleted. See `docs/api-integration.md`'s gap
+  register and mock-layer section for the full per-file rationale.
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §4 (enums/state), §17 (API gaps), §18 (acceptance checklist)
@@ -72,11 +81,11 @@ ChangesRequested | Approved | Exported`.
 
 ## Steps
 
-1. [ ] Reconcile `enums.ts` values to PascalCase + re-key i18n labels (uz/en/ru); fix call sites — `refactor: canonical api enum values and labels`
-2. [ ] Grep-confirm no `mock-api`/`use-mock-query` imports; delete both — `chore: remove mock api layer`
-3. [ ] Write `docs/api-integration.md` (endpoint map + base URL + gap register + concurrency) — `docs: api integration reference and gap register`
-4. [ ] Update `docs/codemap.md`, CLAUDE.md doc map, `docs/qa-acceptance.md` — `docs: sync docs after mock removal`
-5. [ ] Run §18 acceptance checklist; record results in `docs/qa-acceptance.md` — `test: frontend acceptance checklist pass`
+1. [x] Reconcile `enums.ts` values to PascalCase + re-key i18n labels (uz/en/ru); fix call sites — `refactor: canonical api enum values and labels`
+2. [x] Grep-confirm no `mock-api`/`use-mock-query` imports; delete both — `chore: remove mock api layer`
+3. [x] Write `docs/api-integration.md` (endpoint map + base URL + gap register + concurrency) — `docs: api integration reference and gap register`
+4. [x] Update `docs/codemap.md`, CLAUDE.md doc map, `docs/qa-acceptance.md` — `docs: sync docs after mock removal`
+5. [x] Run §18 acceptance checklist; record results in `docs/qa-acceptance.md` — `test: frontend acceptance checklist pass`
 
 ## Risks / ripple / escalation
 

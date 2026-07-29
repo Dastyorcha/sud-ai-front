@@ -1,6 +1,6 @@
 # Integration 03 — Auth, session & roles
 
-- **Status:** doing
+- **Status:** done
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §2 (auth/session), §7 (auth endpoints), roles table
@@ -65,16 +65,16 @@ DemoOperator`. Reconcile `court-permissions.ts` matrix (currently repo-specific
 
 ## Steps
 
-1. [ ] Add `token-store.ts` (persisted tokens + expiry, sync getters) — `feat: token store`
-2. [ ] Add `auth.service.ts` (login/refresh/logout/me) — `feat: auth service endpoints`
-3. [ ] Add `refresh-manager.ts` (single-flight refresh + rotation swap) — `feat: single-flight token refresh`
-4. [ ] Wire api-client interceptor: attach Bearer + 401→refresh→retry once — `feat: bearer attach and 401 refresh retry`
-5. [ ] Add `use-session.ts` over `/auth/me`; re-point `use-court-auth` to it — `feat: real session hook from auth/me`
-6. [ ] Map `court-permissions.ts` matrix to the five API roles — `refactor: align permission matrix to api roles`
-7. [ ] Wire `loginForm` → `auth.service.login`; handle `INVALID_CREDENTIALS` — `feat: real login form submit`
-8. [ ] Wire auth-guard redirect + logout action; replace admin demo role switcher — `feat: session guard and logout`
-9. [ ] Add auth i18n keys (uz/en/ru) — `feat: auth session copy`
-10. [ ] docs: sync `docs/codemap.md` — `docs: document auth session layer`
+1. [x] Add `token-store.ts` (persisted tokens + expiry, sync getters) — `feat: token store`
+2. [x] Add `auth.service.ts` (login/refresh/logout/me) — `feat: auth service endpoints`
+3. [x] Add `refresh-manager.ts` (single-flight refresh + rotation swap) — `feat: single-flight token refresh`
+4. [x] Wire api-client interceptor: attach Bearer + 401→refresh→retry once — `feat: bearer attach and 401 refresh retry`
+5. [x] Add `use-session.ts` over `/auth/me`; re-point `use-court-auth` to it — `feat: real session hook from auth/me`
+6. [x] Map `court-permissions.ts` matrix to the five API roles — `refactor: align permission matrix to api roles`
+7. [x] Wire `loginForm` → `auth.service.login`; handle `INVALID_CREDENTIALS` — `feat: real login form submit`
+8. [x] Wire auth-guard redirect + logout action; replace admin demo role switcher — `feat: session guard and logout`
+9. [x] Add auth i18n keys (uz/en/ru) — `feat: auth session copy`
+10. [x] docs: sync `docs/codemap.md` — `docs: document auth session layer`
 
 ## Risks / ripple / escalation
 

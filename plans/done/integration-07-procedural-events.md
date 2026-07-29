@@ -1,6 +1,6 @@
 # Integration 07 — Procedural events
 
-- **Status:** doing
+- **Status:** done
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §11 (procedural events), §16 (concurrency)

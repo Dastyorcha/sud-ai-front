@@ -1,6 +1,6 @@
 # Integration 10 — SignalR demo transcript hub
 
-- **Status:** doing
+- **Status:** done
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §14 (SignalR demo transcript hub), §17 (WS gap)

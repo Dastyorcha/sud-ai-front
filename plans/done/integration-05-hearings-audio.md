@@ -1,6 +1,6 @@
 # Integration 05 — Hearings, audio upload & transcription
 
-- **Status:** doing
+- **Status:** done
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §9 (hearing/audio/transcribe/transcript), §17 (gaps)

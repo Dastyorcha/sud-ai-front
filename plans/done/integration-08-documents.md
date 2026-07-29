@@ -1,6 +1,6 @@
 # Integration 08 — Document templates & document lifecycle
 
-- **Status:** doing
+- **Status:** done
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §12 (templates & documents), §16 (concurrency)

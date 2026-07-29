@@ -1,6 +1,6 @@
 # Integration 06 — Transcript editor, speakers, validate & approve
 
-- **Status:** doing
+- **Status:** done
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §10 (transcript editor), §16 (concurrency)
@@ -68,9 +68,9 @@ TRANSCRIPT_LOCKED`). Handle `400 TRANSCRIPT_VALIDATION_FAILED`,
 
 ## Steps
 
-1. [ ] Add `transcript.service.ts` (segment edit/verify, speakers get/put, validate, approve) — `feat: transcript editor service`
-2. [ ] Add `use-transcript-editor.ts` with per-segment version tracking + edit/verify — `feat: transcript segment mutations`
-3. [ ] Add `use-speakers.ts` (list + map/remap, encoded label) — `feat: speaker mapping hooks`
+1. [x] Add `transcript.service.ts` (segment edit/verify, speakers get/put, validate, approve) — `feat: transcript editor service`
+2. [x] Add `use-transcript-editor.ts` with per-segment version tracking + edit/verify — `feat: transcript segment mutations`
+3. [x] Add `use-speakers.ts` (list + map/remap, encoded label) — `feat: speaker mapping hooks`
 4. [x] Wire validate + gate Approve on `isValid`; render issues — `feat: transcript validation gate`
 5. [x] Wire approve using hearing version from session — `feat: transcript approve with hearing version`
 6. [x] Wire panel UI to all of the above; concurrency + locked UX — `feat: transcript editor live wiring`

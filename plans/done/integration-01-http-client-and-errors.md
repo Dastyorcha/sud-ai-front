@@ -1,6 +1,6 @@
 # Integration 01 — Axios client, dev proxy & error contract
 
-- **Status:** doing
+- **Status:** done
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §1 (env/base/CORS), §3 (error format), §16 (concurrency)
@@ -75,13 +75,13 @@ mapped to a localized `t()` key.
 
 ## Steps
 
-1. [ ] Add `src/shared/config/env.ts` + `.env.example` (base URL `https://example.com`, prefix) — `feat: typed env config for api base url`
-2. [ ] Add dev proxy for `/api` + `/hubs` in `vite.config.ts` — `feat: proxy api and hubs to backend in dev`
-3. [ ] Add `api-error.ts` (`ApiError` + `parseApiError` for both problem shapes + empty-body + network) — `feat: typed api error parser`
-4. [ ] Add `request-id.ts` (UUID gen + last-response-id capture) — `feat: x-request-id generation and capture`
-5. [ ] Add `api-client.ts` axios instance with request/response interceptors (token getter injectable, request-id, error parse) — `feat: axios api client with interceptors`
-6. [ ] Extend `error-map.ts` `ErrorCode` union + add `errors.codes.*` keys in uz/en/ru — `feat: map backend error codes to localized keys`
-7. [ ] docs: sync `docs/codemap.md` + `docs/architecture.md` (new `shared/lib/http` layer, env) — `docs: document http client layer`
+1. [x] Add `src/shared/config/env.ts` + `.env.example` (base URL `https://example.com`, prefix) — `feat: typed env config for api base url`
+2. [x] Add dev proxy for `/api` + `/hubs` in `vite.config.ts` — `feat: proxy api and hubs to backend in dev`
+3. [x] Add `api-error.ts` (`ApiError` + `parseApiError` for both problem shapes + empty-body + network) — `feat: typed api error parser`
+4. [x] Add `request-id.ts` (UUID gen + last-response-id capture) — `feat: x-request-id generation and capture`
+5. [x] Add `api-client.ts` axios instance with request/response interceptors (token getter injectable, request-id, error parse) — `feat: axios api client with interceptors`
+6. [x] Extend `error-map.ts` `ErrorCode` union + add `errors.codes.*` keys in uz/en/ru — `feat: map backend error codes to localized keys`
+7. [x] docs: sync `docs/codemap.md` + `docs/architecture.md` (new `shared/lib/http` layer, env) — `docs: document http client layer`
 
 ## Risks / ripple / escalation
 

@@ -1,6 +1,6 @@
 # Integration 09 — Audit logs
 
-- **Status:** doing
+- **Status:** done
 - **Size:** small
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §13 (audit logs)
