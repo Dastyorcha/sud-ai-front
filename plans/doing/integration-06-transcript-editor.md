@@ -1,6 +1,6 @@
 # Integration 06 — Transcript editor, speakers, validate & approve
 
-- **Status:** idea
+- **Status:** doing
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §10 (transcript editor), §16 (concurrency)
