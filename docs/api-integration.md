@@ -30,6 +30,19 @@ Two separate env vars (handoff §1) — the origin is not the REST base:
     **must** allowlist the exact app origin (§2/§3). Never set
     `Access-Control-Allow-Origin: *`.
 
+## Startup connectivity (`src/features/system/`)
+
+Boot-time reachability probe (handoff §4), non-blocking:
+
+- `system.service.ts` — `getSystemInfo()` (`GET /api/v1/system`, public),
+  `checkBackendReachable()` (never throws → `boolean`), and an optional
+  `checkHealthReady()` (`GET /health/ready` at the bare origin).
+- `use-backend-connectivity.ts` / `backend-connectivity-probe.tsx` — the probe
+  runs once on mount inside `LocaleProvider`; on failure it shows a persistent,
+  retryable "can't reach server" toast (`showBackendUnreachable`,
+  `system.unreachable*` i18n keys) and dismisses it once a probe succeeds. It
+  never gates rendering — the login flow still surfaces its own auth errors.
+
 ## HTTP client (`src/shared/lib/http/`)
 
 - `api-client.ts` — single axios instance (`apiClient`). Request interceptor

@@ -19,6 +19,11 @@ export const en: Messages = {
     allRightsReserved: "© {year} {app}. All rights reserved.",
     noData: "No data found",
   },
+  system: {
+    unreachableTitle: "Can't reach the server",
+    unreachableDescription:
+      "The backend isn't responding right now. Check your connection or try again shortly.",
+  },
   nav: {
     dashboard: "Dashboard",
     cases: "Cases",

@@ -22,6 +22,11 @@ export const uz = {
     allRightsReserved: "© {year} {app}. Barcha huquqlar himoyalangan.",
     noData: "Ma'lumot topilmadi",
   },
+  system: {
+    unreachableTitle: "Serverga ulanib bo‘lmadi",
+    unreachableDescription:
+      "Backend hozircha javob bermayapti. Internet aloqangizni tekshiring yoki birozdan so‘ng qayta urinib ko‘ring.",
+  },
   nav: {
     dashboard: "Boshqaruv paneli",
     cases: "Sud ishlari",

@@ -19,6 +19,11 @@ export const ru: Messages = {
     allRightsReserved: "© {year} {app}. Все права защищены.",
     noData: "Данные не найдены",
   },
+  system: {
+    unreachableTitle: "Не удаётся подключиться к серверу",
+    unreachableDescription:
+      "Бэкенд сейчас не отвечает. Проверьте подключение или повторите попытку чуть позже.",
+  },
   nav: {
     dashboard: "Панель управления",
     cases: "Дела",
