@@ -1,6 +1,7 @@
 import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { createRequestId, setLastRequestId } from "@/shared/lib/http/request-id";
 import { parseApiError } from "@/shared/lib/http/api-error";
+import { env } from "@/shared/config/env";
 
 /**
  * Reads the current access token, or `undefined` when signed out. Defaults to
@@ -35,13 +36,13 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler): void {
 }
 
 /**
- * The single axios instance every service imports. `baseURL` stays relative
- * (`""`) — callers pass same-origin paths (`/api/v1/...`); the Vite dev proxy
- * forwards to the real host and prod sits behind a same-origin reverse proxy
- * (guide §1's CORS workaround — never `Access-Control-Allow-Origin: *`).
+ * The single axios instance every service imports. Callers pass paths prefixed
+ * with `API_PREFIX` (`/api/v1/...`); `baseURL` supplies only the origin, so the
+ * `/api/v1` prefix is applied exactly once (handoff §1). It resolves to `""`
+ * (relative → Vite dev proxy) in dev and to the absolute backend origin in prod.
  */
 export const apiClient = axios.create({
-  baseURL: "",
+  baseURL: env.restBaseUrl,
   timeout: 30_000,
 });
 

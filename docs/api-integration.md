@@ -10,16 +10,25 @@ it and where it deliberately still diverges.
 
 ## Base URL & environment
 
-- API base URL: `VITE_API_BASE_URL` (`.env`/`.env.example`), placeholder
-  `https://example.com`.
-- API prefix: `/api/v1` (`src/shared/config/env.ts`'s `API_PREFIX`). SignalR
-  hub: `/hubs/demo-transcript` (`DEMO_TRANSCRIPT_HUB_PATH`).
-- **No CORS on the backend yet** (guide §1) — the Vite dev server
-  (`vite.config.ts`) proxies same-origin `/api` and `/hubs` requests to
-  `apiBaseUrl`; production sits behind a same-origin reverse proxy. Every
-  service call uses a **relative** path (`${API_PREFIX}/...`); `apiClient`'s
-  `baseURL` stays `""`. Never set `Access-Control-Allow-Origin: *`
-  client-side — that's not how this workaround works.
+Two separate env vars (handoff §1) — the origin is not the REST base:
+
+- `VITE_API_ORIGIN` — bare backend origin (`https://api.beezy.uz`). SignalR hub
+  (`/hubs/...`) and health probes (`/health/*`, `GET /api/v1/system`) live here.
+- `VITE_API_BASE_URL` — REST base, i.e. `<origin>/api/v1`
+  (`https://api.beezy.uz/api/v1`). Placeholder `https://example.com/api/v1`.
+- API prefix: `/api/v1` (`src/shared/config/env.ts`'s `API_PREFIX`, appended by
+  every service). SignalR hub path: `/hubs/demo-transcript`
+  (`DEMO_TRANSCRIPT_HUB_PATH`). **Never add `/api/v1` twice** — `apiClient`'s
+  `baseURL` carries only the origin; callers add `API_PREFIX`.
+- **Dev vs prod switch** (`env.restBaseUrl` / `env.hubOrigin`, gated on
+  `import.meta.env.DEV`):
+  - **Dev** → `""` (relative). The Vite dev server (`vite.config.ts`) proxies
+    same-origin `/api`, `/hubs` and `/health` to the origin (derived from
+    `VITE_API_ORIGIN`, or `VITE_API_BASE_URL` with `/api/v1` stripped), so the
+    backend needs no CORS.
+  - **Prod** → the absolute backend origin. There is no proxy, so the backend
+    **must** allowlist the exact app origin (§2/§3). Never set
+    `Access-Control-Allow-Origin: *`.
 
 ## HTTP client (`src/shared/lib/http/`)
 
@@ -87,7 +96,7 @@ Each row: what's missing, how the frontend copes today, and where.
 | `PATCH` document content-edit returns no regeneration `jobId` | Callers re-GET/poll until `docxStorageKey` changes instead of tracking a job                                                                                                                                                                                                                  | `features/documents/document.service.ts`                                                       |
 | No template update/deactivate/download endpoints              | Template catalogue is create + list only                                                                                                                                                                                                                                                      | `features/documents/template.service.ts`                                                       |
 | No `GET /participants/{id}`                                   | List-only; edits go through the case's participant list, not a direct fetch-by-id                                                                                                                                                                                                             | `features/participants/participant.service.ts`                                                 |
-| No CORS                                                       | Vite dev proxy (`/api`, `/hubs`) + same-origin prod reverse proxy; every call is a relative path                                                                                                                                                                                              | `vite.config.ts`, `shared/config/env.ts`                                                       |
+| No CORS                                                       | Dev: Vite proxy (`/api`, `/hubs`, `/health`) → origin, relative paths. Prod: absolute origin, backend must allowlist the app origin (`env.restBaseUrl`/`hubOrigin`, gated on `import.meta.env.DEV`)                                                                                           | `vite.config.ts`, `shared/config/env.ts`                                                       |
 | SignalR WebSocket auth not implemented                        | Hub transport hard-pinned to `HttpTransportType.LongPolling` (`demo-hub.ts`) until the backend's JWT handler reads the WS `access_token` query param                                                                                                                                          | `features/live-session/demo-hub.ts`                                                            |
 
 ## Mock layer retained after integration-11 — why

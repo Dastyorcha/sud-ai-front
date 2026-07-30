@@ -4,7 +4,7 @@ import {
   HubConnectionBuilder,
   HubConnectionState,
 } from "@microsoft/signalr";
-import { DEMO_TRANSCRIPT_HUB_PATH } from "@/shared/config/env";
+import { DEMO_TRANSCRIPT_HUB_PATH, env } from "@/shared/config/env";
 import { getAccessToken } from "@/shared/lib/auth/token-store";
 import type { SegmentStatus } from "@/shared/types/enums";
 
@@ -52,10 +52,13 @@ export type { HubConnection };
  * keeps LongPolling authorized. */
 export function buildDemoHubConnection(hearingId: string): HubConnection {
   return new HubConnectionBuilder()
-    .withUrl(`${DEMO_TRANSCRIPT_HUB_PATH}?hearingId=${encodeURIComponent(hearingId)}`, {
-      accessTokenFactory: () => getAccessToken() ?? "",
-      transport: HttpTransportType.LongPolling,
-    })
+    .withUrl(
+      `${env.hubOrigin}${DEMO_TRANSCRIPT_HUB_PATH}?hearingId=${encodeURIComponent(hearingId)}`,
+      {
+        accessTokenFactory: () => getAccessToken() ?? "",
+        transport: HttpTransportType.LongPolling,
+      }
+    )
     .withAutomaticReconnect()
     .build();
 }
