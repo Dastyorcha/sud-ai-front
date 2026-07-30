@@ -4,7 +4,7 @@ Project guide for Claude Code. **Always loaded.** Keep it short — every detail
 
 ## What this project is
 
-**React Admin Template** — a Vite + React 19 + React Router v7 single-page admin app, meant to be cloned and adapted for a new project. No public/marketing surface, **no SEO**. Optimise for data density, reusable CRUD surfaces, and fast interactions. Development is AI-driven and token-conscious.
+**LexKotib (Court AI Assistant)** — the frontend for an AI-assisted court transcription and documentation panel: run a hearing, capture/edit its transcript, extract procedural events, and generate court documents from verified sources. Vite + React 19 + React Router v7 SPA against the LexKotib REST + SignalR backend (`docs/api-integration.md`). No public/marketing surface, **no SEO**. Optimise for data density, reusable CRUD surfaces, and fast interactions. Development is AI-driven and token-conscious.
 
 ## Commands
 
