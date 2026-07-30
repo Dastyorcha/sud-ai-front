@@ -19,7 +19,7 @@ SignalR backend (`docs/api-integration.md`).
 
 ```bash
 npm install
-cp .env.example .env   # set VITE_API_ORIGIN / VITE_API_BASE_URL
+cp .env.example .env   # already the real backend; override VITE_API_ORIGIN/VITE_API_BASE_URL to point elsewhere
 npm run dev
 ```
 

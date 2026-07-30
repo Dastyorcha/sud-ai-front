@@ -15,7 +15,9 @@ Two separate env vars (handoff §1) — the origin is not the REST base:
 - `VITE_API_ORIGIN` — bare backend origin (`https://api.beezy.uz`). SignalR hub
   (`/hubs/...`) and health probes (`/health/*`, `GET /api/v1/system`) live here.
 - `VITE_API_BASE_URL` — REST base, i.e. `<origin>/api/v1`
-  (`https://api.beezy.uz/api/v1`). Placeholder `https://example.com/api/v1`.
+  (`https://api.beezy.uz/api/v1`). `.env.example` ships the real production
+  values directly — `cp .env.example .env` to point at the live backend; no
+  placeholder swap needed.
 - API prefix: `/api/v1` (`src/shared/config/env.ts`'s `API_PREFIX`, appended by
   every service). SignalR hub path: `/hubs/demo-transcript`
   (`DEMO_TRANSCRIPT_HUB_PATH`). **Never add `/api/v1` twice** — `apiClient`'s
