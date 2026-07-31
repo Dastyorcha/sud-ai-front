@@ -1,6 +1,6 @@
 # Integration 10 — SignalR demo transcript hub
 
-- **Status:** idea
+- **Status:** done
 - **Size:** medium
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §14 (SignalR demo transcript hub), §17 (WS gap)
@@ -58,12 +58,12 @@ endMs, speakerLabel, rawText, normalizedText, confidence, status, createdAt }`.
 
 ## Steps
 
-1. [ ] Install `@microsoft/signalr`; expose hub path in `env.ts` — `feat: add signalr dependency and hub path`
-2. [ ] Add `demo-hub.ts` (build/start/stop, LongPolling, accessTokenFactory) — `feat: signalr demo hub connection`
-3. [ ] Add `use-demo-hub.ts` (state + received segments + publish) — `feat: demo hub hook`
-4. [ ] Swap `live-hearing-panel` scripted feed for the hub stream + connection status — `feat: live panel over signalr`
-5. [ ] Add hub error codes to the error map (uz/en/ru) — `feat: signalr hub error copy`
-6. [ ] docs: sync `docs/codemap.md` + `docs/architecture.md` — `docs: document signalr demo hub`
+1. [x] Install `@microsoft/signalr`; expose hub path in `env.ts` — `feat: add signalr dependency and hub path`
+2. [x] Add `demo-hub.ts` (build/start/stop, LongPolling, accessTokenFactory) — `feat: signalr demo hub connection`
+3. [x] Add `use-demo-hub.ts` (state + received segments + publish) — `feat: demo hub hook`
+4. [x] Swap `live-hearing-panel` scripted feed for the hub stream + connection status — `feat: live panel over signalr`
+5. [x] Add hub error codes to the error map (uz/en/ru) — `feat: signalr hub error copy`
+6. [x] docs: sync `docs/codemap.md` + `docs/architecture.md` — `docs: document signalr demo hub`
 
 ## Risks / ripple / escalation
 

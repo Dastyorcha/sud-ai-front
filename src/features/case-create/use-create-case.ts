@@ -60,13 +60,13 @@ export function useCreateCase(): UseCreateCaseResult {
         caseId: created.id,
         displayName: values.claimant.displayName,
         organizationName: values.claimant.organizationName || null,
-        role: "CLAIMANT",
+        role: "Claimant",
       });
       await createParticipant({
         caseId: created.id,
         displayName: values.defendant.displayName,
         organizationName: values.defendant.organizationName || null,
-        role: "DEFENDANT",
+        role: "Defendant",
       });
       if (values.hasRepresentative && values.representativeName.trim()) {
         await createParticipant({

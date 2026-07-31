@@ -4,7 +4,7 @@ Project guide for Claude Code. **Always loaded.** Keep it short — every detail
 
 ## What this project is
 
-**React Admin Template** — a Vite + React 19 + React Router v7 single-page admin app, meant to be cloned and adapted for a new project. No public/marketing surface, **no SEO**. Optimise for data density, reusable CRUD surfaces, and fast interactions. Development is AI-driven and token-conscious.
+**LexKotib (Court AI Assistant)** — the frontend for an AI-assisted court transcription and documentation panel: run a hearing, capture/edit its transcript, extract procedural events, and generate court documents from verified sources. Vite + React 19 + React Router v7 SPA against the LexKotib REST + SignalR backend (`docs/api-integration.md`). No public/marketing surface, **no SEO**. Optimise for data density, reusable CRUD surfaces, and fast interactions. Development is AI-driven and token-conscious.
 
 ## Commands
 
@@ -66,15 +66,16 @@ Full spec: `docs/agentic-workflow.md`. In short:
 
 The single index of `docs/*.md`. `/doc-writer` reads this to pick affected docs. Do not crawl `docs/` to explore.
 
-| Doc                        | Covers                                                                     | Sync triggers                                               |
-| -------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `docs/architecture.md`     | FSD layering, routing, naming, tokens, `/tools` playground, admin patterns | `src/{app,views,widgets,features,shared}/`, `src/index.css` |
-| `docs/agentic-workflow.md` | Task sizing, model routing, subagents, `plans/` lifecycle, escalation      | `.claude/agents/`, orchestration changes                    |
-| `docs/claude-hooks.md`     | Every shell hook in `.claude/hooks/`                                       | `.claude/hooks/`                                            |
-| `docs/claude-skills.md`    | Every skill + command in `.claude/`                                        | `.claude/skills/`, `.claude/commands/`                      |
-| `docs/codemap.md`          | One line per source file                                                   | Any add/remove/rename of an export, or file move            |
-| `docs/i18n.md`             | Locale model, message shape, `t()` API + typing, routing, formatting       | `src/shared/lib/i18n/`                                      |
-| `docs/qa-acceptance.md`    | TZ §27 acceptance checklist — feature coverage, a11y, known gaps           | End of a plan; acceptance/QA review                         |
+| Doc                        | Covers                                                                     | Sync triggers                                                   |
+| -------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `docs/architecture.md`     | FSD layering, routing, naming, tokens, `/tools` playground, admin patterns | `src/{app,views,widgets,features,shared}/`, `src/index.css`     |
+| `docs/agentic-workflow.md` | Task sizing, model routing, subagents, `plans/` lifecycle, escalation      | `.claude/agents/`, orchestration changes                        |
+| `docs/claude-hooks.md`     | Every shell hook in `.claude/hooks/`                                       | `.claude/hooks/`                                                |
+| `docs/claude-skills.md`    | Every skill + command in `.claude/`                                        | `.claude/skills/`, `.claude/commands/`                          |
+| `docs/codemap.md`          | One line per source file                                                   | Any add/remove/rename of an export, or file move                |
+| `docs/i18n.md`             | Locale model, message shape, `t()` API + typing, routing, formatting       | `src/shared/lib/i18n/`                                          |
+| `docs/api-integration.md`  | LexKotib API endpoint map, base URL/proxy, §17 gap register, concurrency   | `src/shared/lib/http/`, `src/shared/lib/query/`, `*.service.ts` |
+| `docs/qa-acceptance.md`    | TZ §27 + guide §18 acceptance checklist — feature coverage, a11y, gaps     | End of a plan; acceptance/QA review                             |
 
 ## Architecture summary (full: `docs/architecture.md`)
 

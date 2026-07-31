@@ -64,7 +64,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-3">
                       <StatusBadge
                         label={t(`enums.caseStatus.${c.status}` as MessageKey)}
-                        tone={c.status === "ACTIVE" ? "success" : "neutral"}
+                        tone={c.status === "Active" ? "success" : "neutral"}
                       />
                       <DateText value={c.updatedAt} />
                     </div>

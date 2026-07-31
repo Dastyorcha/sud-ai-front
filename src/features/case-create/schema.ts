@@ -9,8 +9,8 @@ const partySchema = z.object({
 });
 
 const representativeRoleValues = [
-  PARTICIPANT_ROLE.CLAIMANT_REPRESENTATIVE,
-  PARTICIPANT_ROLE.DEFENDANT_REPRESENTATIVE,
+  PARTICIPANT_ROLE.ClaimantRepresentative,
+  PARTICIPANT_ROLE.DefendantRepresentative,
 ] as const;
 
 /**
@@ -58,7 +58,7 @@ export const CASE_WIZARD_DEFAULTS: CaseWizardValues = {
   defendant: { displayName: "", organizationName: "" },
   hasRepresentative: false,
   representativeName: "",
-  representativeRole: "CLAIMANT_REPRESENTATIVE",
+  representativeRole: "ClaimantRepresentative",
   claimText: "",
   claimAmount: 0,
   legalBasis: "",

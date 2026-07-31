@@ -1,6 +1,6 @@
 # Integration 08 — Document templates & document lifecycle
 
-- **Status:** idea
+- **Status:** done
 - **Size:** large
 - **Author model:** Opus 4.8 (planner)
 - **Reference:** Guide §12 (templates & documents), §16 (concurrency)
@@ -83,14 +83,14 @@ sections[] }`; each field `{ key, value, sources[] }`; each section
 
 ## Steps
 
-1. [ ] Model `contentJson`/`sourceSnapshot` + align document/template/version types — `refactor: align document types and content schema to api`
-2. [ ] Add `template.service.ts` + `use-templates` (list/upload, active filter) — `feat: document template service`
-3. [ ] Add `document.service.ts` generate + GET + job wiring — `feat: document generate and fetch`
-4. [ ] Add content PATCH + re-GET/poll for regenerated DOCX; preserve sources — `feat: document content edit with regeneration poll`
-5. [ ] Add blob DOCX download — `feat: docx download`
-6. [ ] Wire lifecycle (submit/request-changes/approve) with role+status gating — `feat: document review lifecycle`
-7. [ ] Wire PDF export job + exported state; version history panel — `feat: document export and version history`
-8. [ ] docs: sync `docs/codemap.md` — `docs: sync document services`
+1. [x] Model `contentJson`/`sourceSnapshot` + align document/template/version types — `refactor: align document types and content schema to api`
+2. [x] Add `template.service.ts` + `use-templates` (list/upload, active filter) — `feat: document template service`
+3. [x] Add `document.service.ts` generate + GET + job wiring — `feat: document generate and fetch`
+4. [x] Add content PATCH + re-GET/poll for regenerated DOCX; preserve sources — `feat: document content edit with regeneration poll`
+5. [x] Add blob DOCX download — `feat: docx download`
+6. [x] Wire lifecycle (submit/request-changes/approve) with role+status gating — `feat: document review lifecycle`
+7. [x] Wire PDF export job + exported state; version history panel — `feat: document export and version history`
+8. [x] docs: sync `docs/codemap.md` — `docs: sync document services`
 
 ## Risks / ripple / escalation
 
@@ -100,6 +100,21 @@ sections[] }`; each field `{ key, value, sources[] }`; each section
   never-ready DOCX (timeout + user message).
 - Blob download must bypass the JSON error parser on success.
 - Rollback: mock service remains until integration-11.
+- **Implementation deviation:** the "Affected files" table named
+  `widgets/documents-workspace`/`document-editor`/`template-selector` (the
+  case-detail "Sud hujjatlari" tab) as the UI to wire. That tab has no
+  live-API equivalent at all — generation needs a `hearingId` (guide §12),
+  and there's no `GET /cases/{id}/documents` list (guide §17 — explicitly
+  out of scope above), so that mockup widget can't be wired regardless and
+  was left untouched. Steps 6–7's "wire" work instead targets
+  `features/protocol/protocol-panel.tsx` — the hearing-scoped tab already
+  used by `views/hearings/hearing-detail.tsx` alongside the real
+  `EventsPanel`/`RealTranscriptPanel`, which does have a `hearingId` in
+  scope. It was rewritten from its mock `document.service.ts` calls to the
+  full live flow: template pick → generate (job poll) → `contentJson`
+  fields/sections/paragraphs editor (sources preserved) → submit/approve/
+  request-changes (status + role gated) → DOCX download → PDF export (job
+  poll, exported-state only) → version history.
 
 ## Verification
 

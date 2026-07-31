@@ -10,6 +10,7 @@ import { LocaleProvider, useTranslation } from "@/shared/lib/i18n/locale-context
 import ScrollToTop from "@/shared/custom/scroll-to-top";
 import { AuthGuard } from "@/widgets/layout/auth-guard/auth-guard";
 import { AppShell } from "@/widgets/layout/app-shell/app-shell";
+import { BackendConnectivityProbe } from "@/features/system/backend-connectivity-probe";
 
 // public lazy imports
 const ToolsPage = lazy(() => import("@/pages/tools/toolsPage"));
@@ -73,6 +74,7 @@ function LocaleRoot() {
   return (
     <LocaleProvider>
       <ScrollToTop />
+      <BackendConnectivityProbe />
       {validLocale ? (
         <>
           <Outlet />

@@ -73,7 +73,13 @@ export default function HearingDetailView() {
     {
       id: "transcript",
       label: t("hearing.transcriptTab"),
-      content: <RealTranscriptPanel hearingId={hearing.id} reloadKey={transcriptReloadKey} />,
+      content: (
+        <RealTranscriptPanel
+          hearing={hearing}
+          onHearingChanged={setHearing}
+          reloadKey={transcriptReloadKey}
+        />
+      ),
     },
     {
       id: "events",

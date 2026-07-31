@@ -52,12 +52,11 @@ const schema = z.object({
         displayName: z.string().trim().min(1, "errName"),
         organizationName: z.string().trim(),
         role: z.enum(roleValues),
-      }),
+      })
     )
     .refine(
-      (rows) =>
-        rows.some((r) => r.role === "CLAIMANT") && rows.some((r) => r.role === "DEFENDANT"),
-      { message: "errClaimantDefendant" },
+      (rows) => rows.some((r) => r.role === "Claimant") && rows.some((r) => r.role === "Defendant"),
+      { message: "errClaimantDefendant" }
     ),
 });
 
@@ -70,8 +69,8 @@ const EMPTY_DRAFT: CaseFormValues = {
   caseType: "ECONOMIC_DISPUTE",
   judgeId: NO_JUDGE,
   participants: [
-    { displayName: "", organizationName: "", role: "CLAIMANT" },
-    { displayName: "", organizationName: "", role: "DEFENDANT" },
+    { displayName: "", organizationName: "", role: "Claimant" },
+    { displayName: "", organizationName: "", role: "Defendant" },
   ],
 };
 
@@ -176,7 +175,11 @@ export default function CaseNewView() {
                   <FormItem>
                     <FormLabel>{t("caseForm.caseNumber")}</FormLabel>
                     <FormControl>
-                      <Input {...field} className="font-mono" placeholder={t("caseForm.caseNumberHint")} />
+                      <Input
+                        {...field}
+                        className="font-mono"
+                        placeholder={t("caseForm.caseNumberHint")}
+                      />
                     </FormControl>
                     <FormMessage>{err(fieldState.error?.message)}</FormMessage>
                   </FormItem>
@@ -274,14 +277,20 @@ export default function CaseNewView() {
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               {fields.map((row, index) => (
-                <div key={row.id} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
+                <div
+                  key={row.id}
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
+                >
                   <FormField
                     control={form.control}
                     name={`participants.${index}.displayName`}
                     render={({ field, fieldState }) => (
                       <FormItem>
                         <FormControl>
-                          <Input {...field} placeholder={t("caseForm.participantNamePlaceholder")} />
+                          <Input
+                            {...field}
+                            placeholder={t("caseForm.participantNamePlaceholder")}
+                          />
                         </FormControl>
                         <FormMessage>{err(fieldState.error?.message)}</FormMessage>
                       </FormItem>
@@ -342,7 +351,7 @@ export default function CaseNewView() {
                 variant="outline"
                 size="sm"
                 className="self-start"
-                onClick={() => append({ displayName: "", organizationName: "", role: "OTHER" })}
+                onClick={() => append({ displayName: "", organizationName: "", role: "Other" })}
               >
                 <Plus className="size-4" />
                 {t("caseForm.addParticipant")}

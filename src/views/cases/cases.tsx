@@ -23,6 +23,16 @@ import { notify } from "@/shared/lib/toast";
 
 const NewCaseWizard = lazy(() => import("@/widgets/new-case-wizard/new-case-wizard"));
 
+/** Real API case statuses only (guide §8) — `CASE_STATUS` also carries the
+ * mock layer's `ACTIVE`/`ARCHIVED` values for `case-new.tsx`, which this
+ * live-API filter must not surface. */
+const CASE_STATUS_FILTER_VALUES = [
+  CASE_STATUS.Draft,
+  CASE_STATUS.Active,
+  CASE_STATUS.Completed,
+  CASE_STATUS.Archived,
+] as const;
+
 /**
  * Case dashboard grid (mockup-02, wired to the live API — guide §8): search
  * (→ `caseNumber` contains) + status filter over `useCases()`, live result
@@ -81,7 +91,7 @@ export default function CasesView() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">{t("cases.allStatuses")}</SelectItem>
-            {(Object.values(CASE_STATUS) as CaseStatus[]).map((s) => (
+            {CASE_STATUS_FILTER_VALUES.map((s) => (
               <SelectItem key={s} value={s}>
                 {t(`enums.caseStatus.${s}` as MessageKey)}
               </SelectItem>
