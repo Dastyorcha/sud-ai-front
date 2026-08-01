@@ -32,14 +32,15 @@ export interface UseCreateCaseResult {
 
 /**
  * New-case wizard submit hook (`case-create` feature): `POST /cases` (guide
- * §8) then its claimant/defendant/optional-representative participants via
+ * §8) then its claimant/defendant participants via
  * `POST /cases/{id}/participants`. The wizard's `caseType` (case kind:
  * Civil/Economic/Special) maps to the request's `courtType`; the finer-grained
  * `category` (e.g. "debtRecovery") maps to the request's `caseType`, since the
  * live API's `caseType` is a free ≤100-char string, not this app's enum.
- * `judgeId` is the wizard's manual UUID field (guide §17 — no judge-list
- * endpoint). Callers should catch and toast `errorMessageKey(error)` — e.g.
- * `400 INVALID_JUDGE`, `409 CASE_NUMBER_EXISTS`.
+ * `judgeId` isn't collected by the wizard yet (no judge-list endpoint, guide
+ * §17) — `createCase`'s `judgeId` is omitted, left for the backend/assignment
+ * step to set later. Callers should catch and toast `errorMessageKey(error)`
+ * — e.g. `409 CASE_NUMBER_EXISTS`.
  */
 export function useCreateCase(): UseCreateCaseResult {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,8 +53,7 @@ export function useCreateCase(): UseCreateCaseResult {
         courtName: DEFAULT_COURT_NAME,
         courtType: COURT_TYPE_BY_KIND[values.caseType as CaseKind],
         caseType: values.category,
-        judgeId: values.judgeId,
-        description: values.claimText,
+        description: values.summaryText,
       });
 
       await createParticipant({
@@ -68,14 +68,6 @@ export function useCreateCase(): UseCreateCaseResult {
         organizationName: values.defendant.organizationName || null,
         role: "Defendant",
       });
-      if (values.hasRepresentative && values.representativeName.trim()) {
-        await createParticipant({
-          caseId: created.id,
-          displayName: values.representativeName,
-          organizationName: null,
-          role: values.representativeRole,
-        });
-      }
 
       return created;
     } finally {

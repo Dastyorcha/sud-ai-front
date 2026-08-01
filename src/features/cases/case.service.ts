@@ -93,8 +93,8 @@ export interface CreateCaseInput {
   courtName: string;
   courtType: string;
   caseType: string;
-  /** Active Judge UUID — required (guide §17: no judge-list endpoint, so the wizard collects it as free text). */
-  judgeId: string;
+  /** Active Judge UUID — optional (guide §17: no judge-list endpoint yet, so the wizard no longer collects it). */
+  judgeId?: string;
   description?: string;
   isDemo?: boolean;
 }
