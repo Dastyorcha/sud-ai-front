@@ -98,12 +98,12 @@ services with the real API (see "HTTP client / real-backend layer" and
 wholesale — every file still there has a genuine, deliberate consumer with no
 live endpoint to migrate to (documented per-file in `docs/codemap.md` and in
 `docs/api-integration.md`'s gap register: no hearing list/GET, no case-level
-document list, the reference users CRUD page, the judge-copilot feature).
+document list, the reference users CRUD page).
 Each mock call is still `async` with a simulated ~250ms latency (`delay.ts`)
 so loading states are always exercised.
 
 - **Domain models** (`src/shared/types/models.ts`) are shared between the mock and real layers — backend-shaped (ISO date strings, enum IDs from `enums.ts`), with mock-only fields marked `undefined` on real records. `src/shared/types/query-types.ts` holds the generic `ListParams<TFilters, TField>` / `Paginated<T>` request/response shapes for server-style list endpoints.
-- **`data/`** holds the seed dataset (one file per entity — `organization.ts`, `users.ts`, `court-cases.ts`, `hearings.ts`, `transcript-segments.ts`, `documents.ts`, `copilot.ts`, …). `data/index.ts` is the single import surface — add new seed files there as you add entities.
+- **`data/`** holds the seed dataset (one file per entity — `organization.ts`, `users.ts`, `court-cases.ts`, `hearings.ts`, `transcript-segments.ts`, `documents.ts`, …). `data/index.ts` is the single import surface — add new seed files there as you add entities. (`case-advisor.service.ts` is mock too — no real AI-assistant endpoint exists — but it's stateless, so it has no seed file.)
 - **`*.service.ts`** (one per still-mock entity) reads from `data/` and exposes server-shaped async functions (`listUsers`/`getUser`, `createCase`/`transitionHearing`, …), following the same pattern.
 - **Consumer hooks** (`src/features/users/use-users.ts`, `src/shared/hooks/use-mock-query.ts`) wrap the services with plain `useState`/`useEffect` (`{ data, isLoading, error }` or `{ data, isLoading, error, refetch }`) — no `react-query`, by design (no extra dependency for a mock-only layer). `use-mock-query.ts` is the generic loader — pass it any `() => Promise<T>` and a dependency array.
 

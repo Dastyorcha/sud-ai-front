@@ -144,8 +144,8 @@ a genuine consumer with no live endpoint to replace it (per-file detail in
 - **`user.service.ts` + `data/users.ts` + `data/organization.ts`** — powers
   `views/users/*`, the template's reference CRUD example, out of the
   LexKotib guide's scope entirely.
-- **`copilot.service.ts` + `data/copilot.ts`** — the judge-copilot
-  ("Sudya maslahatchisi") feature has no real Lex.uz/LLM backend at all.
+- **`case-advisor.service.ts`** — the "Sudya maslahatchisi" chat has no real
+  AI-assistant backend at all; stateless, so it has no `data/` seed file.
 - **`data/court-users.ts`** — mock judge/user picker data for
   `vocabulary-panel.tsx`/`case-detail.tsx`/`case-new.tsx` (no judge-list
   endpoint, gap register above).

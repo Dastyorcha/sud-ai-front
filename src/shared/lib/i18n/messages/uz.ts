@@ -327,7 +327,7 @@ export const uz = {
     tabs: {
       protocol: "Bayonnoma",
       documents: "Sud hujjatlari",
-      copilot: "Sudya maslahatchisi",
+      advisor: "Sudya maslahatchisi",
     },
   },
   hearing: {
@@ -517,37 +517,12 @@ export const uz = {
         "Diqqat: matn namuna sifatida yaratilgan, chop etishdan oldin yuridik ko'rikdan o'tkazing.",
     },
   },
-  copilotGrid: {
-    defects: {
-      title: "Protsessual kamchiliklar",
-      empty: "Kamchiliklar aniqlanmadi.",
-      severity: {
-        danger: "Yuqori xavf",
-        warning: "O'rta xavf",
-        info: "Ma'lumot uchun",
-      },
-    },
-    lawArticles: {
-      title: "Tegishli qonun moddalari",
-      empty: "Tegishli moddalar topilmadi.",
-    },
-    deadlines: {
-      title: "Protsessual muddatlar",
-      empty: "Kuzatilayotgan muddatlar yo'q.",
-      daysLeft: "{count} kun qoldi",
-      overdue: "Muddati o'tgan",
-      urgency: {
-        urgent: "Zudlik bilan",
-        warning: "Diqqat talab qiladi",
-        normal: "Rejadagi",
-      },
-    },
-    suggestions: {
-      title: "AI xulosalari va tavsiyalari",
-      empty: "Tavsiyalar mavjud emas.",
-      addToDocument: "Hujjatga qo'shish",
-      addedToast: 'Hujjat loyihasining "Asoslantiruvchi" qismiga qo\'shildi',
-    },
+  caseAdvisorChat: {
+    emptyTitle: "Suhbatni boshlang",
+    emptyDescription: "Ish bo'yicha savolingizni yozing — sudya maslahatchisi javob beradi.",
+    placeholder: "Savolingizni yozing…",
+    send: "Yuborish",
+    typing: "Maslahatchi yozmoqda…",
   },
   protocol: {
     origin: { template: "Shablon", ai: "AI yaratgan", human: "Tahrirlangan" },

@@ -320,7 +320,7 @@ export const en: Messages = {
     tabs: {
       protocol: "Protocol",
       documents: "Court documents",
-      copilot: "Judge copilot",
+      advisor: "Judge's advisor",
     },
   },
   hearing: {
@@ -509,37 +509,12 @@ export const en: Messages = {
         "Note: this text is a generated sample — have it reviewed by legal counsel before printing.",
     },
   },
-  copilotGrid: {
-    defects: {
-      title: "Procedural defects",
-      empty: "No defects detected.",
-      severity: {
-        danger: "High risk",
-        warning: "Medium risk",
-        info: "For information",
-      },
-    },
-    lawArticles: {
-      title: "Relevant law articles",
-      empty: "No relevant articles found.",
-    },
-    deadlines: {
-      title: "Procedural deadlines",
-      empty: "No deadlines being tracked.",
-      daysLeft: "{count} days left",
-      overdue: "Overdue",
-      urgency: {
-        urgent: "Urgent",
-        warning: "Needs attention",
-        normal: "On schedule",
-      },
-    },
-    suggestions: {
-      title: "AI conclusions & recommendations",
-      empty: "No recommendations available.",
-      addToDocument: "Add to document",
-      addedToast: 'Added to the draft\'s "Reasoning" section',
-    },
+  caseAdvisorChat: {
+    emptyTitle: "Start the conversation",
+    emptyDescription: "Ask a question about the case — the judge's advisor will reply.",
+    placeholder: "Type your question…",
+    send: "Send",
+    typing: "Advisor is typing…",
   },
   protocol: {
     origin: { template: "Template", ai: "AI-generated", human: "Edited" },
