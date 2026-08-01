@@ -13,7 +13,6 @@ export const COURT_ACTION = {
   documentSubmit: "document.submit",
   documentApprove: "document.approve",
   documentExport: "document.export",
-  adminView: "admin.view",
 } as const;
 export type CourtAction = (typeof COURT_ACTION)[keyof typeof COURT_ACTION];
 

@@ -21,7 +21,6 @@ export const ROUTE_PATHS = {
   /** Hearing workspace (live/transcript/events/protocol via `?tab=`). */
   HEARING_DETAIL: "/hearings/:hearingId",
   DOCUMENTS: "/documents",
-  ADMIN: "/admin",
 
   // Auth / session
   LOGIN: "/auth/login",

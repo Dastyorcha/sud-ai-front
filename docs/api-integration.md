@@ -93,7 +93,6 @@ fieldErrors? }` + `parseApiError()`. Distinguishes: RFC 7807
 | §11 events      | `POST /hearings/{id}/events/extract`, `GET /hearings/{id}/events`, `PATCH /events/{id}`, `POST /events/{id}/verify`                                                                                       | `features/events/event.service.ts`                     |
 | §12 templates   | `GET /document-templates`, `POST /document-templates`                                                                                                                                                     | `features/documents/template.service.ts`               |
 | §12 documents   | `POST /cases/{id}/documents/generate`, `GET/PATCH /documents/{id}`, `POST /documents/{id}/{submit-review,request-changes,approve,export}`, `GET /documents/{id}/download`, `GET /documents/{id}/versions` | `features/documents/document.service.ts`               |
-| §13 audit       | `GET /audit-logs`                                                                                                                                                                                         | `features/audit/audit.service.ts`                      |
 | §14 SignalR     | `/hubs/demo-transcript` (`PublishMockSegment` → `TranscriptSegmentReceived`)                                                                                                                              | `features/live-session/demo-hub.ts`, `use-demo-hub.ts` |
 
 ## §17 gap register (backend follow-ups)
