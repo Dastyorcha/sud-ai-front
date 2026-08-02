@@ -52,7 +52,7 @@ import type { MessageKey } from "@/shared/lib/i18n/messages";
 // tab is opened.
 const ProtocolWorkspace = lazy(() => import("@/widgets/protocol-workspace/protocol-workspace"));
 const DocumentsWorkspace = lazy(() => import("@/widgets/documents-workspace/documents-workspace"));
-const CopilotGrid = lazy(() => import("@/widgets/copilot-grid/copilot-grid"));
+const CaseAdvisorChat = lazy(() => import("@/widgets/case-advisor-chat/case-advisor-chat"));
 
 /**
  * Case detail shell (mockup-04): back nav, case number + parties headline,
@@ -228,11 +228,11 @@ export default function CaseDetailView() {
             ),
           },
           {
-            id: "copilot",
-            label: t("caseDetail.tabs.copilot"),
+            id: "advisor",
+            label: t("caseDetail.tabs.advisor"),
             content: (
               <Suspense fallback={<LoadingState rows={4} />}>
-                <CopilotGrid caseId={caseId} />
+                <CaseAdvisorChat caseId={caseId} />
               </Suspense>
             ),
           },

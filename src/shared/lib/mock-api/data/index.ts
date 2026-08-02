@@ -13,9 +13,3 @@ export {
   GENERATED_DOCUMENTS,
   DOCUMENT_VERSIONS,
 } from "@/shared/lib/mock-api/data/documents";
-export {
-  COPILOT_DEFECTS,
-  COPILOT_LAW_ARTICLES,
-  COPILOT_DEADLINES,
-  COPILOT_SUGGESTIONS,
-} from "@/shared/lib/mock-api/data/copilot";

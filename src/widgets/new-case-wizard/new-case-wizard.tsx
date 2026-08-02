@@ -7,10 +7,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Form } from "@/shared/components/ui/form";
 import { StepIndicator } from "@/widgets/new-case-wizard/step-indicator";
 import { CaseTypeStep } from "@/widgets/new-case-wizard/steps/case-type-step";
-import { PartiesStep } from "@/widgets/new-case-wizard/steps/parties-step";
-import { ClaimStep } from "@/widgets/new-case-wizard/steps/claim-step";
 import { DocumentsStep } from "@/widgets/new-case-wizard/steps/documents-step";
-import { SummaryStep } from "@/widgets/new-case-wizard/steps/summary-step";
+import { AiSummaryStep } from "@/widgets/new-case-wizard/steps/ai-summary-step";
 import {
   CASE_WIZARD_DEFAULTS,
   caseWizardSchema,
@@ -18,10 +16,7 @@ import {
   WIZARD_STEP_FIELDS,
   type CaseWizardValues,
 } from "@/features/case-create/schema";
-import {
-  REQUIRED_DOCUMENT_KEYS,
-  type RequiredDocumentKey,
-} from "@/features/case-create/categories";
+import { type RequiredDocumentKey } from "@/features/case-create/categories";
 import { useCreateCase } from "@/features/case-create/use-create-case";
 import { errorMessageKey } from "@/shared/lib/errors/error-map";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
@@ -37,18 +32,17 @@ export interface NewCaseWizardProps {
 
 const STEP_LABEL_KEYS: MessageKey[] = [
   "caseWizard.steps.type",
-  "caseWizard.steps.parties",
-  "caseWizard.steps.claim",
   "caseWizard.steps.documents",
-  "caseWizard.steps.summary",
+  "caseWizard.steps.aiSummary",
 ];
 
 /**
- * "Yangi ish ochish" 5-step modal wizard (mockup-03): case kind/category,
- * parties, claim + state fee, documents, summary + confirm. Backed by a
- * single `react-hook-form` instance (see `features/case-create/schema.ts`) so
- * Back never loses values; each step is validated independently before
- * advancing. Lazy-loaded from `views/cases/cases.tsx`.
+ * "Yangi ish ochish" 3-step modal wizard: case kind/category, documents,
+ * then an AI-generated case summary (subject + parties) extracted from the
+ * uploaded documents. Backed by a single `react-hook-form` instance (see
+ * `features/case-create/schema.ts`) so Back never loses values; each step is
+ * validated independently before advancing. Lazy-loaded from
+ * `views/cases/cases.tsx`.
  */
 export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCaseWizardProps) {
   const { t } = useTranslation();
@@ -117,9 +111,7 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
             onSubmit={(e) => e.preventDefault()}
           >
             {step === 1 && <CaseTypeStep />}
-            {step === 2 && <PartiesStep />}
-            {step === 3 && <ClaimStep />}
-            {step === 4 && (
+            {step === 2 && (
               <DocumentsStep
                 files={files}
                 onFilesChange={setFiles}
@@ -127,13 +119,7 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
                 onCheckedDocsChange={setCheckedDocs}
               />
             )}
-            {step === 5 && (
-              <SummaryStep
-                fileCount={files.length}
-                checkedDocsCount={checkedDocs.length}
-                requiredDocsCount={REQUIRED_DOCUMENT_KEYS.length}
-              />
-            )}
+            {step === 3 && <AiSummaryStep fileNames={files.map((file) => file.name)} />}
           </form>
         </Form>
 

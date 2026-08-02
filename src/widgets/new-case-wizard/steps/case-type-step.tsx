@@ -1,7 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { Scale, Landmark, Gavel } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,14 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/shared/components/ui/form";
+import { FormField, FormItem, FormLabel, FormMessage } from "@/shared/components/ui/form";
 import {
   CASE_CATEGORY_OPTIONS,
   CASE_KIND_VALUES,
@@ -99,25 +91,6 @@ export function CaseTypeStep() {
                 ))}
               </SelectContent>
             </Select>
-            <FormMessage>{err(fieldState.error?.message)}</FormMessage>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="judgeId"
-        render={({ field, fieldState }) => (
-          <FormItem>
-            <FormLabel>{t("caseWizard.judgeId")}</FormLabel>
-            <FormControl>
-              <Input
-                {...field}
-                className="font-mono"
-                placeholder={t("caseWizard.judgeIdPlaceholder")}
-              />
-            </FormControl>
-            <FormDescription>{t("caseWizard.judgeIdHint")}</FormDescription>
             <FormMessage>{err(fieldState.error?.message)}</FormMessage>
           </FormItem>
         )}
