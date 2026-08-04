@@ -1,17 +1,14 @@
-import { ChevronRight, LogOut, Menu, Scale } from "lucide-react";
+import { ChevronRight, Menu, Scale } from "lucide-react";
 import { Link, matchPath, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { useCourtAuth } from "@/features/auth/use-court-auth";
-import { useLogout } from "@/features/auth/use-logout";
 import { APP_FULL_NAME, APP_NAME } from "@/shared/constants/app";
 import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useCase } from "@/features/cases/use-case";
@@ -40,7 +37,6 @@ function initials(name: string): string {
 export function AppHeader({ onOpenNav }: AppHeaderProps) {
   const { t, locale } = useTranslation();
   const { user, role } = useCourtAuth();
-  const { logout } = useLogout();
   const { pathname } = useLocation();
 
   const caseMatch = matchPath(withLocale(locale, ROUTE_PATHS.CASE_DETAIL), pathname);
@@ -134,16 +130,6 @@ export function AppHeader({ onOpenNav }: AppHeaderProps) {
                 {role ? t(`enums.apiRoles.${role}` as MessageKey) : null}
               </span>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer text-destructive focus:text-destructive"
-              onClick={() => {
-                void logout();
-              }}
-            >
-              <LogOut className="size-4" aria-hidden="true" />
-              {t("common.logout")}
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

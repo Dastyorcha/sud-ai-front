@@ -5,7 +5,6 @@ import {
   HubConnectionState,
 } from "@microsoft/signalr";
 import { DEMO_TRANSCRIPT_HUB_PATH, env } from "@/shared/config/env";
-import { getAccessToken } from "@/shared/lib/auth/token-store";
 import type { SegmentStatus } from "@/shared/types/enums";
 
 /**
@@ -55,7 +54,6 @@ export function buildDemoHubConnection(hearingId: string): HubConnection {
     .withUrl(
       `${env.hubOrigin}${DEMO_TRANSCRIPT_HUB_PATH}?hearingId=${encodeURIComponent(hearingId)}`,
       {
-        accessTokenFactory: () => getAccessToken() ?? "",
         transport: HttpTransportType.LongPolling,
       }
     )

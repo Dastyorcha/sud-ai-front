@@ -1,4 +1,4 @@
-import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { createRequestId, setLastRequestId } from "@/shared/lib/http/request-id";
 import { parseApiError } from "@/shared/lib/http/api-error";
 import { env } from "@/shared/config/env";
@@ -10,11 +10,9 @@ import { env } from "@/shared/config/env";
  */
 export type AccessTokenGetter = () => string | undefined;
 
-let getAccessToken: AccessTokenGetter = () => undefined;
-
-/** Wires the real token getter — called once by the auth store (integration-03). */
+/** Compatibility no-op while authentication is disabled. */
 export function setAccessTokenGetter(getter: AccessTokenGetter): void {
-  getAccessToken = getter;
+  void getter;
 }
 
 /**
@@ -28,11 +26,9 @@ export type UnauthorizedHandler = (
   originalRequest: InternalAxiosRequestConfig
 ) => Promise<AxiosResponse | undefined>;
 
-let handleUnauthorized: UnauthorizedHandler = () => Promise.resolve(undefined);
-
-/** Wires the real 401 handler — called once by `refresh-manager` at app init. */
+/** Compatibility no-op while authentication is disabled. */
 export function setUnauthorizedHandler(handler: UnauthorizedHandler): void {
-  handleUnauthorized = handler;
+  void handler;
 }
 
 /**
@@ -50,11 +46,6 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   config.headers.set("Accept", "application/json");
   config.headers.set("X-Request-ID", createRequestId());
 
-  const token = getAccessToken();
-  if (token) {
-    config.headers.set("Authorization", `Bearer ${token}`);
-  }
-
   return config;
 });
 
@@ -66,11 +57,6 @@ apiClient.interceptors.response.use(
   async (error: unknown) => {
     const apiError = parseApiError(error);
     setLastRequestId(apiError.requestId);
-
-    if (apiError.status === 401 && isAxiosError(error) && error.config) {
-      const retried = await handleUnauthorized(error.config);
-      if (retried) return retried;
-    }
 
     return Promise.reject(apiError);
   }

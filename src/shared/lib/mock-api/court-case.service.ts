@@ -30,7 +30,6 @@ export interface CreateCaseInput {
   courtName: string;
   courtType: CourtType;
   caseType: CaseType;
-  judgeId: string | null;
   subject?: string;
   claimantName?: string | null;
   defendantName?: string | null;
@@ -106,7 +105,7 @@ export async function createCase(
     courtName: input.courtName,
     courtType: input.courtType,
     caseType: input.caseType,
-    judgeId: input.judgeId,
+    judgeId: null,
     status: "ACTIVE",
     description: input.subject ?? null,
     isDemo: false,

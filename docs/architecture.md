@@ -1,5 +1,8 @@
 # Architecture
 
+> Authentication is temporarily disabled. `AppShell` is mounted directly and
+> the backend exposes a public compatibility identity for display purposes.
+
 Feature-Sliced Design (FSD) for a **Vite + React 19 + React Router v7** admin panel. This is the source of truth for layering, file placement, and naming. `CLAUDE.md` links here; the `ui-designer` and `refactor-code` skills enforce it.
 
 Admin panel — **no SEO, no marketing pages**. Optimise for data density, fast interactions, and reusable CRUD surfaces.

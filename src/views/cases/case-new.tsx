@@ -24,7 +24,6 @@ import {
 } from "@/shared/components/ui/select";
 import { createCase } from "@/shared/lib/mock-api/court-case.service";
 import { createParticipant } from "@/shared/lib/mock-api/participant.service";
-import { COURT_USERS } from "@/shared/lib/mock-api/data";
 import { COURT_TYPE, CASE_TYPE, PARTICIPANT_ROLE } from "@/shared/types/enums";
 import type { CourtType, CaseType, ParticipantRole } from "@/shared/types/enums";
 import { ROUTE_PATHS, buildRoute, withLocale } from "@/shared/constants/route-paths";
@@ -33,7 +32,6 @@ import type { MessageKey } from "@/shared/lib/i18n/messages";
 import { notify } from "@/shared/lib/toast";
 
 const DRAFT_KEY = "lexkotib:case-draft";
-const NO_JUDGE = "NONE";
 
 const courtTypeValues = Object.values(COURT_TYPE) as [CourtType, ...CourtType[]];
 const caseTypeValues = Object.values(CASE_TYPE) as [CaseType, ...CaseType[]];
@@ -45,7 +43,6 @@ const schema = z.object({
   courtName: z.string().trim().min(1, "errCourtName"),
   courtType: z.enum(courtTypeValues),
   caseType: z.enum(caseTypeValues),
-  judgeId: z.string(),
   participants: z
     .array(
       z.object({
@@ -67,7 +64,6 @@ const EMPTY_DRAFT: CaseFormValues = {
   courtName: "",
   courtType: "ECONOMIC",
   caseType: "ECONOMIC_DISPUTE",
-  judgeId: NO_JUDGE,
   participants: [
     { displayName: "", organizationName: "", role: "Claimant" },
     { displayName: "", organizationName: "", role: "Defendant" },
@@ -114,8 +110,6 @@ export default function CaseNewView() {
     return () => sub.unsubscribe();
   }, [form]);
 
-  const judges = COURT_USERS.filter((u) => u.role === "JUDGE");
-
   /** Resolves a Zod message token to a localized string (falls back to the token). */
   const err = (message?: string) => (message ? t(`caseForm.${message}` as MessageKey) : undefined);
 
@@ -127,7 +121,6 @@ export default function CaseNewView() {
         courtName: values.courtName,
         courtType: values.courtType,
         caseType: values.caseType,
-        judgeId: values.judgeId === NO_JUDGE ? null : values.judgeId,
       });
       for (const p of values.participants) {
         await createParticipant({
@@ -237,30 +230,6 @@ export default function CaseNewView() {
                         {caseTypeValues.map((v) => (
                           <SelectItem key={v} value={v}>
                             {t(`enums.caseType.${v}` as MessageKey)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="judgeId"
-                render={({ field }) => (
-                  <FormItem className="sm:col-span-2">
-                    <FormLabel>{t("enums.courtRoles.JUDGE")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("caseForm.selectJudge")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={NO_JUDGE}>{t("caseForm.unassigned")}</SelectItem>
-                        {judges.map((j) => (
-                          <SelectItem key={j.id} value={j.id}>
-                            {j.fullName}
                           </SelectItem>
                         ))}
                       </SelectContent>

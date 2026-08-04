@@ -76,7 +76,8 @@ export interface CourtCase {
   courtName: string;
   courtType: CourtType;
   caseType: CaseType;
-  judgeId: string | null;
+  /** Legacy mock-only assignment; absent from the live public API contract. */
+  judgeId?: string | null;
   status: CaseStatus;
   /** Free-text case description (guide §8, ≤4000 chars server-side). */
   description: string | null;

@@ -17,7 +17,6 @@ interface CourtCaseResponse {
   courtName: string;
   courtType: string;
   caseType: string;
-  judgeId: string | null;
   status: CaseStatus;
   description: string | null;
   isDemo: boolean;
@@ -34,7 +33,6 @@ function toCourtCase(response: CourtCaseResponse): CourtCase {
     courtName: response.courtName,
     courtType: response.courtType as CourtType,
     caseType: response.caseType as CaseType,
-    judgeId: response.judgeId,
     status: response.status,
     description: response.description,
     isDemo: response.isDemo,
@@ -93,8 +91,6 @@ export interface CreateCaseInput {
   courtName: string;
   courtType: string;
   caseType: string;
-  /** Active Judge UUID — optional (guide §17: no judge-list endpoint yet, so the wizard no longer collects it). */
-  judgeId?: string;
   description?: string;
   isDemo?: boolean;
 }
@@ -111,7 +107,6 @@ export interface UpdateCaseInput {
   courtName?: string;
   courtType?: string;
   caseType?: string;
-  judgeId?: string;
   description?: string;
 }
 

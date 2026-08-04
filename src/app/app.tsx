@@ -8,19 +8,13 @@ import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { DEFAULT_LOCALE, isLocale, LOCALE_STORAGE_KEY } from "@/shared/lib/i18n/locale";
 import { LocaleProvider, useTranslation } from "@/shared/lib/i18n/locale-context";
 import ScrollToTop from "@/shared/custom/scroll-to-top";
-import { AuthGuard } from "@/widgets/layout/auth-guard/auth-guard";
 import { AppShell } from "@/widgets/layout/app-shell/app-shell";
 import { BackendConnectivityProbe } from "@/features/system/backend-connectivity-probe";
 
 // public lazy imports
 const ToolsPage = lazy(() => import("@/pages/tools/toolsPage"));
 
-// auth pages lazy imports
-const LoginPage = lazy(() => import("@/pages/auth/login/loginPage"));
-const RegisterPage = lazy(() => import("@/pages/auth/register/registerPage"));
-const ResetPasswordPage = lazy(() => import("@/pages/auth/resetPassword/resetPasswordPage"));
-
-// product views lazy imports (rendered inside the protected app shell)
+// product views lazy imports (rendered inside the public app shell)
 const Dashboard = lazy(() => import("@/views/dashboard/dashboard"));
 const UsersView = lazy(() => import("@/views/users/users"));
 const CasesView = lazy(() => import("@/views/cases/cases"));
@@ -92,14 +86,8 @@ function App() {
       <Route path="/" element={<RootRedirect />} />
 
       <Route path="/:lang" element={<LocaleRoot />}>
-        {/* product shell — protected, dashboard is the index route */}
-        <Route
-          element={
-            <AuthGuard>
-              <AppShell />
-            </AuthGuard>
-          }
-        >
+        {/* product shell — temporarily public, dashboard is the index route */}
+        <Route element={<AppShell />}>
           <Route
             index
             element={
@@ -189,11 +177,6 @@ function App() {
           <Route path={relative(ROUTE_PATHS.TOOLS)} element={<ToolsPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-
-        {/* auth pages */}
-        <Route path={relative(ROUTE_PATHS.LOGIN)} element={<LoginPage />} />
-        <Route path={relative(ROUTE_PATHS.REGISTER)} element={<RegisterPage />} />
-        <Route path={relative(ROUTE_PATHS.RESET_PASSWORD)} element={<ResetPasswordPage />} />
       </Route>
     </Routes>
   );

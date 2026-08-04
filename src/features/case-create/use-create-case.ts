@@ -37,9 +37,8 @@ export interface UseCreateCaseResult {
  * Civil/Economic/Special) maps to the request's `courtType`; the finer-grained
  * `category` (e.g. "debtRecovery") maps to the request's `caseType`, since the
  * live API's `caseType` is a free ≤100-char string, not this app's enum.
- * `judgeId` isn't collected by the wizard yet (no judge-list endpoint, guide
- * §17) — `createCase`'s `judgeId` is omitted, left for the backend/assignment
- * step to set later. Callers should catch and toast `errorMessageKey(error)`
+ * The case contract has no `judgeId`; judge identity comes from participants.
+ * Callers should catch and toast `errorMessageKey(error)`
  * — e.g. `409 CASE_NUMBER_EXISTS`.
  */
 export function useCreateCase(): UseCreateCaseResult {
