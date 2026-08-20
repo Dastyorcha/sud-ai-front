@@ -43,13 +43,26 @@ Date: 2026-08-20
   - integration: 23 passed;
   - architecture: 9 passed.
 
-## Production cutover requirements
+## Production cutover completed
 
-1. Deploy the new private `lexkotib-ai-platform` Cloud Run service.
-2. Grant `roles/run.invoker` on that service only to the VM runtime service account.
-3. Set API and Worker to `Stt__FinalProvider=LexKotibAI` and enable the `LexKotibAi__*` configuration.
-4. Deploy backend API/Worker and run health plus authenticated STT/document smoke tests.
-5. Deploy the frontend build and perform microphone permission testing in Chrome over HTTPS.
+- Private Cloud Run service: `lexkotib-ai-platform` in `us-central1`.
+- Deployed revision: `lexkotib-ai-platform-00001-lrm`.
+- Canonical service audience: `https://lexkotib-ai-platform-156676755216.us-central1.run.app`.
+- Unauthenticated access returns `403`; there is no `allUsers` invoker binding.
+- Service-scoped `roles/run.invoker` is granted only to the VM runtime service account.
+- API and Worker use `Stt__FinalProvider=LexKotibAI`; the LexKotib AI integration and document AI are enabled.
+- Public readiness endpoint `https://api.beezy.uz/health/ready` returns `200`.
+- Production frontend `https://beezy.uz` serves the LexKotib AI build over HTTPS.
+- Authenticated synthetic-audio STT smoke completed through the VM identity and returned segmented Uzbek output.
+- Authenticated document smoke completed from extraction through controlled drafting and DOCX rendering.
+- Chrome production checks covered the dashboard, demo case, hearing/STT placement and the expert document templates.
+
+## Isolation and rollback boundary
+
+- LexKotib API, Worker and frontend were deployed from separate immutable release directories.
+- LexKotib PostgreSQL, Redis and MinIO were not restarted.
+- Qarz AI API, frontend and PostgreSQL were not modified or restarted; all retained their existing ten-day uptime during the final verification.
+- The shared VM service account was not replaced because it is also used by Qarz AI. Access to the new AI service was added at the individual Cloud Run service level only.
 
 ## Explicit limitation
 
