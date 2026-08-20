@@ -78,6 +78,7 @@ export const ru: Messages = {
       BANKRUPTCY: "Банкротство",
       CIVIL: "Гражданское",
       SPECIAL: "Особое",
+      DemoClaim: "Синтетическое демо-дело",
       OTHER: "Прочее",
     },
     caseStatus: {

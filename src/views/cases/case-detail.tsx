@@ -48,15 +48,14 @@ import { ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
 
-// Sub-tab modules (mockup-05/06/07) — lazy so the shell stays light until a
-// tab is opened.
+// Document workspace is lazy so the case shell stays light until it is opened.
 const DocumentsWorkspace = lazy(() => import("@/widgets/documents-workspace/documents-workspace"));
-const CaseAdvisorChat = lazy(() => import("@/widgets/case-advisor-chat/case-advisor-chat"));
 
 /**
  * Case detail shell (mockup-04): back nav, case number + parties headline,
- * stage badge and stat cards, followed by the Bayonnoma / Sud hujjatlari /
- * Sudya maslahatchisi sub-tabs (placeholders until mockup-05/06/07 land).
+ * stage badge and stat cards, followed by the working Bayonnoma and
+ * Sud hujjatlari tabs. The mock judge-advisor surface is intentionally not
+ * exposed because LexKotib AI does not make judicial decisions.
  * Existing requisites/participants/hearings management stays reachable below
  * the tabs. Reads `:caseId` from the route.
  */
@@ -248,15 +247,6 @@ export default function CaseDetailView() {
             content: (
               <Suspense fallback={<LoadingState rows={4} />}>
                 <DocumentsWorkspace caseId={caseId} />
-              </Suspense>
-            ),
-          },
-          {
-            id: "advisor",
-            label: t("caseDetail.tabs.advisor"),
-            content: (
-              <Suspense fallback={<LoadingState rows={4} />}>
-                <CaseAdvisorChat caseId={caseId} />
               </Suspense>
             ),
           },

@@ -78,6 +78,7 @@ export const en: Messages = {
       BANKRUPTCY: "Bankruptcy",
       CIVIL: "Civil",
       SPECIAL: "Special",
+      DemoClaim: "Synthetic demo case",
       OTHER: "Other",
     },
     caseStatus: {

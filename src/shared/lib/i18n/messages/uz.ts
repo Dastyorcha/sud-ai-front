@@ -81,6 +81,7 @@ export const uz = {
       BANKRUPTCY: "Bankrotlik",
       CIVIL: "Fuqarolik",
       SPECIAL: "Maxsus",
+      DemoClaim: "Sintetik demo ishi",
       OTHER: "Boshqa",
     },
     caseStatus: {
