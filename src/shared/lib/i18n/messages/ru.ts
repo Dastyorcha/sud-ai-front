@@ -439,6 +439,7 @@ export const ru: Messages = {
       selectCta: "Выбрать",
       selectedCta: "Выбрано",
       article: "ст. {code} ГПК",
+      referenceFormat: "Формат, утверждённый экспертом",
       groups: {
         claimReview: "Рассмотрение искового заявления",
         preparation: "Подготовка дела к слушанию",
@@ -447,6 +448,11 @@ export const ru: Messages = {
         appeal: "Апелляция",
       },
       templates: {
+        economicHearingProtocol: "Протокол заседания экономического суда",
+        economicCassationLeaveWithoutReview:
+          "Определение об оставлении кассационной жалобы без рассмотрения",
+        civilDebtCourtOrder: "Судебный приказ о взыскании задолженности",
+        criminalJudgment: "Приговор по уголовному делу",
         claimAccept: "Определение о принятии искового заявления",
         claimReturn: "Определение о возврате искового заявления",
         claimLeaveWithoutMovement: "Определение об оставлении иска без движения",
@@ -496,8 +502,8 @@ export const ru: Messages = {
       collapse: "Свернуть",
       expand: "Развернуть",
       placeholder: "Введите текст здесь…",
-      aiFill: "Заполнить с помощью ИИ",
-      aiFillDone: "Заполнено по шаблону — отправьте на юридическую проверку",
+      aiFill: "Заполнить демонстрационными данными",
+      aiFillDone: "Демо заполнено в экспертном формате — отправьте на юридическую проверку",
       export: "Экспорт",
       exportTxt: "Скачать как TXT",
       exportHtml: "Скачать как HTML",

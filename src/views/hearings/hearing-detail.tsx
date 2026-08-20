@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Tabs from "@/shared/components/ui/tabs";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/custom/empty-state";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
-import { useHearingSession } from "@/features/hearings/use-hearing-session";
+import { useHearing } from "@/features/hearings/use-hearings";
 import { HearingLifecyclePanel } from "@/features/hearings/hearing-lifecycle-panel";
 import { RealTranscriptPanel } from "@/features/transcript/real-transcript-panel";
 import { useCase } from "@/features/cases/use-case";
@@ -13,21 +14,25 @@ import { EventsPanel } from "@/features/events/events-panel";
 import { ProtocolPanel } from "@/features/protocol/protocol-panel";
 import { buildRoute, ROUTE_PATHS, withLocale } from "@/shared/constants/route-paths";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
+import { queryKeys } from "@/shared/lib/query/query-keys";
+import type { Hearing } from "@/shared/types/models";
 
 /**
  * Hearing workspace (spec §16.1 #6–9, integration guide §9): live session
  * (real start/stop/upload/transcribe), transcript review, procedural events
- * and protocol in one tabbed screen. Reads `:hearingId` from the route, but
- * — since there's no `GET /hearings/{id}` yet (guide §17) — the hearing
- * itself comes from `use-hearing-session`'s sessionStorage carry, populated
- * by the create/start/stop calls that got the user here. A hearing this tab
- * never saw (fresh tab, cleared session, another device) can't be recovered:
- * the empty state below sends the user back to the case to reopen it.
+ * and protocol in one tabbed screen. Reads `:hearingId` from the route and
+ * recovers the persisted hearing from the API, so refreshes and direct links
+ * are safe.
  */
 export default function HearingDetailView() {
   const { t, locale } = useTranslation();
   const { hearingId = "" } = useParams<{ hearingId: string }>();
-  const { hearing, setHearing } = useHearingSession(hearingId);
+  const queryClient = useQueryClient();
+  const { data: hearing } = useHearing(hearingId);
+  const setHearing = (next: Hearing) => {
+    queryClient.setQueryData(queryKeys.hearings.detail(hearingId), next);
+    void queryClient.invalidateQueries({ queryKey: queryKeys.hearings.list(next.caseId) });
+  };
   const { data: courtCase } = useCase(hearing?.caseId ?? "");
   const [transcriptReloadKey, setTranscriptReloadKey] = useState(0);
 

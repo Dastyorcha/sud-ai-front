@@ -1,11 +1,5 @@
-/**
- * Mock AI document-analysis for the new-case wizard's final step — no backend
- * endpoint exists yet (docs/api-integration.md §17 gap register). Given the
- * uploaded documents' file names it stands in for an AI pass that would
- * extract the case subject and the two parties' names; the result is shown
- * to the user as an editable draft, never submitted as-is.
- */
-import { delay } from "@/shared/lib/mock-api/delay";
+import { API_PREFIX } from "@/shared/config/env";
+import { apiClient } from "@/shared/lib/http/api-client";
 import type { CaseKind } from "@/features/case-create/categories";
 
 export interface CaseAnalysisResult {
@@ -17,31 +11,55 @@ export interface CaseAnalysisResult {
 export interface AnalyzeCaseDocumentsInput {
   caseType: CaseKind;
   category: string;
-  fileNames: string[];
+  files: File[];
 }
 
-function fileStem(fileName: string): string {
-  return fileName
-    .replace(/\.[^./]+$/, "")
-    .replace(/[_-]+/g, " ")
-    .trim();
+interface CaseMemoryParticipant {
+  full_name: string;
+  role: string;
+  organization: string | null;
 }
 
-/** Simulates an AI pass over the uploaded documents (mock UC; TODO: replace with a real analysis endpoint). */
+interface CaseMemoryClaim {
+  description: string;
+  amount?: { value: number; currency: string; purpose?: string | null } | null;
+}
+
+interface CaseMemoryResponse {
+  case_number: string | null;
+  participants: CaseMemoryParticipant[];
+  claims: CaseMemoryClaim[];
+}
+
+/** Runs source-grounded extraction through the authenticated LexKotib backend. */
 export async function analyzeCaseDocuments({
-  fileNames,
+  caseType,
+  category,
+  files,
 }: AnalyzeCaseDocumentsInput): Promise<CaseAnalysisResult> {
-  await delay(1200);
+  if (files.length === 0) throw new Error("Tahlil uchun kamida bitta hujjat yuklang.");
+  const form = new FormData();
+  form.append("analysisId", `new-${caseType}-${category}-${crypto.randomUUID()}`);
+  files.forEach((file) => form.append("files", file));
+  const { data } = await apiClient.post<CaseMemoryResponse>(
+    `${API_PREFIX}/ai/case-memory/extract`,
+    form
+  );
 
-  const subjects = fileNames.map(fileStem).filter(Boolean);
-  const summaryText =
-    subjects.length > 0
-      ? `Yuklangan hujjatlar (${subjects.join(", ")}) asosida tahlil qilindi.`
-      : "";
+  const claimant = data.participants.find((item) => item.role === "plaintiff");
+  const defendant = data.participants.find((item) => item.role === "defendant");
+  const summaryText = data.claims
+    .map((claim) => {
+      const amount = claim.amount
+        ? ` — ${claim.amount.value.toLocaleString("uz-UZ")} ${claim.amount.currency}`
+        : "";
+      return `${claim.description}${amount}`;
+    })
+    .join("\n");
 
   return {
-    claimantName: "",
-    defendantName: "",
+    claimantName: claimant?.full_name ?? claimant?.organization ?? "",
+    defendantName: defendant?.full_name ?? defendant?.organization ?? "",
     summaryText,
   };
 }

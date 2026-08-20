@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mic, RotateCw, Square, Wand2 } from "lucide-react";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
@@ -36,12 +36,8 @@ export interface HearingLifecyclePanelProps {
 
 /**
  * Real hearing lifecycle (integration guide §9): `Created`→start→`Recording`
- * →stop→`Finalizing`, then upload the audio recording. The mic level meter is
- * a real `getUserMedia`+`AnalyserNode` reading (kept from the original
- * mock-driven panel) — a visual aid only, it isn't what gets uploaded, since
- * there's no capture-to-file pipeline yet. The uploaded file is picked
- * manually and client-validated (extension/MIME/size) before
- * `POST /hearings/{id}/audio`.
+ * →stop→`Finalizing`, then uploads the browser's actual MediaRecorder output
+ * and queues final STT. Manual WAV/MP3/WebM upload remains as a recovery path.
  */
 export function HearingLifecyclePanel({
   hearing,
@@ -57,6 +53,11 @@ export function HearingLifecyclePanel({
   const [hasAudio, setHasAudio] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [transcribing, setTranscribing] = useState(false);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const animationFrameRef = useRef(0);
   const startMutation = useStartHearing();
   const stopMutation = useStopHearing();
   const { job, isSucceeded, isFailed } = useJobPolling(jobId);
@@ -76,72 +77,127 @@ export function HearingLifecyclePanel({
     return () => clearInterval(clock);
   }, [recording]);
 
-  // Real microphone level meter (FR-04) — echo cancellation / noise
-  // suppression / AGC off (courtroom audio, plan D-07). Falls back to a
-  // simulated level if access is denied.
   useEffect(() => {
-    if (!recording) {
-      setLevel(0);
-      return;
-    }
-    let stream: MediaStream | null = null;
-    let ctx: AudioContext | null = null;
-    let raf = 0;
-    let fallback: ReturnType<typeof setInterval> | undefined;
-
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: {
-          channelCount: 1,
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-        },
-      })
-      .then((s) => {
-        stream = s;
-        ctx = new AudioContext();
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 512;
-        ctx.createMediaStreamSource(s).connect(analyser);
-        const buf = new Float32Array(analyser.fftSize);
-        const tick = () => {
-          analyser.getFloatTimeDomainData(buf);
-          let sum = 0;
-          for (const v of buf) sum += v * v;
-          setLevel(Math.min(100, Math.sqrt(sum / buf.length) * 400));
-          raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-      })
-      .catch(() => {
-        fallback = setInterval(() => setLevel(30 + ((Date.now() / 300) % 50)), 300);
-      });
-
     return () => {
-      cancelAnimationFrame(raf);
-      if (fallback) clearInterval(fallback);
-      stream?.getTracks().forEach((tr) => tr.stop());
-      void ctx?.close();
+      releaseMicrophone();
     };
-  }, [recording]);
+  }, []);
+
+  function releaseMicrophone() {
+    cancelAnimationFrame(animationFrameRef.current);
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    void audioContextRef.current?.close();
+    audioContextRef.current = null;
+    setLevel(0);
+  }
+
+  async function prepareRecorder(): Promise<MediaRecorder> {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      throw new Error("Bu brauzer mikrofon orqali audio yozishni qo‘llamaydi.");
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: 1,
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+    });
+    streamRef.current = stream;
+
+    const mimeType = ["audio/webm;codecs=opus", "audio/webm"].find((candidate) =>
+      MediaRecorder.isTypeSupported(candidate)
+    );
+    const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    recorderRef.current = recorder;
+    chunksRef.current = [];
+    recorder.addEventListener("dataavailable", (event) => {
+      if (event.data.size > 0) chunksRef.current.push(event.data);
+    });
+
+    const audioContext = new AudioContext();
+    audioContextRef.current = audioContext;
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 512;
+    audioContext.createMediaStreamSource(stream).connect(analyser);
+    const buffer = new Float32Array(analyser.fftSize);
+    const tick = () => {
+      analyser.getFloatTimeDomainData(buffer);
+      let sum = 0;
+      for (const value of buffer) sum += value * value;
+      setLevel(Math.min(100, Math.sqrt(sum / buffer.length) * 400));
+      animationFrameRef.current = requestAnimationFrame(tick);
+    };
+    animationFrameRef.current = requestAnimationFrame(tick);
+    return recorder;
+  }
+
+  function finishRecording(): Promise<File | null> {
+    const recorder = recorderRef.current;
+    if (!recorder || recorder.state === "inactive") return Promise.resolve(null);
+
+    return new Promise((resolve) => {
+      recorder.addEventListener(
+        "stop",
+        () => {
+          const contentType = recorder.mimeType || "audio/webm";
+          const blob = new Blob(chunksRef.current, { type: contentType });
+          recorderRef.current = null;
+          chunksRef.current = [];
+          releaseMicrophone();
+          resolve(
+            blob.size > 0
+              ? new File([blob], `lexkotib-hearing-${hearing.id}.webm`, { type: contentType })
+              : null
+          );
+        },
+        { once: true }
+      );
+      recorder.stop();
+    });
+  }
 
   async function start() {
     try {
+      const recorder = await prepareRecorder();
       const updated = await startMutation.mutateAsync(hearing.id);
+      recorder.start(1_000);
       onHearingChanged(updated);
-    } catch {
-      // Errors (incl. 409 INVALID_HEARING_TRANSITION) already toasted by useApiMutation.
+    } catch (error) {
+      releaseMicrophone();
+      if (error instanceof DOMException || error instanceof Error) {
+        notify.error(error.message || "Mikrofonga ruxsat berilmadi.");
+      }
     }
   }
 
   async function confirmStop() {
     setStopOpen(false);
     try {
+      const recordedFile = await finishRecording();
       const updated = await stopMutation.mutateAsync(hearing.id);
       onHearingChanged(updated);
-    } catch {
-      // Errors already toasted by useApiMutation.
+      if (recordedFile) {
+        const validationError = validateAudioFile(recordedFile);
+        if (validationError) throw new Error(t(errorMessageKey(validationError)));
+        setUploading(true);
+        await uploadAudio(hearing.id, recordedFile);
+        setUploadedFileName(recordedFile.name);
+        setHasAudio(true);
+        notify.success(t("hearing.uploaded"));
+
+        setTranscribing(true);
+        const accepted = await transcribeHearing(hearing.id);
+        setJobId(accepted.jobId);
+        notify.success(t("hearing.transcriptionQueued"));
+      }
+    } catch (error) {
+      notify.error(error instanceof Error ? error.message : t("hearing.transcriptionFailed"));
+    } finally {
+      setUploading(false);
+      setTranscribing(false);
     }
   }
 

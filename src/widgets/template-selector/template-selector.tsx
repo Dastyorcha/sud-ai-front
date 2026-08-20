@@ -59,7 +59,11 @@ export function TemplateSelector({ selectedId, onSelect, className }: TemplateSe
                       {t(tpl.titleKey)}
                     </span>
                     <span className="font-mono text-xs text-muted-foreground">
-                      {t("documentsWorkspace.templateSelector.article", { code: tpl.articleCode })}
+                      {tpl.referenceFormat
+                        ? t("documentsWorkspace.templateSelector.referenceFormat")
+                        : t("documentsWorkspace.templateSelector.article", {
+                            code: tpl.articleCode,
+                          })}
                     </span>
                   </div>
                   <Button

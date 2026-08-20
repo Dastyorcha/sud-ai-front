@@ -32,6 +32,66 @@ export function fillDocumentSections(
     code: template.articleCode,
   });
 
+  const commonIntro = [
+    courtCase.courtName.toUpperCase(),
+    `${t("documentsWorkspace.factsPanel.caseNumber")}: ${courtCase.caseNumber}`,
+    parties || "[Taraflar ish materiallaridan olinadi]",
+  ].join("\n");
+
+  if (template.id === "economic-hearing-protocol-v1") {
+    return {
+      intro: `${commonIntro}\n\nSUD MAJLISI BAYONNOMASI\n[Majlis sanasi va joyi]`,
+      descriptive: [
+        "Sud majlisi raislik qiluvchi sudya va sud majlisi kotibi ishtirokida o‘tkazildi.",
+        `Ko‘rilayotgan masala: ${subject || "[ish predmeti]"}.`,
+        "Kelgan shaxslar, ularning vakolatlari va protsessual huquqlari ish kartasi asosida tekshirildi.",
+      ].join("\n\n"),
+      reasoning: [
+        "Majlisning borishi vaqt belgilariga ega transkript va tasdiqlangan protsessual hodisalar asosida ketma-ket bayon etiladi.",
+        "Har bir muhim summa, sana, shaxs va talab original audio yoki yuklangan ish hujjatidagi manbaga bog‘lanadi.",
+      ].join("\n\n"),
+      conclusion:
+        "Majlis natijasi va keyingi protsessual harakat sudya tasdiqlagan ma’lumotlar asosida kiritiladi.\n\nRaislik qiluvchi: __________\nSud majlisi kotibi: __________",
+    };
+  }
+
+  if (template.id === "civil-debt-court-order-v1") {
+    return {
+      intro: `${commonIntro}\n\nSUD BUYRUG‘I\nQarzdorlikni undirish to‘g‘risida`,
+      descriptive: `Undiruvchining ${subject || "qarzdorlikni undirish"} haqidagi arizasi va unga ilova qilingan hujjatlar ko‘rib chiqildi.`,
+      reasoning: [
+        `Talab summasi: ${courtCase.claimAmount != null ? courtCase.claimAmount.toLocaleString("uz-UZ") + " so‘m" : "[manbadan olinadi]"}.`,
+        "Majburiyatning kelib chiqish asosi, to‘lov muddati va qarzdor haqidagi rekvizitlar faqat ish materiallaridagi tasdiqlangan manbalardan olinadi.",
+      ].join("\n\n"),
+      conclusion:
+        "UNDIRILSIN:\n1. Asosiy qarz — [tasdiqlangan summa].\n2. Davlat boji va pochta xarajatlari — [tasdiqlangan summa].\n\nSudya: __________",
+    };
+  }
+
+  if (template.id === "economic-cassation-leave-without-review-v1") {
+    return {
+      intro: `${commonIntro}\n\nAJRIM\nKassatsiya shikoyatini ko‘rmasdan qoldirish to‘g‘risida`,
+      descriptive:
+        "Kassatsiya shikoyati, taraflarning vajlari va ish materiallaridagi protsessual hujjatlar o‘rganildi.",
+      reasoning:
+        "Shikoyatni ko‘rmasdan qoldirishga asos bo‘lgan protsessual holat va tegishli qonun normasi sudya tomonidan tanlanadi; LexKotib AI faqat tasdiqlangan natijani hujjat formatiga joylaydi.",
+      conclusion:
+        "AJRIM QILDI:\nKassatsiya shikoyati [sudya tasdiqlagan asos]ga ko‘ra ko‘rmasdan qoldirilsin.\n\nSudya: __________",
+    };
+  }
+
+  if (template.id === "criminal-judgment-v1") {
+    return {
+      intro: `${commonIntro}\n\nO‘ZBEKISTON RESPUBLIKASI NOMIDAN\nHUKM`,
+      descriptive:
+        "Sudlanuvchi, ayblov mazmuni, taraflar pozitsiyasi va tekshirilgan dalillar ish materiallari hamda sud majlisi transkriptidan manbali tarzda bayon qilinadi.",
+      reasoning:
+        "Dalillarga yakuniy huquqiy baho, ayb masalasi va jazo turi faqat sudya tomonidan belgilanadi. AI ushbu bo‘limda mustaqil qaror chiqarmaydi.",
+      conclusion:
+        "HUKM QILDI:\n[Sudya tasdiqlagan rezolyutiv qism kiritiladi.]\n\nRaislik qiluvchi sudya: __________",
+    };
+  }
+
   return {
     intro: [
       `${courtCase.courtName}`,

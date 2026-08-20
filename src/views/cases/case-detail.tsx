@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { Archive, ChevronLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, ChevronLeft, Mic, Pencil, Plus, Trash2 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import {
   Table,
@@ -38,7 +38,7 @@ import { useDocuments } from "@/features/documents/use-documents";
 import { ParticipantFormDialog } from "@/features/participants/participant-form-dialog";
 import { VocabularyPanel } from "@/features/cases/vocabulary-panel";
 import { useCreateHearing } from "@/features/hearings/use-hearings";
-import { useCaseHearingSessions } from "@/features/hearings/use-hearing-session";
+import { useHearings } from "@/features/hearings/use-hearings";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { buildRoute } from "@/shared/constants/route-paths";
 import { COURT_USERS } from "@/shared/lib/mock-api/data";
@@ -50,7 +50,6 @@ import type { MessageKey } from "@/shared/lib/i18n/messages";
 
 // Sub-tab modules (mockup-05/06/07) — lazy so the shell stays light until a
 // tab is opened.
-const ProtocolWorkspace = lazy(() => import("@/widgets/protocol-workspace/protocol-workspace"));
 const DocumentsWorkspace = lazy(() => import("@/widgets/documents-workspace/documents-workspace"));
 const CaseAdvisorChat = lazy(() => import("@/widgets/case-advisor-chat/case-advisor-chat"));
 
@@ -67,13 +66,14 @@ export default function CaseDetailView() {
   const { data: courtCase, isLoading, error } = useCase(caseId);
   const { data: participants, refetch: refetchParticipants } = useParticipants(caseId);
   const { data: documents } = useDocuments(caseId);
-  const { hearings, refresh: refreshHearingSessions } = useCaseHearingSessions(caseId);
+  const hearingsQuery = useHearings(caseId);
+  const hearings = hearingsQuery.data ?? [];
   const createHearingMutation = useCreateHearing();
 
   async function addHearing() {
     try {
       const hearing = await createHearingMutation.mutateAsync({ caseId });
-      refreshHearingSessions();
+      await hearingsQuery.refetch();
       return hearing;
     } catch {
       // Errors are already toasted by useApiMutation.
@@ -213,9 +213,33 @@ export default function CaseDetailView() {
             id: "protocol",
             label: t("caseDetail.tabs.protocol"),
             content: (
-              <Suspense fallback={<LoadingState rows={4} />}>
-                <ProtocolWorkspace caseId={caseId} />
-              </Suspense>
+              <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">LexKotib AI STT</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Mikrofon orqali majlisni yozing, audioni xavfsiz yuklang va manbaga bog‘langan
+                    transkript yarating.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={addHearing} disabled={createHearingMutation.isPending}>
+                    <Mic className="size-4" />
+                    {t("hearing.newHearing")}
+                  </Button>
+                  {hearings[0] && (
+                    <Button variant="outline" asChild>
+                      <Link to={withLocale(locale, buildRoute.hearingDetail(hearings[0].id))}>
+                        {t("pages.hearing")}
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+                {hearings.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {hearings.length} ta saqlangan majlis serverdan yuklandi.
+                  </p>
+                )}
+              </div>
             ),
           },
           {
@@ -339,7 +363,6 @@ export default function CaseDetailView() {
               {t("hearing.newHearing")}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">{t("hearing.sessionOnlyNotice")}</p>
           {hearings.length > 0 ? (
             <ul className="divide-y divide-border rounded-lg border border-border">
               {hearings.map((h) => (

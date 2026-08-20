@@ -43,6 +43,7 @@ import type { DocumentContent } from "@/shared/types/models";
 import type { Hearing } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
+import type { GenerateDocumentInput } from "@/features/documents/document.service";
 
 export interface ProtocolPanelProps {
   /** Only `id`/`caseId` are read — accepts either a full `Hearing` or the session-carried real one. */
@@ -111,11 +112,24 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const generateInFlight =
     generateMutation.isPending || (Boolean(generateJobId) && !generateSucceeded && !generateFailed);
 
+  function documentTypeForTemplate(code: string): GenerateDocumentInput["documentType"] {
+    switch (code) {
+      case "ECONOMIC_CASSATION_LEAVE_WITHOUT_REVIEW":
+        return "EconomicCassationLeaveWithoutReview";
+      case "CIVIL_DEBT_COURT_ORDER":
+        return "CivilDebtCourtOrder";
+      case "CRIMINAL_JUDGMENT":
+        return "CriminalJudgment";
+      default:
+        return "HearingProtocol";
+    }
+  }
+
   function handleGenerate() {
     if (!selectedTemplate) return;
     generateMutation.mutate(
       {
-        documentType: "HearingProtocol",
+        documentType: documentTypeForTemplate(selectedTemplate.templateCode),
         hearingId: hearing.id,
         templateCode: selectedTemplate.templateCode,
         templateVersion: selectedTemplate.version,

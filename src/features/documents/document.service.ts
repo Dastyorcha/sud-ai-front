@@ -21,7 +21,7 @@ import type { DocumentStatus, DocumentType } from "@/shared/types/enums";
 /** `DocumentResponse` (guide §12) — the exact live shape returned by GET/PATCH/lifecycle endpoints. */
 export interface DocumentResponse {
   id: string;
-  caseId: string;
+  courtCaseId: string;
   hearingId: string | null;
   documentType: string;
   templateCode: string;
@@ -42,7 +42,7 @@ export interface DocumentResponse {
 function toDocument(response: DocumentResponse): GeneratedDocument {
   return {
     id: response.id,
-    caseId: response.caseId,
+    caseId: response.courtCaseId,
     hearingId: response.hearingId,
     documentType: response.documentType as DocumentType,
     templateCode: response.templateCode,
@@ -60,12 +60,24 @@ function toDocument(response: DocumentResponse): GeneratedDocument {
   };
 }
 
-/** Body of `POST /cases/{id}/documents/generate` (guide §12) — only `HearingProtocol` is implemented so far. */
+/** Body of `POST /cases/{id}/documents/generate`. */
 export interface GenerateDocumentInput {
-  documentType: "HearingProtocol";
+  documentType:
+    | "HearingProtocol"
+    | "EconomicCassationLeaveWithoutReview"
+    | "CivilDebtCourtOrder"
+    | "CriminalJudgment";
   hearingId: string;
   templateCode: string;
   templateVersion: string | null;
+}
+
+/** Lists all generated documents persisted for a case, newest first. */
+export async function listCaseDocuments(caseId: string): Promise<GeneratedDocument[]> {
+  const { data } = await apiClient.get<DocumentResponse[]>(
+    `${API_PREFIX}/cases/${caseId}/documents`
+  );
+  return data.map(toDocument);
 }
 
 /** `202` response of `POST /cases/{id}/documents/generate` (guide §12). */

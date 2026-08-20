@@ -59,8 +59,9 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
   if (error || !courtCase) return <ErrorState />;
 
   function handleSelectTemplate(template: ProceduralDocumentTemplate) {
+    if (!courtCase) return;
     setSelectedTemplate(template);
-    setSections(emptyDocumentSections());
+    setSections(fillDocumentSections(template, courtCase, t));
   }
 
   function handleSectionChange(id: (typeof DOCUMENT_SECTION_ORDER)[number], value: string) {

@@ -17,9 +17,11 @@ import { CASE_CATEGORY_OPTIONS, type CaseKind } from "@/features/case-create/cat
 import type { CaseWizardValues } from "@/features/case-create/schema";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { notify } from "@/shared/lib/toast";
+import { errorMessageKey } from "@/shared/lib/errors/error-map";
 
 export interface AiSummaryStepProps {
-  fileNames: string[];
+  files: File[];
 }
 
 /**
@@ -27,7 +29,7 @@ export interface AiSummaryStepProps {
  * (case subject + both parties) as an editable draft before the case is
  * created (`features/case-create/ai-case-analysis.service.ts`).
  */
-export function AiSummaryStep({ fileNames }: AiSummaryStepProps) {
+export function AiSummaryStep({ files }: AiSummaryStepProps) {
   const { t } = useTranslation();
   const form = useFormContext<CaseWizardValues>();
   const [analyzed, setAnalyzed] = useState(false);
@@ -45,7 +47,7 @@ export function AiSummaryStep({ fileNames }: AiSummaryStepProps) {
       const result = await analyzeCaseDocuments({
         caseType: kind,
         category: form.getValues("category"),
-        fileNames,
+        files,
       });
       form.setValue(
         "claimant.displayName",
@@ -57,6 +59,8 @@ export function AiSummaryStep({ fileNames }: AiSummaryStepProps) {
       );
       form.setValue("summaryText", result.summaryText || form.getValues("summaryText"));
       setAnalyzed(true);
+    } catch (error) {
+      notify.error(error instanceof Error ? error.message : t(errorMessageKey(error)));
     } finally {
       setAnalyzing(false);
     }
@@ -72,7 +76,7 @@ export function AiSummaryStep({ fileNames }: AiSummaryStepProps) {
           <span>{t(`caseWizard.kind.${kind}` as MessageKey)}</span>
           {category && <span className="text-muted-foreground">{t(category.labelKey)}</span>}
           <span className="text-xs text-muted-foreground">
-            {t("caseWizard.summaryDocuments")}: {fileNames.length}
+            {t("caseWizard.summaryDocuments")}: {files.length}
           </span>
         </CardContent>
       </Card>

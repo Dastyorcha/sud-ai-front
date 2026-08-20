@@ -44,6 +44,8 @@ export interface ProceduralDocumentTemplate {
   titleKey: MessageKey;
   /** FPK (Fuqarolik protsessual kodeksi) article number backing this document — placeholder, verify with legal counsel. */
   articleCode: string;
+  /** Human-reviewed reference family supplied to the AI template library. */
+  referenceFormat?: boolean;
   icon: LucideIcon;
 }
 
@@ -53,6 +55,38 @@ export interface ProceduralDocumentTemplate {
  * against the current FPK/IPK text before any real use.
  */
 export const PROCEDURAL_DOCUMENT_TEMPLATES: ProceduralDocumentTemplate[] = [
+  {
+    id: "economic-hearing-protocol-v1",
+    group: "hearingDecisions",
+    titleKey: "documentsWorkspace.templateSelector.templates.economicHearingProtocol",
+    articleCode: "economic_hearing_protocol_v1",
+    referenceFormat: true,
+    icon: ClipboardList,
+  },
+  {
+    id: "economic-cassation-leave-without-review-v1",
+    group: "appeal",
+    titleKey: "documentsWorkspace.templateSelector.templates.economicCassationLeaveWithoutReview",
+    articleCode: "economic_cassation_leave_without_review_v1",
+    referenceFormat: true,
+    icon: FileX,
+  },
+  {
+    id: "civil-debt-court-order-v1",
+    group: "claimReview",
+    titleKey: "documentsWorkspace.templateSelector.templates.civilDebtCourtOrder",
+    articleCode: "civil_debt_court_order_v1",
+    referenceFormat: true,
+    icon: Scale,
+  },
+  {
+    id: "criminal-judgment-v1",
+    group: "hearingDecisions",
+    titleKey: "documentsWorkspace.templateSelector.templates.criminalJudgment",
+    articleCode: "criminal_judgment_v1",
+    referenceFormat: true,
+    icon: Gavel,
+  },
   {
     id: "claim-accept",
     group: "claimReview",

@@ -5,12 +5,10 @@
  * examples). Never hardcode the brand string in components or message files;
  * change it here once and it propagates everywhere.
  */
-export const APP_NAME = "Court AI Assistant";
+export const APP_NAME = "LexKotib AI";
 
-/** Native-language display name, shown alongside `APP_NAME` in the app
- *  header/logo lockup (spec mockup: "Court AI Assistant / Sud AI
- *  Yordamchisi") — a fixed bilingual brand mark, not locale-switched. */
-export const APP_FULL_NAME = "Sud AI Yordamchisi";
+/** Product descriptor shown alongside `APP_NAME` in the app header/logo lockup. */
+export const APP_FULL_NAME = "Auditable Judicial Documentation Platform";
 
 /** Displayed in `AppFooter` — bump manually until a real release pipeline
  *  wires this to `package.json`/CI. */

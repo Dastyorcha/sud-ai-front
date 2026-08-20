@@ -1,9 +1,6 @@
 /**
  * Real `/hearings` calls (integration guide §9) — create/start/stop, audio
- * upload, transcription queue and transcript GET. There is **no**
- * `GET /hearings/{id}` or hearing-list endpoint yet (guide §17): callers must
- * carry the `HearingResponse` returned by create/start/stop themselves — see
- * `use-hearing-session.ts`. Never invent a GET here.
+ * upload, transcription queue and transcript GET.
  */
 import { apiClient } from "@/shared/lib/http/api-client";
 import { API_PREFIX } from "@/shared/config/env";
@@ -13,36 +10,44 @@ import type { HearingStatus, ParticipantRole, SegmentStatus } from "@/shared/typ
 /** `HearingResponse` (guide §9) — the exact live shape. */
 interface HearingResponse {
   id: string;
-  courtCaseId: string;
+  caseId: string;
   scheduledAt: string | null;
   startedAt: string | null;
   endedAt: string | null;
   status: HearingStatus;
-  liveSttProvider: string | null;
-  liveSttModel: string | null;
-  finalSttProvider: string | null;
-  finalSttModel: string | null;
-  audioDurationMs: number;
-  createdBy: string;
   version: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function toHearing(response: HearingResponse): Hearing {
   return {
     id: response.id,
-    caseId: response.courtCaseId,
+    caseId: response.caseId,
     scheduledAt: response.scheduledAt,
     startedAt: response.startedAt,
     endedAt: response.endedAt,
     status: response.status,
-    liveSttProvider: response.liveSttProvider,
-    liveSttModel: response.liveSttModel,
-    finalSttProvider: response.finalSttProvider,
-    finalSttModel: response.finalSttModel,
-    audioDurationMs: response.audioDurationMs,
-    createdBy: response.createdBy,
+    liveSttProvider: null,
+    liveSttModel: null,
+    finalSttProvider: null,
+    finalSttModel: null,
+    audioDurationMs: 0,
+    createdBy: "",
     version: response.version,
   };
+}
+
+/** Returns all persisted hearings for a case, newest first. */
+export async function listCaseHearings(caseId: string): Promise<Hearing[]> {
+  const { data } = await apiClient.get<HearingResponse[]>(`${API_PREFIX}/cases/${caseId}/hearings`);
+  return data.map(toHearing);
+}
+
+/** Returns one persisted hearing. Safe for refreshes and direct links. */
+export async function getHearing(hearingId: string): Promise<Hearing> {
+  const { data } = await apiClient.get<HearingResponse>(`${API_PREFIX}/hearings/${hearingId}`);
+  return toHearing(data);
 }
 
 /** Input for `POST /cases/{id}/hearings` (guide §9) — `scheduledAt` is nullable. */
@@ -109,7 +114,8 @@ export function validateAudioFile(file: File): AudioValidationError | null {
     return "invalid_audio_size";
   // An empty/browser-unset MIME type is common for some recorders — only flag
   // a *mismatched* non-empty type, the size/signature check happens server-side too.
-  if (file.type && !expectedMimes.includes(file.type)) return "audio_signature_mismatch";
+  const normalizedMime = file.type.split(";", 1)[0]?.trim().toLowerCase();
+  if (normalizedMime && !expectedMimes.includes(normalizedMime)) return "audio_signature_mismatch";
   return null;
 }
 

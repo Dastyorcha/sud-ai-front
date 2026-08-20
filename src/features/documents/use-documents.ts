@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { useMockQuery, type UseMockQueryResult } from "@/shared/hooks/use-mock-query";
-import { listDocuments } from "@/shared/lib/mock-api/document.service";
 import { queryKeys } from "@/shared/lib/query/query-keys";
 import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/use-api-mutation";
 import {
@@ -11,6 +9,7 @@ import {
   generateDocument,
   getDocument,
   listDocumentVersions,
+  listCaseDocuments,
   requestDocumentChanges,
   submitDocumentReview,
   updateDocumentContent,
@@ -23,18 +22,17 @@ import {
 } from "@/features/documents/document.service";
 import type { DocumentVersionHistoryEntry, GeneratedDocument } from "@/shared/types/models";
 
-export type UseDocumentsResult = UseMockQueryResult<GeneratedDocument[]>;
+export type UseDocumentsResult = UseQueryResult<GeneratedDocument[]>;
 
 /**
- * Consumer hook over the mock `document.service.listDocuments` — a case's
- * generated documents. Stays on the mock layer: there's no live
- * `GET /cases/{id}/documents` endpoint yet (guide §17), so this is only a
- * count/list stub (`case-detail`'s stats card) until that endpoint exists.
- * Prefer `useDocument`/`useGenerateDocument` below for a single hearing's
- * real generated document.
+ * A case's generated documents from the live API.
  */
 export function useDocuments(caseId: string): UseDocumentsResult {
-  return useMockQuery(() => listDocuments(caseId), [caseId]);
+  return useQuery({
+    queryKey: queryKeys.documents.list(caseId),
+    queryFn: () => listCaseDocuments(caseId),
+    enabled: Boolean(caseId),
+  });
 }
 
 const HEARING_DOCUMENT_SESSION_KEY_PREFIX = "lexkotib:hearing-document:";

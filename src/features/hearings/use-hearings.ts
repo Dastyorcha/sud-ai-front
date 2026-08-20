@@ -1,42 +1,42 @@
-import { useMockQuery, type UseMockQueryResult } from "@/shared/hooks/use-mock-query";
-import { getHearing, listHearings } from "@/shared/lib/mock-api/hearing.service";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import {
   createHearing,
+  getHearing,
+  listCaseHearings,
   startHearing,
   stopHearing,
   type CreateHearingInput,
 } from "@/features/hearings/hearing.service";
-import { recordHearingSession } from "@/features/hearings/use-hearing-session";
 import type { Hearing } from "@/shared/types/models";
 import { useApiMutation, type UseApiMutationResult } from "@/shared/lib/query/use-api-mutation";
+import { queryKeys } from "@/shared/lib/query/query-keys";
+import type { ApiError } from "@/shared/lib/http/api-error";
 
-/**
- * A case's hearings, oldest first — **mock-backed** (`shared/lib/mock-api/hearing.service`).
- * There is no `GET /cases/{id}/hearings` in the real API yet (guide §17), so
- * this stays on the mock layer for the demo-only widgets that still need a
- * list (`widgets/protocol-workspace/*`, until integration-08). The case-detail
- * "hearings" section and the real lifecycle instead use
- * `useCaseHearingSessions` (`use-hearing-session.ts`) — session-scoped, real
- * hearings only.
- */
-export function useHearings(caseId: string): UseMockQueryResult<Hearing[]> {
-  return useMockQuery(() => listHearings(caseId), [caseId]);
+/** A case's persisted hearings, newest first. */
+export function useHearings(caseId: string): UseQueryResult<Hearing[], ApiError> {
+  return useQuery<Hearing[], ApiError>({
+    queryKey: queryKeys.hearings.list(caseId),
+    queryFn: () => listCaseHearings(caseId),
+    enabled: Boolean(caseId),
+  });
 }
 
-/** A single hearing by id — mock-backed, see `useHearings`'s note above. */
-export function useHearing(hearingId: string): UseMockQueryResult<Hearing | null> {
-  return useMockQuery(() => getHearing(hearingId), [hearingId]);
+/** A single persisted hearing by id. */
+export function useHearing(hearingId: string): UseQueryResult<Hearing, ApiError> {
+  return useQuery<Hearing, ApiError>({
+    queryKey: queryKeys.hearings.detail(hearingId),
+    queryFn: () => getHearing(hearingId),
+    enabled: Boolean(hearingId),
+  });
 }
 
 /**
- * Creates a hearing (guide §9 `POST /cases/{id}/hearings`) and records it in
- * the session carry (`use-hearing-session.ts`) so it's immediately reachable
- * from `views/hearings/hearing-detail.tsx` — there's no GET to refetch it by.
+ * Creates a hearing (guide §9 `POST /cases/{id}/hearings`).
  */
 export function useCreateHearing(): UseApiMutationResult<Hearing, CreateHearingInput> {
   return useApiMutation({
     mutationFn: createHearing,
-    onSuccess: recordHearingSession,
+    invalidateKeys: [],
   });
 }
 
@@ -44,7 +44,6 @@ export function useCreateHearing(): UseApiMutationResult<Hearing, CreateHearingI
 export function useStartHearing(): UseApiMutationResult<Hearing, string> {
   return useApiMutation({
     mutationFn: startHearing,
-    onSuccess: recordHearingSession,
   });
 }
 
@@ -52,6 +51,5 @@ export function useStartHearing(): UseApiMutationResult<Hearing, string> {
 export function useStopHearing(): UseApiMutationResult<Hearing, string> {
   return useApiMutation({
     mutationFn: stopHearing,
-    onSuccess: recordHearingSession,
   });
 }

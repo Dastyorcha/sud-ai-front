@@ -248,10 +248,7 @@ export type CriticalFieldType = (typeof CRITICAL_FIELD_TYPE)[keyof typeof CRITIC
 
 /**
  * Kinds of generated document (spec §13.1). Each sits behind a feature flag.
- * `HearingProtocol` (PascalCase) is the real API's only implemented value so
- * far (integration guide §12 `POST /cases/{id}/documents/generate`) —
- * genuinely additive alongside the mock layer's UPPER_SNAKE values (see
- * `DOCUMENT_STATUS` above for why the mock layer stays).
+ * PascalCase values mirror the real API.
  */
 export const DOCUMENT_TYPE = {
   HEARING_PROTOCOL: "HEARING_PROTOCOL",
@@ -260,6 +257,9 @@ export const DOCUMENT_TYPE = {
   EXECUTION_WRIT: "EXECUTION_WRIT",
   // Real API value (guide §12).
   HearingProtocol: "HearingProtocol",
+  EconomicCassationLeaveWithoutReview: "EconomicCassationLeaveWithoutReview",
+  CivilDebtCourtOrder: "CivilDebtCourtOrder",
+  CriminalJudgment: "CriminalJudgment",
 } as const;
 export type DocumentType = (typeof DOCUMENT_TYPE)[keyof typeof DOCUMENT_TYPE];
 

@@ -119,7 +119,7 @@ export default function NewCaseWizard({ open, onOpenChange, onCreated }: NewCase
                 onCheckedDocsChange={setCheckedDocs}
               />
             )}
-            {step === 3 && <AiSummaryStep fileNames={files.map((file) => file.name)} />}
+            {step === 3 && <AiSummaryStep files={files} />}
           </form>
         </Form>
 

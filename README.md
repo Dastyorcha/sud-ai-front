@@ -1,6 +1,6 @@
-# LexKotib — Court AI Assistant frontend
+# LexKotib AI frontend
 
-The frontend for **LexKotib** (Uzbek: _Sud AI Yordamchisi_) — an AI-assisted
+The frontend for **LexKotib AI** — an AI-assisted
 court transcription and documentation panel. Judges/clerks run a hearing,
 capture and edit its transcript, extract procedural events, and generate
 court documents from verified sources. Integrates against the LexKotib REST +
