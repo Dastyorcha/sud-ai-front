@@ -5,6 +5,8 @@ import { Link, useParams } from "react-router-dom";
 import Tabs from "@/shared/components/ui/tabs";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/custom/empty-state";
+import { ErrorState } from "@/shared/custom/error-state";
+import { LoadingState } from "@/shared/custom/loading-state";
 import { RecordStateBadge } from "@/shared/custom/record/record-state-badge";
 import { useHearing } from "@/features/hearings/use-hearings";
 import { HearingLifecyclePanel } from "@/features/hearings/hearing-lifecycle-panel";
@@ -28,7 +30,7 @@ export default function HearingDetailView() {
   const { t, locale } = useTranslation();
   const { hearingId = "" } = useParams<{ hearingId: string }>();
   const queryClient = useQueryClient();
-  const { data: hearing } = useHearing(hearingId);
+  const { data: hearing, isLoading, error } = useHearing(hearingId);
   const setHearing = (next: Hearing) => {
     queryClient.setQueryData(queryKeys.hearings.detail(hearingId), next);
     void queryClient.invalidateQueries({ queryKey: queryKeys.hearings.list(next.caseId) });
@@ -50,6 +52,24 @@ export default function HearingDetailView() {
       </Link>
     </Button>
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-4">
+        {backLink}
+        <LoadingState rows={5} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-4">
+        {backLink}
+        <ErrorState />
+      </div>
+    );
+  }
 
   if (!hearing) {
     return (
