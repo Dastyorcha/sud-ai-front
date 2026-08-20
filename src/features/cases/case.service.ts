@@ -26,13 +26,25 @@ interface CourtCaseResponse {
   archivedAt: string | null;
 }
 
+/** Compatibility for cases created before the wizard started storing canonical enum values. */
+const LEGACY_CASE_TYPE_MAP: Record<string, CaseType> = {
+  debtRecovery: "DEBT_RECOVERY",
+  contractDispute: "CONTRACT_DISPUTE",
+  bankruptcy: "BANKRUPTCY",
+  family: "CIVIL",
+  property: "CIVIL",
+  inheritance: "CIVIL",
+  administrative: "SPECIAL",
+  other: "OTHER",
+};
+
 function toCourtCase(response: CourtCaseResponse): CourtCase {
   return {
     id: response.id,
     caseNumber: response.caseNumber,
     courtName: response.courtName,
     courtType: response.courtType as CourtType,
-    caseType: response.caseType as CaseType,
+    caseType: LEGACY_CASE_TYPE_MAP[response.caseType] ?? (response.caseType as CaseType),
     status: response.status,
     description: response.description,
     isDemo: response.isDemo,
