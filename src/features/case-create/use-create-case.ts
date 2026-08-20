@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createCase } from "@/features/cases/case.service";
 import { createParticipant } from "@/features/participants/participant.service";
 import type { CourtCase } from "@/shared/types/models";
-import type { CourtType } from "@/shared/types/enums";
+import type { CaseType, CourtType } from "@/shared/types/enums";
 import type { CaseWizardValues } from "@/features/case-create/schema";
 import type { CaseKind } from "@/features/case-create/categories";
 
@@ -15,6 +15,18 @@ const COURT_TYPE_BY_KIND: Record<CaseKind, CourtType> = {
 
 /** Default court shown on newly-created wizard cases (mockup UC; no court picker in the wizard yet). */
 const DEFAULT_COURT_NAME = "Toshkent shahar iqtisodiy sudi";
+
+/** Maps wizard-only category IDs to the canonical values rendered by the case UI. */
+const CASE_TYPE_BY_CATEGORY: Record<string, CaseType> = {
+  debtRecovery: "DEBT_RECOVERY",
+  contractDispute: "CONTRACT_DISPUTE",
+  bankruptcy: "BANKRUPTCY",
+  family: "CIVIL",
+  property: "CIVIL",
+  inheritance: "CIVIL",
+  administrative: "SPECIAL",
+  other: "OTHER",
+};
 
 /** Generates a placeholder case number until intake assigns a real one. */
 function generateCaseNumber(): string {
@@ -35,8 +47,9 @@ export interface UseCreateCaseResult {
  * §8) then its claimant/defendant participants via
  * `POST /cases/{id}/participants`. The wizard's `caseType` (case kind:
  * Civil/Economic/Special) maps to the request's `courtType`; the finer-grained
- * `category` (e.g. "debtRecovery") maps to the request's `caseType`, since the
- * live API's `caseType` is a free ≤100-char string, not this app's enum.
+ * `category` (e.g. "debtRecovery") maps to the UI's canonical `CaseType`
+ * value so newly-created cards resolve a localized label instead of exposing
+ * an internal wizard key.
  * The case contract has no `judgeId`; judge identity comes from participants.
  * Callers should catch and toast `errorMessageKey(error)`
  * — e.g. `409 CASE_NUMBER_EXISTS`.
@@ -51,7 +64,7 @@ export function useCreateCase(): UseCreateCaseResult {
         caseNumber: generateCaseNumber(),
         courtName: DEFAULT_COURT_NAME,
         courtType: COURT_TYPE_BY_KIND[values.caseType as CaseKind],
-        caseType: values.category,
+        caseType: CASE_TYPE_BY_CATEGORY[values.category] ?? "OTHER",
         description: values.summaryText,
       });
 
@@ -60,12 +73,14 @@ export function useCreateCase(): UseCreateCaseResult {
         displayName: values.claimant.displayName,
         organizationName: values.claimant.organizationName || null,
         role: "Claimant",
+        language: "uz-UZ",
       });
       await createParticipant({
         caseId: created.id,
         displayName: values.defendant.displayName,
         organizationName: values.defendant.organizationName || null,
         role: "Defendant",
+        language: "uz-UZ",
       });
 
       return created;
