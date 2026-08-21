@@ -387,7 +387,9 @@ export const ru: Messages = {
     filterUnverified: "Неподтверждённые",
     searchPlaceholder: "Поиск по транскрипту…",
     allSpeakers: "Все говорящие",
-    approveCanonical: "Утвердить канонический транскрипт",
+    approveCanonical: "Утвердить транскрипт",
+    autoDraftHint:
+      "Транскрипт создан автоматически. При необходимости отредактируйте текст, затем утвердите весь транскрипт.",
     approveBlocked: "Сначала проверьте все критические поля (осталось {count})",
     segmentsMapped: "Обновлено сегментов: {count}",
     clearEdit: "Очистить правку",

@@ -390,7 +390,9 @@ export const uz = {
     filterUnverified: "Tasdiqlanmagan",
     searchPlaceholder: "Transkriptdan qidirish…",
     allSpeakers: "Barcha gapiruvchilar",
-    approveCanonical: "Canonical transkriptni tasdiqlash",
+    approveCanonical: "Transkriptni tasdiqlash",
+    autoDraftHint:
+      "Transkript avtomatik yaratildi. Kerak bo‘lsa matnni tahrirlang, so‘ng umumiy transkriptni tasdiqlang.",
     approveBlocked: "Avval barcha kritik maydonlarni tekshiring ({count} ta qoldi)",
     segmentsMapped: "{count} ta segment yangilandi",
     clearEdit: "Tahrirni bekor qilish",

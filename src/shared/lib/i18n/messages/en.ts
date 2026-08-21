@@ -382,7 +382,9 @@ export const en: Messages = {
     filterUnverified: "Unverified",
     searchPlaceholder: "Search transcript…",
     allSpeakers: "All speakers",
-    approveCanonical: "Approve canonical transcript",
+    approveCanonical: "Approve transcript",
+    autoDraftHint:
+      "The transcript was created automatically. Edit any text if needed, then approve the complete transcript.",
     approveBlocked: "Review all critical fields first ({count} left)",
     segmentsMapped: "{count} segments updated",
     clearEdit: "Clear edit",
