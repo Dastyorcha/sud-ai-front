@@ -347,7 +347,19 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
                   rows={1}
                 />
                 {field.sources.length === 0 && (
-                  <p className="text-xs font-medium text-destructive">{t("protocol.noSource")}</p>
+                  <p
+                    className={`text-xs font-medium ${
+                      field.key === "judge" || field.key === "secretary"
+                        ? "text-warning"
+                        : "text-destructive"
+                    }`}
+                  >
+                    {t(
+                      field.key === "judge" || field.key === "secretary"
+                        ? "protocol.manualIdentityField"
+                        : "protocol.noSource"
+                    )}
+                  </p>
                 )}
               </div>
             ))}

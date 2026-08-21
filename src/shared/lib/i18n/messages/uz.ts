@@ -557,6 +557,7 @@ export const uz = {
     reasonPlaceholder: "So‘ralgan o‘zgarishlarni yozing…",
     versionsTitle: "O‘zgarishlar tarixi",
     versionsEmpty: "Hali o‘zgarishlar qayd etilmagan.",
+    manualIdentityField: "Ma’lumot avtomatik topilmadi — ismni kiriting va o‘zgarishni saqlang.",
     noSource:
       "Bu paragrafda manba yo‘q — tasdiqlashdan oldin qo‘llab-quvvatlash xizmatiga murojaat qiling.",
   },

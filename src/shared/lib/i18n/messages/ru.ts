@@ -556,6 +556,7 @@ export const ru: Messages = {
     reasonPlaceholder: "Опишите запрошенные изменения…",
     versionsTitle: "История изменений",
     versionsEmpty: "Изменений пока не зафиксировано.",
+    manualIdentityField: "Имя не найдено автоматически — введите его и сохраните изменения.",
     noSource: "У этого абзаца нет источника — обратитесь в поддержку перед утверждением.",
   },
   protocolWorkspace: {

@@ -549,6 +549,7 @@ export const en: Messages = {
     reasonPlaceholder: "Describe the requested changes…",
     versionsTitle: "Change history",
     versionsEmpty: "No changes recorded yet.",
+    manualIdentityField: "This name was not found automatically — enter it and save the changes.",
     noSource: "This paragraph has no source — contact support before approving.",
   },
   protocolWorkspace: {
