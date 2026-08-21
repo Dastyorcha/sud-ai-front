@@ -107,8 +107,13 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exportSucceeded]);
 
+  const protocolTemplates = activeTemplates?.filter(
+    (template) =>
+      template.templateCode === "ECONOMIC_HEARING_PROTOCOL" ||
+      template.templateCode === "HEARING_PROTOCOL_DEMO"
+  );
   const selectedTemplate =
-    activeTemplates?.find((tpl) => tpl.templateCode === templateCode) ?? activeTemplates?.[0];
+    protocolTemplates?.find((tpl) => tpl.templateCode === templateCode) ?? protocolTemplates?.[0];
   const generateInFlight =
     generateMutation.isPending || (Boolean(generateJobId) && !generateSucceeded && !generateFailed);
 
@@ -234,13 +239,13 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
             <Select
               value={selectedTemplate?.templateCode}
               onValueChange={setTemplateCode}
-              disabled={templatesLoading || !activeTemplates?.length}
+              disabled={templatesLoading || !protocolTemplates?.length}
             >
               <SelectTrigger className="w-64">
                 <SelectValue placeholder={t("protocol.selectTemplate")} />
               </SelectTrigger>
               <SelectContent>
-                {(activeTemplates ?? []).map((tpl) => (
+                {(protocolTemplates ?? []).map((tpl) => (
                   <SelectItem key={tpl.id} value={tpl.templateCode}>
                     {tpl.title} v{tpl.version}
                   </SelectItem>
@@ -253,7 +258,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
             {generateInFlight ? t("protocol.generating") : t("protocol.generate")}
           </Button>
         </div>
-        {!templatesLoading && !activeTemplates?.length && (
+        {!templatesLoading && !protocolTemplates?.length && (
           <p className="text-xs text-destructive">{t("protocol.noActiveTemplates")}</p>
         )}
         {generateJobId && !generateSucceeded && !generateFailed && (
