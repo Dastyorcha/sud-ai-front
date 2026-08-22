@@ -70,6 +70,8 @@ export interface GenerateDocumentInput {
   hearingId: string;
   templateCode: string;
   templateVersion: string | null;
+  /** Human-entered, judge-approved slots required by the selected reference template. */
+  templateFields?: Record<string, string>;
 }
 
 /** Lists all generated documents persisted for a case, newest first. */

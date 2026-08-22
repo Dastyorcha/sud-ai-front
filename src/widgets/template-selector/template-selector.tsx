@@ -12,6 +12,8 @@ import { cn } from "@/shared/lib/utils";
 export interface TemplateSelectorProps {
   selectedId: string | null;
   onSelect: (template: ProceduralDocumentTemplate) => void;
+  /** Hide mock catalogue entries that do not yet have a reviewed reference renderer. */
+  supportedOnly?: boolean;
   className?: string;
 }
 
@@ -20,9 +22,19 @@ export interface TemplateSelectorProps {
  * the 17 procedural document templates — one card per template (icon, title,
  * FPK article), highlighting the active selection.
  */
-export function TemplateSelector({ selectedId, onSelect, className }: TemplateSelectorProps) {
+export function TemplateSelector({
+  selectedId,
+  onSelect,
+  supportedOnly = false,
+  className,
+}: TemplateSelectorProps) {
   const { t } = useTranslation();
-  const groups = groupedProceduralDocumentTemplates();
+  const groups = groupedProceduralDocumentTemplates()
+    .map(({ group, templates }) => ({
+      group,
+      templates: supportedOnly ? templates.filter((template) => template.referenceFormat) : templates,
+    }))
+    .filter(({ templates }) => templates.length > 0);
 
   return (
     <div className={cn("flex flex-col gap-5", className)}>
