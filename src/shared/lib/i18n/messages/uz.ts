@@ -236,6 +236,8 @@ export const uz = {
       invalid_audio_size: "Audio fayl hajmi 1 bayt–100 MB oralig‘ida bo‘lishi kerak.",
       unsupported_audio_format:
         "Qo‘llab-quvvatlanmaydigan audio format. .wav, .mp3 yoki .webm yuklang.",
+      unsupported_case_document_format:
+        "Faqat PDF, DOCX, TXT, JPG yoki PNG sud hujjatlarini yuklang.",
       audio_signature_mismatch: "Fayl kengaytmasi uning haqiqiy formatiga mos kelmadi.",
       hearing_audio_missing: "Avval audio yozuvni yuklang.",
       transcript_text_required:
@@ -700,6 +702,7 @@ export const uz = {
     documentsTitle: "Hujjatlarni yuklash",
     uploadLabel: "Fayllarni bu yerga tashlang yoki tanlang",
     uploadHint: "PDF, DOCX, JPG — bir nechta fayl",
+    unsupportedDocumentFormat: "Faqat PDF, DOCX, TXT, JPG yoki PNG fayllar qabul qilinadi.",
     uploadedFiles: "Yuklangan fayllar",
     removeFile: "Faylni o'chirish",
     noFiles: "Hali fayl yuklanmagan",

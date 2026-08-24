@@ -148,6 +148,9 @@ export interface Hearing {
   createdBy: string;
   /** Optimistic-concurrency token (guide §16) — real hearings only. */
   version?: number;
+  /** Persisted server state, so upload/transcription recovery survives refreshes. */
+  hasAudio?: boolean;
+  transcriptionJobId?: string | null;
 }
 
 /** A recorded audio channel for a hearing (spec §14.5, guide §9 `AudioTrackResponse`). */

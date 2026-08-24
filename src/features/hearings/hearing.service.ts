@@ -18,6 +18,8 @@ interface HearingResponse {
   version: number;
   createdAt: string;
   updatedAt: string;
+  hasAudio?: boolean;
+  transcriptionJobId?: string | null;
 }
 
 function toHearing(response: HearingResponse): Hearing {
@@ -35,6 +37,8 @@ function toHearing(response: HearingResponse): Hearing {
     audioDurationMs: 0,
     createdBy: "",
     version: response.version,
+    hasAudio: response.hasAudio ?? false,
+    transcriptionJobId: response.transcriptionJobId ?? null,
   };
 }
 

@@ -50,14 +50,15 @@ export function HearingLifecyclePanel({
   const [stopOpen, setStopOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const [hasAudio, setHasAudio] = useState(false);
-  const [jobId, setJobId] = useState<string | null>(null);
+  const [hasAudio, setHasAudio] = useState(Boolean(hearing.hasAudio));
+  const [jobId, setJobId] = useState<string | null>(hearing.transcriptionJobId ?? null);
   const [transcribing, setTranscribing] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
   const animationFrameRef = useRef(0);
+  const completedJobRef = useRef<string | null>(null);
   const startMutation = useStartHearing();
   const stopMutation = useStopHearing();
   const { job, isSucceeded, isFailed } = useJobPolling(jobId);
@@ -68,8 +69,15 @@ export function HearingLifecyclePanel({
   const canTranscribe = canUpload && hasAudio && !jobId;
 
   useEffect(() => {
-    if (isSucceeded) onTranscribed?.();
-  }, [isSucceeded, onTranscribed]);
+    if (hearing.hasAudio) setHasAudio(true);
+    if (hearing.transcriptionJobId) setJobId(hearing.transcriptionJobId);
+  }, [hearing.hasAudio, hearing.transcriptionJobId]);
+
+  useEffect(() => {
+    if (!isSucceeded || !jobId || completedJobRef.current === jobId) return;
+    completedJobRef.current = jobId;
+    onTranscribed?.();
+  }, [isSucceeded, jobId, onTranscribed]);
 
   useEffect(() => {
     if (!recording) return;
@@ -276,18 +284,20 @@ export function HearingLifecyclePanel({
         </div>
       )}
 
-      {canUpload && !isSucceeded && (
+      {(canUpload || hearing.status === "Processing") && !isSucceeded && (
         <Card>
           <CardContent className="flex flex-col gap-3 pt-6">
             <h3 className="text-sm font-medium text-foreground">{t("hearing.uploadAudioTitle")}</h3>
-            <FileDropzone
-              onFiles={handleFiles}
-              accept=".wav,.mp3,.webm"
-              multiple={false}
-              disabled={uploading}
-              label={uploading ? t("hearing.uploading") : t("hearing.chooseFile")}
-              hint={t("hearing.uploadAudioDesc")}
-            />
+            {canUpload && (
+              <FileDropzone
+                onFiles={handleFiles}
+                accept=".wav,.mp3,.webm"
+                multiple={false}
+                disabled={uploading}
+                label={uploading ? t("hearing.uploading") : t("hearing.chooseFile")}
+                hint={t("hearing.uploadAudioDesc")}
+              />
+            )}
             {uploadedFileName && (
               <p className="text-sm text-success">
                 {t("hearing.uploaded")}: {uploadedFileName}

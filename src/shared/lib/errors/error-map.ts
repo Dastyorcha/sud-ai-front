@@ -34,6 +34,7 @@ export type ErrorCode =
   | "invalid_hearing_transition"
   | "invalid_audio_size"
   | "unsupported_audio_format"
+  | "unsupported_case_document_format"
   | "audio_signature_mismatch"
   | "hearing_audio_missing"
   | "transcript_text_required"
@@ -96,6 +97,7 @@ const CODE_MESSAGE_KEY: Record<ErrorCode, MessageKey> = {
   invalid_hearing_transition: "errors.codes.invalid_hearing_transition",
   invalid_audio_size: "errors.codes.invalid_audio_size",
   unsupported_audio_format: "errors.codes.unsupported_audio_format",
+  unsupported_case_document_format: "errors.codes.unsupported_case_document_format",
   audio_signature_mismatch: "errors.codes.audio_signature_mismatch",
   hearing_audio_missing: "errors.codes.hearing_audio_missing",
   transcript_text_required: "errors.codes.transcript_text_required",

@@ -8,6 +8,7 @@ import {
 } from "@/features/case-create/categories";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import type { MessageKey } from "@/shared/lib/i18n/messages";
+import { notify } from "@/shared/lib/toast";
 
 export interface DocumentsStepProps {
   files: File[];
@@ -26,7 +27,14 @@ export function DocumentsStep({
   const { t } = useTranslation();
 
   function addFiles(picked: File[]) {
-    onFilesChange([...files, ...picked]);
+    const supported = new Set(["pdf", "docx", "txt", "jpg", "jpeg", "png"]);
+    const accepted = picked.filter((file) =>
+      supported.has(file.name.split(".").pop()?.toLowerCase() ?? "")
+    );
+    if (accepted.length !== picked.length) {
+      notify.error(t("caseWizard.unsupportedDocumentFormat"));
+    }
+    onFilesChange([...files, ...accepted]);
   }
 
   function removeFile(index: number) {
@@ -43,7 +51,7 @@ export function DocumentsStep({
         <h3 className="text-sm font-semibold text-foreground">{t("caseWizard.documentsTitle")}</h3>
         <FileDropzone
           onFiles={addFiles}
-          accept=".pdf,.docx,.doc,.jpg,.jpeg,.png"
+          accept=".pdf,.docx,.txt,.jpg,.jpeg,.png"
           label={t("caseWizard.uploadLabel")}
           hint={t("caseWizard.uploadHint")}
         />

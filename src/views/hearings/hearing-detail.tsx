@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
@@ -30,13 +30,29 @@ export default function HearingDetailView() {
   const { t, locale } = useTranslation();
   const { hearingId = "" } = useParams<{ hearingId: string }>();
   const queryClient = useQueryClient();
-  const { data: hearing, isLoading, error } = useHearing(hearingId);
+  const { data: hearing, isLoading, error, refetch: refetchHearing } = useHearing(hearingId);
   const setHearing = (next: Hearing) => {
     queryClient.setQueryData(queryKeys.hearings.detail(hearingId), next);
     void queryClient.invalidateQueries({ queryKey: queryKeys.hearings.list(next.caseId) });
   };
   const { data: courtCase } = useCase(hearing?.caseId ?? "");
   const [transcriptReloadKey, setTranscriptReloadKey] = useState(0);
+  const [activeTab, setActiveTab] = useState("live");
+
+  const handleTranscribed = useCallback(async () => {
+    const refreshed = await refetchHearing();
+    if (refreshed.data) setHearing(refreshed.data);
+    setTranscriptReloadKey((key) => key + 1);
+    setActiveTab("transcript");
+  // `setHearing` only updates the query cache and is intentionally recreated.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetchHearing]);
+
+  useEffect(() => {
+    if (hearing?.status === "ReadyForReview" || hearing?.status === "Approved") {
+      setActiveTab("transcript");
+    }
+  }, [hearing?.status]);
 
   const backLink = (
     <Button variant="ghost" size="sm" asChild className="self-start">
@@ -91,7 +107,7 @@ export default function HearingDetailView() {
         <HearingLifecyclePanel
           hearing={hearing}
           onHearingChanged={setHearing}
-          onTranscribed={() => setTranscriptReloadKey((k) => k + 1)}
+          onTranscribed={handleTranscribed}
         />
       ),
     },
@@ -133,7 +149,7 @@ export default function HearingDetailView() {
         </div>
       </div>
 
-      <Tabs tabs={tabs} variant="underline" defaultTab="live" />
+      <Tabs tabs={tabs} variant="underline" activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }

@@ -230,6 +230,8 @@ export const en: Messages = {
       invalid_hearing_transition: "The hearing's current state doesn't allow this action.",
       invalid_audio_size: "The audio file must be between 1 byte and 100 MB.",
       unsupported_audio_format: "Unsupported audio format. Upload a .wav, .mp3 or .webm file.",
+      unsupported_case_document_format:
+        "Upload only PDF, DOCX, TXT, JPG or PNG court documents.",
       audio_signature_mismatch: "The file extension doesn't match its actual format.",
       hearing_audio_missing: "Upload the audio recording first.",
       transcript_text_required: "Add human or normalized text before verifying this segment.",
@@ -690,6 +692,7 @@ export const en: Messages = {
     documentsTitle: "Upload documents",
     uploadLabel: "Drop files here or click to browse",
     uploadHint: "PDF, DOCX, JPG — multiple files",
+    unsupportedDocumentFormat: "Only PDF, DOCX, TXT, JPG or PNG files are accepted.",
     uploadedFiles: "Uploaded files",
     removeFile: "Remove file",
     noFiles: "No files uploaded yet",

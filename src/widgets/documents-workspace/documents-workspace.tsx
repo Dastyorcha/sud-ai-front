@@ -8,7 +8,10 @@ import { LoadingState } from "@/shared/custom/loading-state";
 import { ErrorState } from "@/shared/custom/error-state";
 import { TemplateSelector } from "@/widgets/template-selector/template-selector";
 import { CaseFactsPanel } from "@/widgets/case-facts-panel/case-facts-panel";
-import type { ProceduralDocumentTemplate } from "@/shared/constants/document-templates";
+import {
+  PROCEDURAL_DOCUMENT_TEMPLATES,
+  type ProceduralDocumentTemplate,
+} from "@/shared/constants/document-templates";
 import { useCase } from "@/features/cases/use-case";
 import { useParticipants } from "@/features/participants/use-participants";
 import { useHearings } from "@/features/hearings/use-hearings";
@@ -86,6 +89,17 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
   );
   const claimant = activeParticipants.find((participant) => participant.role === "Claimant");
   const defendant = activeParticipants.find((participant) => participant.role === "Defendant");
+
+  useEffect(() => {
+    if (selectedTemplate || !caseQuery.data) return;
+    const preferredId = caseQuery.data.courtType === "CRIMINAL"
+      ? "criminal-judgment-v1"
+      : caseQuery.data.caseType === "DEBT_RECOVERY"
+        ? "civil-debt-court-order-v1"
+        : "economic-hearing-protocol-v1";
+    const preferred = PROCEDURAL_DOCUMENT_TEMPLATES.find((item) => item.id === preferredId);
+    if (preferred) setSelectedTemplate(preferred);
+  }, [caseQuery.data, selectedTemplate]);
 
   useEffect(() => {
     const judge = activeParticipants.find((participant) => participant.role === "Judge");
@@ -217,7 +231,7 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
                 </label>
               </>
             )}
-            <Button variant="gold" onClick={handleGenerate} disabled={!selectedTemplate || !approvedHearing || !liveTemplate || generating}>
+            <Button variant="gold" onClick={handleGenerate} disabled={generating}>
               <Sparkles className="size-4" />
               {generating ? t("documentsWorkspace.realGenerator.generating") : t("documentsWorkspace.realGenerator.generate")}
             </Button>

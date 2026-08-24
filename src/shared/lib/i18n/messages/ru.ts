@@ -231,6 +231,8 @@ export const ru: Messages = {
       invalid_hearing_transition: "Текущее состояние заседания не допускает это действие.",
       invalid_audio_size: "Размер аудиофайла должен быть от 1 байта до 100 МБ.",
       unsupported_audio_format: "Неподдерживаемый формат аудио. Загрузите .wav, .mp3 или .webm.",
+      unsupported_case_document_format:
+        "Загрузите судебный документ только в формате PDF, DOCX, TXT, JPG или PNG.",
       audio_signature_mismatch: "Расширение файла не соответствует его фактическому формату.",
       hearing_audio_missing: "Сначала загрузите аудиозапись.",
       transcript_text_required:
@@ -696,6 +698,7 @@ export const ru: Messages = {
     documentsTitle: "Загрузка документов",
     uploadLabel: "Перетащите файлы сюда или выберите",
     uploadHint: "PDF, DOCX, JPG — несколько файлов",
+    unsupportedDocumentFormat: "Принимаются только файлы PDF, DOCX, TXT, JPG или PNG.",
     uploadedFiles: "Загруженные файлы",
     removeFile: "Удалить файл",
     noFiles: "Файлы ещё не загружены",
