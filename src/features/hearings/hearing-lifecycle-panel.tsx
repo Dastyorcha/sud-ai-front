@@ -291,7 +291,7 @@ export function HearingLifecyclePanel({
             {canUpload && (
               <FileDropzone
                 onFiles={handleFiles}
-                accept=".wav,.mp3,.webm"
+                accept=".wav,.mp3,.m4a,.webm"
                 multiple={false}
                 disabled={uploading}
                 label={uploading ? t("hearing.uploading") : t("hearing.chooseFile")}

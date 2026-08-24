@@ -235,7 +235,7 @@ export const uz = {
       invalid_hearing_transition: "Majlis holati bu amalni bajarishga imkon bermaydi.",
       invalid_audio_size: "Audio fayl hajmi 1 bayt–100 MB oralig‘ida bo‘lishi kerak.",
       unsupported_audio_format:
-        "Qo‘llab-quvvatlanmaydigan audio format. .wav, .mp3 yoki .webm yuklang.",
+        "Qo‘llab-quvvatlanmaydigan audio format. .wav, .mp3, .m4a yoki .webm yuklang.",
       unsupported_case_document_format:
         "Faqat PDF, DOCX, TXT, JPG yoki PNG sud hujjatlarini yuklang.",
       audio_signature_mismatch: "Fayl kengaytmasi uning haqiqiy formatiga mos kelmadi.",
@@ -366,7 +366,7 @@ export const uz = {
     sessionLostNotice:
       "Bu majlis holati topilmadi (sahifa yangilangan yoki boshqa qurilmadan ochilgan). Ishni sahifasidan qayta oching.",
     uploadAudioTitle: "Audio yozuvni yuklash",
-    uploadAudioDesc: ".wav, .mp3 yoki .webm formatida, 100 MB gacha.",
+    uploadAudioDesc: ".wav, .mp3, .m4a yoki .webm formatida, 100 MB gacha.",
     chooseFile: "Faylni tanlash",
     uploading: "Yuklanmoqda…",
     uploaded: "Audio yuklandi",

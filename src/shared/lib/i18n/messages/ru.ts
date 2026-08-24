@@ -230,7 +230,7 @@ export const ru: Messages = {
       invalid_credentials: "Неверный логин или пароль.",
       invalid_hearing_transition: "Текущее состояние заседания не допускает это действие.",
       invalid_audio_size: "Размер аудиофайла должен быть от 1 байта до 100 МБ.",
-      unsupported_audio_format: "Неподдерживаемый формат аудио. Загрузите .wav, .mp3 или .webm.",
+      unsupported_audio_format: "Неподдерживаемый формат аудио. Загрузите .wav, .mp3, .m4a или .webm.",
       unsupported_case_document_format:
         "Загрузите судебный документ только в формате PDF, DOCX, TXT, JPG или PNG.",
       audio_signature_mismatch: "Расширение файла не соответствует его фактическому формату.",
@@ -363,7 +363,7 @@ export const ru: Messages = {
     sessionLostNotice:
       "Состояние этого заседания не найдено (страница обновлена или открыта на другом устройстве). Откройте его заново со страницы дела.",
     uploadAudioTitle: "Загрузить аудиозапись",
-    uploadAudioDesc: ".wav, .mp3 или .webm, до 100 МБ.",
+    uploadAudioDesc: ".wav, .mp3, .m4a или .webm, до 100 МБ.",
     chooseFile: "Выбрать файл",
     uploading: "Загрузка…",
     uploaded: "Аудио загружено",

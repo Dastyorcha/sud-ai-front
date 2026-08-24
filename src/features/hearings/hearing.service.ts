@@ -99,6 +99,7 @@ export async function stopHearing(hearingId: string): Promise<Hearing> {
 const AUDIO_MIME_BY_EXTENSION: Record<string, string[]> = {
   wav: ["audio/wav", "audio/x-wav", "audio/wave"],
   mp3: ["audio/mpeg", "audio/mp3"],
+  m4a: ["audio/mp4", "audio/x-m4a"],
   webm: ["audio/webm"],
 };
 
