@@ -200,7 +200,7 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             {!approvedHearing && <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{t("documentsWorkspace.realGenerator.approvedTranscriptRequired")}</p>}
-            {selectedTemplate && !liveTemplate && <p className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">{t("documentsWorkspace.realGenerator.templateUnavailable")}</p>}
+            {selectedTemplate && templatesQuery.isSuccess && !liveTemplate && <p className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">{t("documentsWorkspace.realGenerator.templateUnavailable")}</p>}
             <label className="flex flex-col gap-1 text-sm font-medium">
               {t("documentsWorkspace.realGenerator.documentDate")}
               <Input type="date" value={documentDate} onChange={(event) => setDocumentDate(event.target.value)} />
