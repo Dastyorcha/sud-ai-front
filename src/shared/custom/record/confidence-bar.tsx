@@ -6,7 +6,7 @@ const LOW_CONFIDENCE = 0.75;
 
 export interface ConfidenceBarProps {
   /** STT confidence in the range 0..1. */
-  value: number;
+  value: number | null | undefined;
   className?: string;
 }
 
@@ -17,6 +17,10 @@ export interface ConfidenceBarProps {
  */
 export function ConfidenceBar({ value, className }: ConfidenceBarProps) {
   const { t } = useTranslation();
+  // Some providers do not return confidence. Never present missing data as 100%.
+  if (value == null || !Number.isFinite(value)) {
+    return <span className={cn("text-xs text-muted-foreground", className)} aria-label={`${t("record.confidence")}: —`}>—</span>;
+  }
   const clamped = Math.min(1, Math.max(0, value));
   const percent = Math.round(clamped * 100);
   const low = clamped < LOW_CONFIDENCE;

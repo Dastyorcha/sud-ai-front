@@ -133,7 +133,7 @@ export function RealTranscriptPanel({
               />
               <RecordStateBadge kind="segment" status={s.status} />
               <div className="w-24">
-                <ConfidenceBar value={s.confidence ?? 1} />
+                <ConfidenceBar value={s.confidence} />
               </div>
               {!locked && (
                 <div className="ml-auto flex gap-1">

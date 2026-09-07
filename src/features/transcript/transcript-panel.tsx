@@ -77,7 +77,7 @@ export function TranscriptPanel({ hearing, onApproved, activeMs }: TranscriptPan
     let all = segments ?? [];
     switch (filter) {
       case "low":
-        all = all.filter((s) => (s.confidence ?? 1) < 0.75);
+        all = all.filter((s) => s.confidence == null || s.confidence < 0.75);
         break;
       case "critical":
         all = all.filter((s) => !s.isCriticalReviewed);
@@ -227,7 +227,7 @@ export function TranscriptPanel({ hearing, onApproved, activeMs }: TranscriptPan
                 />
                 <RecordStateBadge kind="segment" status={s.status} />
                 <div className="w-24">
-                  <ConfidenceBar value={s.confidence ?? 1} />
+                  <ConfidenceBar value={s.confidence} />
                 </div>
                 <div className="ml-auto flex gap-1">
                   <Button
