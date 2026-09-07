@@ -65,7 +65,7 @@ export function HearingLifecyclePanel({
 
   const recording = hearing.status === "Recording";
   const canStart = hearing.status === "Created" || hearing.status === "DeviceCheck";
-  const canUpload = hearing.status === "Finalizing" || hearing.status === "Failed";
+  const canUpload = canStart || hearing.status === "Finalizing" || hearing.status === "Failed";
   const canTranscribe = canUpload && hasAudio && !jobId;
 
   useEffect(() => {
@@ -115,7 +115,7 @@ export function HearingLifecyclePanel({
     });
     streamRef.current = stream;
 
-    const mimeType = ["audio/webm;codecs=opus", "audio/webm"].find((candidate) =>
+    const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((candidate) =>
       MediaRecorder.isTypeSupported(candidate)
     );
     const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
@@ -157,7 +157,7 @@ export function HearingLifecyclePanel({
           releaseMicrophone();
           resolve(
             blob.size > 0
-              ? new File([blob], `lexkotib-hearing-${hearing.id}.webm`, { type: contentType })
+              ? new File([blob], `lexkotib-hearing-${hearing.id}.${contentType.startsWith("audio/mp4") ? "m4a" : "webm"}`, { type: contentType })
               : null
           );
         },
@@ -219,10 +219,18 @@ export function HearingLifecyclePanel({
     }
     setUploading(true);
     try {
+      // Importing a recording must not require access to the microphone.
+      if (canStart) {
+        const started = await startMutation.mutateAsync(hearing.id);
+        onHearingChanged(started);
+        const stopped = await stopMutation.mutateAsync(hearing.id);
+        onHearingChanged(stopped);
+      }
       await uploadAudio(hearing.id, file);
       setUploadedFileName(file.name);
       setHasAudio(true);
       notify.success(t("hearing.uploaded"));
+      await queueTranscription();
     } catch (error) {
       notify.error(t(errorMessageKey(error)));
     } finally {
@@ -293,7 +301,7 @@ export function HearingLifecyclePanel({
                 onFiles={handleFiles}
                 accept=".wav,.mp3,.m4a,.webm"
                 multiple={false}
-                disabled={uploading}
+                disabled={uploading || transcribing || Boolean(jobId && !isFailed)}
                 label={uploading ? t("hearing.uploading") : t("hearing.chooseFile")}
                 hint={t("hearing.uploadAudioDesc")}
               />

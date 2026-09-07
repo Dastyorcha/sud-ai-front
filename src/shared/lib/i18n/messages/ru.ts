@@ -229,7 +229,7 @@ export const ru: Messages = {
       archived_case_immutable: "Это дело архивировано и больше не может быть изменено.",
       invalid_credentials: "Неверный логин или пароль.",
       invalid_hearing_transition: "Текущее состояние заседания не допускает это действие.",
-      invalid_audio_size: "Размер аудиофайла должен быть от 1 байта до 100 МБ.",
+      invalid_audio_size: "Размер аудиофайла должен быть от 1 байта до 25 МБ.",
       unsupported_audio_format: "Неподдерживаемый формат аудио. Загрузите .wav, .mp3, .m4a или .webm.",
       unsupported_case_document_format:
         "Загрузите судебный документ только в формате PDF, DOCX, TXT, JPG или PNG.",
@@ -363,7 +363,7 @@ export const ru: Messages = {
     sessionLostNotice:
       "Состояние этого заседания не найдено (страница обновлена или открыта на другом устройстве). Откройте его заново со страницы дела.",
     uploadAudioTitle: "Загрузить аудиозапись",
-    uploadAudioDesc: ".wav, .mp3, .m4a или .webm, до 100 МБ.",
+    uploadAudioDesc: ".wav, .mp3, .m4a или .webm, до 25 МБ. Транскрипция начинается автоматически после загрузки.",
     chooseFile: "Выбрать файл",
     uploading: "Загрузка…",
     uploaded: "Аудио загружено",

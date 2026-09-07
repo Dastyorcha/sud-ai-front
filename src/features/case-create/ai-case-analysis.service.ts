@@ -43,7 +43,8 @@ export async function analyzeCaseDocuments({
   files.forEach((file) => form.append("files", file));
   const { data } = await apiClient.post<CaseMemoryResponse>(
     `${API_PREFIX}/ai/case-memory/extract`,
-    form
+    form,
+    { timeout: 300_000 }
   );
 
   const claimant = data.participants.find((item) => item.role === "plaintiff");

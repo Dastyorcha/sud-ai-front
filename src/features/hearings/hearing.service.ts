@@ -104,7 +104,7 @@ const AUDIO_MIME_BY_EXTENSION: Record<string, string[]> = {
 };
 
 const MIN_AUDIO_SIZE_BYTES = 1;
-const MAX_AUDIO_SIZE_BYTES = 100 * 1024 * 1024;
+const MAX_AUDIO_SIZE_BYTES = 25 * 1024 * 1024;
 
 /** Client-side guard mirroring the server's checks (guide §9) — never skip these before uploading. */
 export type AudioValidationError =

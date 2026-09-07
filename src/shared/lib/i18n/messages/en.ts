@@ -228,7 +228,7 @@ export const en: Messages = {
       archived_case_immutable: "This case is archived and can no longer be edited.",
       invalid_credentials: "Incorrect username or password.",
       invalid_hearing_transition: "The hearing's current state doesn't allow this action.",
-      invalid_audio_size: "The audio file must be between 1 byte and 100 MB.",
+      invalid_audio_size: "The audio file must be between 1 byte and 25 MB.",
       unsupported_audio_format: "Unsupported audio format. Upload a .wav, .mp3, .m4a or .webm file.",
       unsupported_case_document_format:
         "Upload only PDF, DOCX, TXT, JPG or PNG court documents.",
@@ -359,7 +359,7 @@ export const en: Messages = {
     sessionLostNotice:
       "This hearing's state wasn't found (page refreshed or opened on another device). Reopen it from the case page.",
     uploadAudioTitle: "Upload audio recording",
-    uploadAudioDesc: ".wav, .mp3, .m4a or .webm, up to 100 MB.",
+    uploadAudioDesc: ".wav, .mp3, .m4a or .webm, up to 25 MB. Transcription starts automatically after upload.",
     chooseFile: "Choose file",
     uploading: "Uploading…",
     uploaded: "Audio uploaded",

@@ -34,6 +34,7 @@ import {
   useExportDocument,
   useGenerateDocument,
   useHearingDocumentId,
+  useDocuments,
   useRequestDocumentChanges,
   useSubmitDocumentReview,
   useUpdateDocumentContent,
@@ -68,6 +69,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const { can } = useCourtAuth();
   const { activeTemplates, isLoading: templatesLoading } = useActiveTemplates();
   const [documentId, setDocumentId] = useHearingDocumentId(hearing.id);
+  const savedDocuments = useDocuments(hearing.caseId);
   const [templateCode, setTemplateCode] = useState<string | null>(null);
   const [generateJobId, setGenerateJobId] = useState<string | null>(null);
   const [content, setContent] = useState<DocumentContent | null>(null);
@@ -91,6 +93,14 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const exportMutation = useExportDocument(documentId ?? "");
   const { isSucceeded: exportSucceeded, isFailed: exportFailed } = useJobPolling(exportJobId);
   const versionsQuery = useDocumentVersions(documentId);
+
+  useEffect(() => {
+    if (documentId) return;
+    const saved = savedDocuments.data?.find((item) =>
+      item.hearingId === hearing.id && item.documentType === "HearingProtocol"
+    );
+    if (saved) setDocumentId(saved.id);
+  }, [documentId, hearing.id, savedDocuments.data, setDocumentId]);
 
   useEffect(() => {
     setContent(doc?.contentJson ?? null);
