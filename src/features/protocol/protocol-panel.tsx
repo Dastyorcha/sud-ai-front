@@ -46,6 +46,7 @@ import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
 import type { GenerateDocumentInput } from "@/features/documents/document.service";
 import { ReferenceLayoutSelect } from "@/features/documents/reference-layout-select";
+import { documentSectionLabel } from "@/features/documents/document-section-label";
 
 export interface ProtocolPanelProps {
   /** Only `id`/`caseId` are read — accepts either a full `Hearing` or the session-carried real one. */
@@ -385,7 +386,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
       {content.sections.map((section) => (
         <Card key={section.sectionKey}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">{section.sectionKey}</CardTitle>
+            <CardTitle className="text-base">{documentSectionLabel(section.sectionKey)}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {section.paragraphs.map((paragraph) => (

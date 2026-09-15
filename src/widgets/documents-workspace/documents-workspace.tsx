@@ -22,6 +22,7 @@ import { useJobPolling } from "@/shared/lib/query/use-job-polling";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
 import { ReferenceLayoutSelect } from "@/features/documents/reference-layout-select";
+import { documentSectionLabel } from "@/features/documents/document-section-label";
 
 export interface DocumentsWorkspaceProps { caseId: string }
 
@@ -263,7 +264,7 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
           <CardContent className="flex flex-col gap-4">
             {preview.contentJson.sections.map((section) => (
               <section key={section.sectionKey} className="rounded-lg border border-border p-4">
-                <h3 className="mb-3 font-mono text-xs font-semibold uppercase text-muted-foreground">{section.sectionKey}</h3>
+                <h3 className="mb-3 text-sm font-semibold text-muted-foreground">{documentSectionLabel(section.sectionKey)}</h3>
                 <div className="flex flex-col gap-3">
                   {section.paragraphs.map((paragraph) => (
                     <div key={paragraph.paragraphId} className="text-sm leading-6 text-foreground">
