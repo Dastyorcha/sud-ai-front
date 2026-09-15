@@ -45,6 +45,7 @@ import type { Hearing } from "@/shared/types/models";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
 import type { GenerateDocumentInput } from "@/features/documents/document.service";
+import { ReferenceLayoutSelect } from "@/features/documents/reference-layout-select";
 
 export interface ProtocolPanelProps {
   /** Only `id`/`caseId` are read — accepts either a full `Hearing` or the session-carried real one. */
@@ -71,6 +72,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
   const [documentId, setDocumentId] = useHearingDocumentId(hearing.id);
   const savedDocuments = useDocuments(hearing.caseId);
   const [templateCode, setTemplateCode] = useState<string | null>(null);
+  const [protocolVariant, setProtocolVariant] = useState("44036");
   const [generateJobId, setGenerateJobId] = useState<string | null>(null);
   const [content, setContent] = useState<DocumentContent | null>(null);
   const [reasonOpen, setReasonOpen] = useState(false);
@@ -119,11 +121,12 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
 
   const protocolTemplates = activeTemplates?.filter(
     (template) =>
-      template.templateCode === "ECONOMIC_HEARING_PROTOCOL" ||
-      template.templateCode === "HEARING_PROTOCOL_DEMO"
+      template.templateCode === "ECONOMIC_HEARING_PROTOCOL"
   );
   const selectedTemplate =
-    protocolTemplates?.find((tpl) => tpl.templateCode === templateCode) ?? protocolTemplates?.[0];
+    protocolTemplates?.find((tpl) => tpl.templateCode === templateCode)
+    ?? protocolTemplates?.find((tpl) => tpl.templateCode === "ECONOMIC_HEARING_PROTOCOL")
+    ?? protocolTemplates?.[0];
   const generateInFlight =
     generateMutation.isPending || (Boolean(generateJobId) && !generateSucceeded && !generateFailed);
 
@@ -148,6 +151,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
         hearingId: hearing.id,
         templateCode: selectedTemplate.templateCode,
         templateVersion: selectedTemplate.version,
+        templateFields: { protocol_variant: protocolVariant },
       },
       {
         onSuccess: (accepted) => {
@@ -263,6 +267,7 @@ export function ProtocolPanel({ hearing }: ProtocolPanelProps) {
               </SelectContent>
             </Select>
           </div>
+          <ReferenceLayoutSelect family="protocol" value={protocolVariant} onChange={setProtocolVariant} disabled={generateInFlight} />
           <Button onClick={handleGenerate} disabled={!selectedTemplate || generateInFlight}>
             <Sparkles className="size-4" />
             {generateInFlight ? t("protocol.generating") : t("protocol.generate")}

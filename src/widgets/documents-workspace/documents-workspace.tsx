@@ -21,6 +21,7 @@ import { downloadDocument, type GenerateDocumentInput } from "@/features/documen
 import { useJobPolling } from "@/shared/lib/query/use-job-polling";
 import { useTranslation } from "@/shared/lib/i18n/locale-context";
 import { notify } from "@/shared/lib/toast";
+import { ReferenceLayoutSelect } from "@/features/documents/reference-layout-select";
 
 export interface DocumentsWorkspaceProps { caseId: string }
 
@@ -71,6 +72,8 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
   const [outcomeText, setOutcomeText] = useState("");
   const [bankDetails, setBankDetails] = useState("");
   const [objectionPeriod, setObjectionPeriod] = useState("");
+  const [protocolVariant, setProtocolVariant] = useState("44036");
+  const [judgmentVariant, setJudgmentVariant] = useState("3069268");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { isSucceeded, isFailed, job } = useJobPolling(jobId);
   const documentQuery = useDocument(documentId, { pollForDocx: true });
@@ -148,6 +151,8 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
         debtor_details: partyDetails(defendant),
         bank_details: bankDetails,
         objection_period: objectionPeriod,
+        protocol_variant: selectedConfig.documentType === "HearingProtocol" ? protocolVariant : "",
+        judgment_variant: selectedConfig.documentType === "CriminalJudgment" ? judgmentVariant : "",
       }).filter(([, value]) => value.trim().length > 0)
     );
     generateMutation.mutate(
@@ -199,6 +204,8 @@ export default function DocumentsWorkspace({ caseId }: DocumentsWorkspaceProps) 
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
+            {selectedConfig?.documentType === "HearingProtocol" && <ReferenceLayoutSelect family="protocol" value={protocolVariant} onChange={setProtocolVariant} disabled={generating} />}
+            {selectedConfig?.documentType === "CriminalJudgment" && <ReferenceLayoutSelect family="judgment" value={judgmentVariant} onChange={setJudgmentVariant} disabled={generating} />}
             {!approvedHearing && <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{t("documentsWorkspace.realGenerator.approvedTranscriptRequired")}</p>}
             {selectedTemplate && templatesQuery.isSuccess && !liveTemplate && <p className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">{t("documentsWorkspace.realGenerator.templateUnavailable")}</p>}
             <label className="flex flex-col gap-1 text-sm font-medium">
